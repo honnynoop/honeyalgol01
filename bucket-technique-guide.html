@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>버킷 기법 — 구간 델타와 Top-K, O(1)에 가깝게</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@500;700&family=Pretendard-Regular&display=swap');
+  @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css');
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+  :root{
+    --bg: #ffffff;
+    --bg-soft: #f5f9fd;
+    --bg-soft2: #eef6fc;
+    --ink: #17222d;
+    --ink-soft: #52657a;
+    --ink-faint: #8798a8;
+    --line: #dfe9f2;
+    --line-strong: #c4d7e8;
+    --code-bg: #eef6fd;
+    --code-bg2: #e3f0fb;
+    --code-border: #bcdcf2;
+    --code-text: #235e94;
+    --code-text-dim: #5a86a8;
+    --accent: #2f7ab8;
+    --accent-strong: #1c5687;
+    --accent-soft: #eaf4fd;
+    --warn-bg: #fff7ec;
+    --warn-border: #f0d9ae;
+    --warn-text: #8a5a12;
+    --good-bg: #eef9f2;
+    --good-border: #bfe3cc;
+    --good-text: #1f7a45;
+    --shadow: 0 1px 2px rgba(23,34,45,.04), 0 8px 24px rgba(23,34,45,.05);
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"Pretendard Variable","Pretendard",-apple-system,"Malgun Gothic",sans-serif;
+    line-height:1.7;
+    font-size:16px;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  .wrap{max-width:860px;margin:0 auto;padding:0 28px 120px;}
+
+  /* ---------- Hero ---------- */
+  .hero{
+    padding:76px 0 48px;
+    border-bottom:1px solid var(--line);
+  }
+  .hero .eyebrow{
+    font-family:"JetBrains Mono",monospace;
+    font-size:13px;
+    color:var(--code-text);
+    background:var(--code-bg);
+    border:1px solid var(--code-border);
+    display:inline-block;
+    padding:4px 10px;
+    border-radius:5px;
+    margin-bottom:22px;
+  }
+  .hero h1{
+    font-family:"Noto Serif KR",serif;
+    font-weight:700;
+    font-size:40px;
+    line-height:1.32;
+    margin:0 0 18px;
+    color:var(--ink);
+    letter-spacing:-0.01em;
+  }
+  .hero p.lead{
+    font-size:17px;
+    color:var(--ink-soft);
+    max-width:600px;
+    margin:0;
+  }
+
+  /* ---------- Section chrome ---------- */
+  section{padding:52px 0;border-bottom:1px solid var(--line);}
+  section:last-of-type{border-bottom:none;}
+  h2{
+    font-family:"Noto Serif KR",serif;
+    font-size:25px;
+    font-weight:700;
+    color:var(--ink);
+    margin:0 0 6px;
+  }
+  h2 .idx{
+    font-family:"JetBrains Mono",monospace;
+    font-size:15px;
+    color:var(--accent);
+    margin-right:10px;
+  }
+  .section-sub{
+    color:var(--ink-faint);
+    font-size:14.5px;
+    margin:0 0 28px;
+  }
+  h3{
+    font-size:18px;
+    font-weight:600;
+    color:var(--ink);
+    margin:32px 0 12px;
+  }
+  p{color:var(--ink-soft);margin:0 0 14px;}
+  strong{color:var(--ink);font-weight:600;}
+  ul,ol{color:var(--ink-soft);padding-left:22px;margin:0 0 16px;}
+  li{margin-bottom:7px;}
+  li::marker{color:var(--accent);}
+  a{color:var(--accent-strong);}
+
+  /* ---------- Code ---------- */
+  code{
+    font-family:"JetBrains Mono",monospace;
+    background:var(--code-bg);
+    color:var(--code-text);
+    padding:2px 6px;
+    border-radius:4px;
+    font-size:0.87em;
+    border:1px solid var(--code-border);
+  }
+  pre{
+    background:var(--code-bg);
+    border:1px solid var(--code-border);
+    border-radius:10px;
+    padding:18px 20px;
+    overflow-x:auto;
+    margin:0 0 18px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.6);
+  }
+  pre code{
+    background:none;
+    border:none;
+    padding:0;
+    color:var(--code-text);
+    font-size:13.5px;
+    line-height:1.65;
+    white-space:pre;
+  }
+  .code-label{
+    font-family:"JetBrains Mono",monospace;
+    font-size:12px;
+    color:var(--accent);
+    text-transform:none;
+    margin:0 0 8px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .code-label::before{
+    content:"";
+    width:6px;height:6px;border-radius:50%;
+    background:var(--accent);
+    display:inline-block;
+  }
+
+  /* ---------- Callouts ---------- */
+  .callout{
+    border-radius:10px;
+    padding:16px 18px;
+    margin:0 0 20px;
+    font-size:15px;
+  }
+  .callout p{margin:0;color:inherit;}
+  .callout p + p{margin-top:8px;}
+  .callout .tag{
+    font-family:"JetBrains Mono",monospace;
+    font-size:12px;
+    font-weight:600;
+    display:block;
+    margin-bottom:6px;
+    letter-spacing:.02em;
+  }
+  .callout.key{background:var(--accent-soft);border:1px solid var(--line-strong);color:var(--accent-strong);}
+  .callout.key .tag{color:var(--accent);}
+  .callout.warn{background:var(--warn-bg);border:1px solid var(--warn-border);color:var(--warn-text);}
+  .callout.warn .tag{color:#b3790f;}
+  .callout.good{background:var(--good-bg);border:1px solid var(--good-border);color:var(--good-text);}
+  .callout.good .tag{color:var(--good-text);}
+
+  /* ---------- Diagram frame ---------- */
+  .diagram{
+    background:var(--bg-soft);
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:26px;
+    margin:20px 0 24px;
+    text-align:center;
+  }
+  .diagram figcaption{
+    margin-top:14px;
+    font-size:13.5px;
+    color:var(--ink-faint);
+  }
+  svg text{font-family:"JetBrains Mono",monospace;}
+
+  /* ---------- Table ---------- */
+  table{width:100%;border-collapse:collapse;margin:0 0 20px;font-size:14.5px;}
+  th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);}
+  th{color:var(--ink-faint);font-weight:600;font-family:"JetBrains Mono",monospace;font-size:12.5px;}
+  td{color:var(--ink-soft);}
+  td.num, th.num{text-align:right;font-family:"JetBrains Mono",monospace;}
+  tr:last-child td{border-bottom:none;}
+
+  /* ---------- Function cards ---------- */
+  .fn-card{
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:24px;
+    margin:0 0 22px;
+    background:var(--bg);
+  }
+  .fn-card h4{
+    font-family:"JetBrains Mono",monospace;
+    font-size:16px;
+    color:var(--ink);
+    margin:0 0 4px;
+  }
+  .fn-card .fn-role{
+    font-size:13.5px;
+    color:var(--ink-faint);
+    margin:0 0 14px;
+  }
+
+  /* ---------- Two-col ---------- */
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+  @media (max-width:680px){.grid2{grid-template-columns:1fr;}}
+
+  /* ---------- Problem box ---------- */
+  .problem{
+    border:1px solid var(--line-strong);
+    border-radius:12px;
+    background:linear-gradient(180deg,var(--bg-soft2),var(--bg));
+    padding:26px 28px;
+    margin:20px 0;
+  }
+  .problem .plabel{
+    font-family:"JetBrains Mono",monospace;
+    font-size:12px;
+    color:var(--accent);
+    margin-bottom:8px;
+  }
+  .problem h3{margin-top:0;}
+  .io-box{
+    background:var(--bg);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:14px 16px;
+    margin:10px 0;
+  }
+  .io-box .io-title{
+    font-family:"JetBrains Mono",monospace;
+    font-size:12px;
+    color:var(--ink-faint);
+    margin-bottom:6px;
+  }
+
+  /* ---------- Test harness ---------- */
+  .lab{
+    border:1px solid var(--line-strong);
+    border-radius:12px;
+    padding:26px;
+    background:var(--bg-soft);
+  }
+  .lab-controls{
+    display:flex;
+    flex-wrap:wrap;
+    gap:14px;
+    align-items:flex-end;
+    margin-bottom:18px;
+  }
+  .field{display:flex;flex-direction:column;gap:6px;}
+  .field label{
+    font-family:"JetBrains Mono",monospace;
+    font-size:11.5px;
+    color:var(--ink-faint);
+  }
+  .field input{
+    width:88px;
+    padding:8px 10px;
+    border:1px solid var(--line-strong);
+    border-radius:7px;
+    font-family:"JetBrains Mono",monospace;
+    font-size:14px;
+    color:var(--ink);
+    background:var(--bg);
+  }
+  .field input:focus{outline:2px solid var(--accent);outline-offset:1px;}
+  button.run{
+    padding:10px 20px;
+    border-radius:7px;
+    border:1px solid var(--accent-strong);
+    background:var(--accent);
+    color:#fff;
+    font-family:"Pretendard Variable",sans-serif;
+    font-weight:600;
+    font-size:14.5px;
+    cursor:pointer;
+  }
+  button.run:hover{background:var(--accent-strong);}
+  button.run:active{transform:translateY(1px);}
+  button.ghost{
+    padding:10px 18px;
+    border-radius:7px;
+    border:1px solid var(--line-strong);
+    background:var(--bg);
+    color:var(--ink-soft);
+    font-family:"Pretendard Variable",sans-serif;
+    font-size:14.5px;
+    cursor:pointer;
+  }
+  button.ghost:hover{border-color:var(--accent);color:var(--accent-strong);}
+
+  #lab-summary{
+    font-family:"JetBrains Mono",monospace;
+    font-size:14px;
+    padding:12px 16px;
+    border-radius:8px;
+    margin-bottom:14px;
+    display:none;
+  }
+  #lab-summary.pass{display:block;background:var(--good-bg);border:1px solid var(--good-border);color:var(--good-text);}
+  #lab-summary.fail{display:block;background:var(--warn-bg);border:1px solid var(--warn-border);color:var(--warn-text);}
+
+  #lab-log{
+    max-height:340px;
+    overflow-y:auto;
+    background:var(--bg);
+    border:1px solid var(--line);
+    border-radius:8px;
+    font-family:"JetBrains Mono",monospace;
+    font-size:12.5px;
+  }
+  #lab-log .row{
+    padding:8px 14px;
+    border-bottom:1px solid var(--line);
+    color:var(--ink-soft);
+    white-space:pre-wrap;
+  }
+  #lab-log .row:last-child{border-bottom:none;}
+  #lab-log .row.ok{color:var(--good-text);}
+  #lab-log .row.bad{background:var(--warn-bg);color:var(--warn-text);}
+  #lab-log .row .op{color:var(--accent-strong);font-weight:600;}
+
+  .manual-grid{
+    display:grid;
+    grid-template-columns:repeat(var(--gn,6),1fr);
+    gap:3px;
+    max-width:320px;
+    margin:14px auto;
+  }
+  .manual-grid .cell{
+    aspect-ratio:1;
+    display:flex;align-items:center;justify-content:center;
+    font-family:"JetBrains Mono",monospace;
+    font-size:12px;
+    background:var(--code-bg);
+    border:1px solid var(--code-border);
+    color:var(--code-text);
+    border-radius:4px;
+  }
+  .manual-grid .cell.hi{
+    background:var(--accent);
+    border-color:var(--accent-strong);
+    color:#fff;
+  }
+
+  footer{
+    padding:44px 0 0;
+    color:var(--ink-faint);
+    font-size:13px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="hero">
+    <span class="eyebrow">algorithm note · sqrt-decomposition / bucket update</span>
+    <h1>버킷 기법으로 구간 갱신과 Top-K를 동시에 잡기</h1>
+    <p class="lead">
+      N×N 격자에서 <strong>구간 전체를 더하는 연산(work)</strong>과 <strong>특정 칸의 실제 값을 읽고 쓰는 연산(get/set)</strong>,
+      그리고 <strong>구간 내 상위 K개를 뽑는 연산(query)</strong>이 각각 최대 만 번씩 섞여서 들어온다면,
+      순진하게 매번 전체를 갱신하는 방식은 반드시 시간 초과가 난다. 버킷(구역) 단위로 델타를 누적해두는 아이디어 하나로
+      이 문제를 어떻게 풀어내는지, 주어진 소스를 한 줄씩 뜯어보며 정리한다.
+    </p>
+  </div>
+
+  <!-- ============================================================= -->
+  <section id="s1">
+    <h2><span class="idx">01</span>문제 상황</h2>
+    <p class="section-sub">이 기법이 왜 필요한지부터</p>
+
+    <p>
+      크기 N×N인 격자 <code>mGrid</code>가 주어진다. 여기에 다음 다섯 가지 연산이 섞여서, 도합 최대 <strong>10,000번</strong> 호출된다.
+    </p>
+    <table>
+      <tr><th>연산</th><th>의미</th></tr>
+      <tr><td><code>init(N, K, mGrid)</code></td><td>격자 초기화. <strong>N은 K의 배수</strong>라는 조건이 주어진다.</td></tr>
+      <tr><td><code>work(A, B, delta)</code></td><td>A, B로 정해지는 직사각형 구간의 모든 칸에 delta를 더한다.</td></tr>
+      <tr><td><code>getLogistic(P)</code></td><td>칸 P의 현재 값을 반환한다.</td></tr>
+      <tr><td><code>setLogistic(P, value)</code></td><td>칸 P의 값을 value로 덮어쓴다.</td></tr>
+      <tr><td><code>query(A, B)</code></td><td>구간 A~B 안에서 값이 큰 상위 5개 좌표를 반환한다.</td></tr>
+    </table>
+
+    <p>
+      여기서 문제가 슬쩍 힌트를 하나 흘려준다. <code>work</code>에 들어오는 A, B는 아무 좌표가 아니라
+      <strong>A.y % K == 0, A.x % K == 0</strong> 이고 <strong>B.y % K == K-1, B.x % K == K-1</strong> 이라는 것.
+      즉 A는 항상 어떤 K×K 구역의 <strong>왼쪽 위 모서리</strong>이고, B는 항상 어떤 구역의 <strong>오른쪽 아래 모서리</strong>다.
+      다시 말해 <strong>work가 갱신하는 범위는 항상 K×K 구역 몇 개를 딱 맞게 덮는다</strong> — 경계가 구역 중간에서 걸치는 일이 없다.
+      이 조건이 전체 풀이의 자물쇠를 여는 열쇠다.
+    </p>
+  </section>
+
+  <!-- ============================================================= -->
+  <section id="s2">
+    <h2><span class="idx">02</span>순진한 풀이가 안 되는 이유</h2>
+    <p class="section-sub">이중 for문으로 매번 다 갱신하면?</p>
+
+    <p>
+      가장 직관적인 구현은 <code>work(A, B, delta)</code>가 호출될 때마다 A부터 B까지 두 번 중첩된 for문을
+      돌면서 <code>mGrid[y][x] += delta</code>를 해주는 것이다. 정확하긴 하다. 문제는 속도다.
+    </p>
+    <div class="callout warn">
+      <span class="tag">WHY NOT</span>
+      <p>
+        구간의 크기가 최악의 경우 N×N 전체가 될 수 있고, 이런 <code>work</code>가 최대 10,000번 호출된다.
+        총 연산량은 <strong>O(N² × 10,000)</strong>. N이 조금만 커져도(예: N=1,000) 10억 × 10,000 수준으로 치솟아
+        시간 제한 안에 들어올 수가 없다.
+      </p>
+      <p>
+        반대로 <code>getLogistic</code> 한 번을 위해 그 칸이 지금까지 몇 번의 <code>work</code>에 포함됐는지
+        전부 되짚어보는 방식도 마찬가지로 느리다. <strong>갱신은 빠르게, 조회도 빠르게</strong> — 이 둘을 동시에 만족하는
+        구조가 필요하다.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============================================================= -->
+  <section id="s3">
+    <h2><span class="idx">03</span>버킷 기법의 원리</h2>
+    <p class="section-sub">칸 하나하나 대신, 구역 단위로 게으르게 쌓아둔다</p>
+
+    <p>
+      핵심 아이디어는 단순하다. N×N 격자를 K×K 크기의 작은 <strong>버킷(구역)</strong>들로 나눈다.
+      N이 K의 배수이므로 버킷은 (N/K) × (N/K)개가 정확히 딱 맞게 만들어진다.
+    </p>
+    <p>
+      그리고 <code>work(A, B, delta)</code>가 호출되면, 그 delta를 <strong>구간 안의 칸 하나하나에 더하는 대신
+      구간이 덮는 버킷들에만 더해준다.</strong> 즉 각 버킷마다 "이 구역 전체에 지금까지 얼마가 더해졌는가"를 뜻하는
+      <code>bucket[by][bx]</code> 라는 <strong>지연된 델타(lazy delta)</strong> 값을 따로 관리한다.
+    </p>
+
+    <div class="diagram">
+      <svg viewBox="0 0 620 300" width="100%" style="max-width:560px;">
+        <!-- grid 8x8, cell 30 -->
+        <g transform="translate(30,20)">
+          <!-- fine grid lines -->
+          <g stroke="#c9dceb" stroke-width="1">
+            <line x1="0" y1="0" x2="240" y2="0"/><line x1="0" y1="30" x2="240" y2="30"/>
+            <line x1="0" y1="60" x2="240" y2="60"/><line x1="0" y1="90" x2="240" y2="90"/>
+            <line x1="0" y1="120" x2="240" y2="120"/><line x1="0" y1="150" x2="240" y2="150"/>
+            <line x1="0" y1="180" x2="240" y2="180"/><line x1="0" y1="210" x2="240" y2="210"/>
+            <line x1="0" y1="240" x2="240" y2="240"/>
+            <line x1="0" y1="0" x2="0" y2="240"/><line x1="30" y1="0" x2="30" y2="240"/>
+            <line x1="60" y1="0" x2="60" y2="240"/><line x1="90" y1="0" x2="90" y2="240"/>
+            <line x1="120" y1="0" x2="120" y2="240"/><line x1="150" y1="0" x2="150" y2="240"/>
+            <line x1="180" y1="0" x2="180" y2="240"/><line x1="210" y1="0" x2="210" y2="240"/>
+            <line x1="240" y1="0" x2="240" y2="240"/>
+          </g>
+          <!-- highlighted work range: buckets covering cols/rows 2..5 (K=2) -->
+          <rect x="60" y="60" width="120" height="120" fill="#2f7ab8" fill-opacity="0.16" stroke="#2f7ab8" stroke-width="2"/>
+          <!-- bucket boundary lines (thicker, every K=2 cells = 60px) -->
+          <g stroke="#1c5687" stroke-width="2">
+            <line x1="0" y1="0" x2="240" y2="0"/><line x1="0" y1="60" x2="240" y2="60"/>
+            <line x1="0" y1="120" x2="240" y2="120"/><line x1="0" y1="180" x2="240" y2="180"/>
+            <line x1="0" y1="240" x2="240" y2="240"/>
+            <line x1="0" y1="0" x2="0" y2="240"/><line x1="60" y1="0" x2="60" y2="240"/>
+            <line x1="120" y1="0" x2="120" y2="240"/><line x1="180" y1="0" x2="180" y2="240"/>
+            <line x1="240" y1="0" x2="240" y2="240"/>
+          </g>
+          <circle cx="60" cy="60" r="4" fill="#1c5687"/>
+          <text x="66" y="52" font-size="13" fill="#1c5687" font-weight="600">A (2,2)</text>
+          <circle cx="180" cy="180" r="4" fill="#1c5687"/>
+          <text x="150" y="204" font-size="13" fill="#1c5687" font-weight="600">B (5,5)</text>
+          <text x="90" y="130" font-size="12" fill="#2f7ab8">+delta</text>
+          <text x="0" y="-8" font-size="12" fill="#8798a8">N = 8, K = 2 → 버킷 4×4개</text>
+        </g>
+        <!-- side note -->
+        <g transform="translate(320,60)" font-size="13" fill="#52657a">
+          <text x="0" y="0" font-weight="600" fill="#17222d">work(A, B, delta) 가 하는 일</text>
+          <text x="0" y="26">A~B는 항상 버킷 경계에</text>
+          <text x="0" y="46">딱 맞춰서 들어온다.</text>
+          <text x="0" y="76">→ 칸을 하나씩 훑지 않고</text>
+          <text x="0" y="96">   덮인 버킷 2×2개의</text>
+          <text x="0" y="116">   bucket[][] 값만</text>
+          <text x="0" y="136">   +delta 해주면 끝.</text>
+          <text x="0" y="166" fill="#2f7ab8" font-family="JetBrains Mono, monospace">O((N/K)²) per call</text>
+        </g>
+      </svg>
+      <figcaption>work(A,B,delta): 칸 단위가 아니라 A~B가 덮는 버킷들에만 delta를 더한다.</figcaption>
+    </div>
+
+    <p>
+      이렇게 하면 <code>work</code> 한 번의 비용은 칸의 개수가 아니라 <strong>버킷의 개수</strong>에 비례한다.
+      버킷이 (N/K)×(N/K)개뿐이므로, K를 √N 근방으로 잡으면 <code>work</code> 한 번이 O(N/K × N/K) ≈ O(N) 수준으로 줄어든다.
+      이 "구간을 통째로 처리하기 좋은 블록으로 미리 잘라둔다"는 접근을 흔히 <strong>제곱근 분할(sqrt decomposition)</strong>이라 부르고,
+      델타를 개별 원소가 아니라 구역 단위로 지연시켜 쌓아두는 방식은 세그먼트 트리의 <strong>lazy propagation</strong>과 본질적으로 같은 발상이다.
+    </p>
+
+    <div class="callout key">
+      <span class="tag">핵심</span>
+      <p>
+        "N이 K의 배수"이고 "work의 A, B가 항상 버킷 경계"라는 두 조건이 함께 있어야만 이 트릭이 성립한다.
+        만약 구간이 버킷 중간에서 걸쳐 들어올 수 있다면, 걸친 버킷의 일부 칸만 델타를 받아야 하므로
+        버킷 델타 하나로는 표현이 안 되고 결국 칸 단위 처리로 되돌아가야 한다.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============================================================= -->
+  <section id="s4">
+    <h2><span class="idx">04</span>실제 값은 어떻게 읽고 쓰는가</h2>
+    <p class="section-sub">저장은 나눠서, 조회는 합쳐서</p>
+
+    <p>
+      버킷에 델타를 몰아서 쌓아두기로 한 순간, 각 칸의 "진짜 값"은 더 이상 <code>arr[y][x]</code> 하나에
+      들어있지 않다. 진짜 값은 <strong>그 칸에 저장된 값 + 그 칸이 속한 버킷의 델타</strong>로 쪼개져 있다.
+    </p>
+
+    <div class="diagram">
+      <svg viewBox="0 0 560 140" width="100%" style="max-width:520px;">
+        <g font-size="13" fill="#17222d">
+          <rect x="10" y="40" width="150" height="56" rx="8" fill="#eef6fd" stroke="#bcdcf2"/>
+          <text x="85" y="63" text-anchor="middle" font-family="JetBrains Mono, monospace" fill="#235e94">arr[y][x].value</text>
+          <text x="85" y="82" text-anchor="middle" font-size="11" fill="#8798a8">칸에 저장된 값</text>
+
+          <text x="180" y="74" font-size="20" fill="#2f7ab8">+</text>
+
+          <rect x="205" y="40" width="150" height="56" rx="8" fill="#eef6fd" stroke="#bcdcf2"/>
+          <text x="280" y="63" text-anchor="middle" font-family="JetBrains Mono, monospace" fill="#235e94">bucket[by][bx]</text>
+          <text x="280" y="82" text-anchor="middle" font-size="11" fill="#8798a8">구역 전체 델타</text>
+
+          <text x="375" y="74" font-size="20" fill="#2f7ab8">=</text>
+
+          <rect x="400" y="40" width="150" height="56" rx="8" fill="#2f7ab8" fill-opacity="0.12" stroke="#2f7ab8"/>
+          <text x="475" y="63" text-anchor="middle" font-family="JetBrains Mono, monospace" fill="#1c5687" font-weight="600">진짜 값</text>
+          <text x="475" y="82" text-anchor="middle" font-size="11" fill="#1c5687">getLogistic이 반환</text>
+        </g>
+      </svg>
+      <figcaption>getLogistic(P): 두 값을 더해서 반환하면 끝 — O(1).</figcaption>
+    </div>
+
+    <p>
+      그래서 <code>getLogistic(P)</code>는 아주 쉽다. <code>arr[P.y][P.x].value + bucket[해당 버킷]</code>을 더해서
+      돌려주면 된다. 버킷이 몇 번 갱신됐든 상관없이 항상 O(1).
+    </p>
+    <p>
+      문제는 <code>setLogistic(P, mValue)</code>다. 만약 단순히 <code>arr[P.y][P.x].value = mValue</code>로
+      덮어써 버리면, 다음번 <code>getLogistic</code>이 <code>mValue + bucket[해당 버킷]</code>을 반환해버린다.
+      델타가 중복으로 한 번 더 더해지는 것이다. 이 칸은 지금까지 이 버킷이 쌓아온 델타를 "이미 반영한" 값으로 설정하고 싶은 게 아니라,
+      <strong>지금 이 순간의 진짜 값이 mValue가 되도록</strong> 만들고 싶은 것이므로, 저장할 때 그만큼을 미리 빼줘야 한다.
+    </p>
+    <div class="callout good">
+      <span class="tag">해결</span>
+      <p><code>arr[P.y][P.x].value = mValue - bucket[해당 버킷]</code>로 저장한다. 그래야 다음에 get이
+      다시 버킷 델타를 더했을 때 정확히 mValue가 나온다.</p>
+    </div>
+  </section>
+
+  <!-- ============================================================= -->
+  <section id="s5">
+    <h2><span class="idx">05</span>Top-K 조회는 "전교 5등" 문제와 같다</h2>
+    <p class="section-sub">query()의 원리</p>
+
+    <p>
+      구간 A~B 안에서 값이 큰 상위 5개를 뽑아야 한다. 이것도 그 구간에 속한 모든 칸을 매번 훑으면
+      느리다. 여기서 쓰는 비유가 <strong>"전교 5등을 뽑고 싶다면, 각 반의 5등까지만 모아서 그 안에서 다시 5등을 뽑으면 된다"</strong>는 것이다.
+    </p>
+    <div class="diagram">
+      <svg viewBox="0 0 620 220" width="100%" style="max-width:560px;">
+        <g font-family="JetBrains Mono, monospace" font-size="12.5">
+          <!-- 3 class boxes -->
+          <rect x="10"  y="10" width="120" height="52" rx="8" fill="#eef6fd" stroke="#bcdcf2"/>
+          <rect x="150" y="10" width="120" height="52" rx="8" fill="#eef6fd" stroke="#bcdcf2"/>
+          <rect x="290" y="10" width="120" height="52" rx="8" fill="#eef6fd" stroke="#bcdcf2"/>
+          <text x="70"  y="41" text-anchor="middle" fill="#235e94">버킷 A TOP 5</text>
+          <text x="210" y="41" text-anchor="middle" fill="#235e94">버킷 B TOP 5</text>
+          <text x="350" y="41" text-anchor="middle" fill="#235e94">버킷 C TOP 5</text>
+
+          <path d="M70,62 L70,95 M210,62 L210,95 M350,62 L350,95" stroke="#8798a8" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+          <rect x="90" y="100" width="240" height="48" rx="8" fill="#fff7ec" stroke="#f0d9ae"/>
+          <text x="210" y="129" text-anchor="middle" fill="#8a5a12">후보 풀 (최대 15개)</text>
+
+          <path d="M210,148 L210,180" stroke="#8798a8" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+          <rect x="130" y="185" width="160" height="30" rx="8" fill="#2f7ab8" fill-opacity="0.15" stroke="#2f7ab8"/>
+          <text x="210" y="205" text-anchor="middle" fill="#1c5687" font-weight="600">전체 TOP 5</text>
+
+          <defs>
+            <marker id="arrow" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto">
+              <path d="M0,0 L8,4 L0,8 z" fill="#8798a8"/>
+            </marker>
+          </defs>
+        </g>
+      </svg>
+      <figcaption>구간에 걸친 버킷마다 상위 5개 후보만 모아, 그 후보군에서 다시 상위 5개를 뽑는다.</figcaption>
+    </div>
+    <p>
+      왜 이게 정확한가: 전체 상위 5개 중 어떤 버킷 하나가 기여할 수 있는 개수는 최대 5개뿐이다(전체가 5개이므로).
+      따라서 각 버킷의 상위 5개만 후보로 모아도, 그 후보 집합은 전체 상위 5개를 반드시 포함한다.
+      버킷이 여러 개 걸쳐 있어도 후보 수는 "버킷 개수 × 5" 정도로 작으므로, 그 안에서 다시 정렬해 5개를 뽑는 비용은 아주 작다.
+    </p>
+    <p>
+      이때 각 버킷 안에서 "값이 큰 순서"를 빠르게 꺼내기 위해, 버킷마다 정렬된 집합(<code>TreeSet</code>)을
+      미리 유지해둔다. 흥미로운 점은, <code>work</code>로 버킷 전체에 같은 델타가 더해져도 <strong>그 버킷 안에서의 상대적인
+      순위는 절대 바뀌지 않는다</strong>는 것이다(모두에게 같은 수를 더하면 대소관계는 그대로다). 그래서 TreeSet 안의 값은
+      델타가 반영되지 않은 "상대값" 그대로 두어도 정렬 순서는 항상 맞다 — 버킷이 갱신될 때마다 TreeSet을 다시 정렬할 필요가 없다는 뜻이다.
+    </p>
+  </section>
+
+  <!-- ============================================================= -->
+  <section id="s6">
+    <h2><span class="idx">06</span>주어진 소스, 한 함수씩</h2>
+    <p class="section-sub">Object 클래스부터 work()까지</p>
+
+    <div class="fn-card">
+      <h4>class Object implements Comparable&lt;Object&gt;</h4>
+      <p class="fn-role">좌표 + 값을 함께 들고 다니는 원소. 정렬 기준을 스스로 정의한다.</p>
+      <pre><code>@Override
+public int compareTo(Object o) {
+    if(this.value != o.value) return Integer.compare(o.value, this.value); // 값 내림차순
+    if(this.x != o.x) return Integer.compare(this.x, o.x);                 // x 오름차순
+    return Integer.compare(this.y, o.y);                                   // y 오름차순
+}</code></pre>
+      <p>
+        값이 큰 원소가 먼저 오도록 <strong>내림차순</strong>으로 비교하고, 값이 같으면 x, 그다음 y로 동점을 깨서
+        <strong>완전한 전순서(total order)</strong>를 만든다. 좌표 (x, y)가 서로 다른 두 칸은 절대 compareTo가 0이 될 수 없으므로,
+        값이 같은 칸이 여러 개 있어도 <code>TreeSet</code>이 서로 다른 원소를 같은 것으로 오인해 지워버리는 일이 없다.
+      </p>
+    </div>
+
+    <div class="fn-card">
+      <h4>init(N, K, mGrid)</h4>
+      <p class="fn-role">격자를 버킷으로 쪼개고, 버킷별 정렬 집합을 채운다.</p>
+      <pre><code>bucketTreeSet[bucketY][bucketX].add(object);
+// 이전 값을 빼지 않음(상위 5개만 관리하지 않음)
+// 순위가 바뀔 때 후순위가 필요할 수도 있으니.</code></pre>
+      <p>
+        각 버킷의 TreeSet에는 그 버킷에 속한 <strong>모든 칸</strong>을 넣어둔다. 상위 5개만 잘라서 들고 있고 싶은
+        유혹이 있지만, 나중에 <code>setLogistic</code>으로 값이 바뀌면 6등이 5등 안으로 들어올 수도 있으므로
+        버킷 전체를 계속 정렬된 상태로 유지해야 한다. 대신 정렬 집합이라 삽입/삭제/조회가 모두 O(log(버킷 크기))로 싸다.
+      </p>
+    </div>
+
+    <div class="fn-card">
+      <h4>getLogistic(P)</h4>
+      <pre><code>int arrValue = arr[P.y][P.x].value;
+int bucketValue = bucket[bucektY][bucketX];
+return arrValue + bucketValue;</code></pre>
+      <p>저장된 상대값과 버킷 델타를 더할 뿐이라 <strong>O(1)</strong>.</p>
+    </div>
+
+    <div class="fn-card">
+      <h4>setLogistic(P, mValue)</h4>
+      <pre><code>bucketTreeSet[bucektY][bucketX].remove(object);   // ① 옛 순위 제거
+object.value = mValue - bucketValue;              // ② 상대값으로 환산해 저장
+bucketTreeSet[bucektY][bucketX].add(object);       // ③ 새 순위로 재삽입</code></pre>
+      <p>
+        ①③이 필요한 이유는 TreeSet이 내부적으로 <code>compareTo</code> 순서로 정렬돼 있기 때문이다. 값을 바꾼다는 건
+        정렬 위치가 바뀐다는 뜻이므로, 그냥 <code>object.value</code>만 고쳐서는 안 되고 <strong>지웠다가 새 값으로 다시 넣어야</strong>
+        정렬 구조가 깨지지 않는다. ②가 앞서 <strong>섹션 04</strong>에서 짚은, 델타 중복을 막기 위한 상대값 환산이다.
+      </p>
+    </div>
+
+    <div class="fn-card">
+      <h4>work(A, B, mDelta)</h4>
+      <pre><code>for (int x = bucketStartX; x <= bucketEndX; x++) {
+    for (int y = bucketStartY; y <= bucketEndY; y++) {
+        bucket[y][x] += mDelta;
+    }
+}</code></pre>
+      <p>
+        칸이 아니라 <strong>버킷</strong>을 순회한다. A, B가 항상 버킷 경계에 맞춰 들어온다는 문제 조건 덕분에
+        가능한 코드다. 비용은 구간이 덮는 버킷 수, 즉 O((N/K)²) — 최악이어도 전체 버킷 개수를 넘지 않는다.
+      </p>
+    </div>
+
+    <div class="fn-card">
+      <h4>query(A, B) — Top 5</h4>
+      <pre><code>for (Object object : bucketTreeSet[y][x]) {
+    int realValue = object.value + bucketValue;      // 버킷 델타를 더해 "진짜 값"으로 환산
+    pq.offer(new Object(object.x, object.y, realValue));
+    cnt++;
+    if (cnt == 5) break;                              // 버킷당 최대 5개만 후보로
+}</code></pre>
+      <p>
+        버킷마다 상대값 순서(=진짜 값 순서, 섹션 05 참고)로 상위 5개까지만 훑어서, 그 자리에서 실제 값으로
+        환산한 새 객체를 후보 큐에 담는다. 이 후보들만 모아서 다시 정렬하면 구간 전체의 상위 5개가 나온다.
+      </p>
+      <div class="callout warn">
+        <span class="tag">주의할 점</span>
+        <p>
+          <code>for (Object object : pq)</code>처럼 <code>PriorityQueue</code>를 for-each로 그냥 순회하면,
+          내부 배열(힙) 순서대로 도는 것이라 <strong>정렬된 순서라는 보장이 없다</strong>. 힙은 최솟값(혹은 이 코드 기준으로는
+          가장 큰 진짜 값)이 루트에 있다는 것만 보장할 뿐, 나머지 원소들의 순서는 힙 구조 규칙만 지킬 뿐 전체 정렬이 아니다.
+          진짜로 상위 5개를 정확한 순서로 뽑으려면 <code>pq.poll()</code>을 5번 호출해야 한다. 아래 테스트 코드는 이 부분을
+          <code>poll()</code>로 바로잡아 구현했다 — 실제로 구현할 때 자주 놓치는 지점이니 기억해두자.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================= -->
+  <section id="s7">
+    <h2><span class="idx">07</span>복잡도 정리</h2>
+    <table>
+      <tr><th>연산</th><th class="num">순진한 방식</th><th class="num">버킷 방식</th></tr>
+      <tr><td>work (구간 갱신)</td><td class="num">O(N²)</td><td class="num">O((N/K)²)</td></tr>
+      <tr><td>getLogistic</td><td class="num">O(1)</td><td class="num">O(1)</td></tr>
+      <tr><td>setLogistic</td><td class="num">O(1)</td><td class="num">O(log K²)</td></tr>
+      <tr><td>query (Top 5)</td><td class="num">O(N² log N²)</td><td class="num">O((N/K)² · log K²)</td></tr>
+    </table>
+    <p>
+      K를 √N 근방으로 고르면 N/K도 √N 근방이 되어, work와 query 모두 O(√N) 수준의 버킷 개수만 다루게 된다.
+      호출이 10,000번 섞여 들어와도 총 비용이 감당 가능한 범위로 떨어지는 이유다.
+    </p>
+  </section>
+
+  <!-- ============================================================= -->
+  <section id="s8">
+    <h2><span class="idx">08</span>이 기법으로 만든 연습 문제</h2>
+    <p class="section-sub">"구역 물류 센터" — 원본 소스의 문맥을 문제 형태로 재구성</p>
+
+    <div class="problem">
+      <div class="plabel">PRACTICE PROBLEM</div>
+      <h3>구역 물류 센터</h3>
+      <p>
+        물류 센터는 N×N 크기의 창고 그리드로 이루어져 있고, 각 칸 (y, x)에는 재고량 <code>mGrid[y][x]</code>가 있다.
+        창고는 K×K 크기의 구역 단위로 관리되며, <strong>N은 항상 K의 배수</strong>다. 다음 연산을 총 최대 10,000번 처리하라.
+      </p>
+      <ul>
+        <li><code>work(A, B, delta)</code> — A~B 구역 전체 재고에 delta(음수 가능, |delta| ≤ 50,000)를 더한다.
+          A, B는 항상 어떤 구역들의 왼쪽 위 / 오른쪽 아래 모서리로 주어진다.</li>
+        <li><code>get(P)</code> — 칸 P의 현재 재고량을 반환한다.</li>
+        <li><code>set(P, value)</code> — 칸 P의 재고량을 value로 고정한다.</li>
+        <li><code>query(A, B)</code> — A~B 범위(역시 구역 경계에 맞춰 주어짐) 안에서 재고량이 가장 많은 상위 5칸의 좌표를,
+          재고량 내림차순(동률이면 x 오름차순, 다음 y 오름차순)으로 반환한다.</li>
+      </ul>
+      <p>제약: 1 ≤ K ≤ N ≤ 1,000, 모든 재고량과 그 누적 합은 int 범위(±10억) 안에 들어온다.</p>
+
+      <div class="io-box">
+        <div class="io-title">예시 흐름</div>
+        <code>init(8, 2, grid)</code> → <code>work((2,2), (5,5), +10)</code> →
+        <code>get((3,3))</code> → <code>set((0,0), 999)</code> → <code>query((0,0), (7,7))</code>
+      </div>
+      <p>
+        이 문제를 풀 때 스스로에게 던져야 할 질문은 정확히 이 노트에서 다룬 것들이다: delta를 칸에 바로 더질지
+        구역에 쌓아둘지, set에서 왜 그냥 덮어쓰면 안 되는지, top-5를 구할 때 왜 구역별 상위 5개만 모아도 충분한지.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============================================================= -->
+  <section id="s9">
+    <h2><span class="idx">09</span>직접 돌려보는 테스트 케이스</h2>
+    <p class="section-sub">버킷 구현 vs 완전탐색(brute force) — 무작위 연산을 똑같이 먹여서 결과를 비교한다</p>
+
+    <p>
+      아래 실험실은 이 노트에서 설명한 <strong>버킷 자료구조</strong>와, 매번 전체를 훑는 <strong>완전탐색 구현</strong>을
+      동시에 만들어 같은 순서의 무작위 연산(work / get / set / query)을 흘려보낸 뒤 결과가 한 글자도 다르지 않은지 확인한다.
+      N, K, 연산 횟수를 바꿔가며 여러 번 눌러봐도 좋다.
+    </p>
+
+    <div class="lab">
+      <div class="lab-controls">
+        <div class="field">
+          <label for="in-n">N</label>
+          <input id="in-n" type="number" value="12" min="1" max="60">
+        </div>
+        <div class="field">
+          <label for="in-k">K (N의 약수)</label>
+          <input id="in-k" type="number" value="3" min="1" max="60">
+        </div>
+        <div class="field">
+          <label for="in-ops">연산 횟수</label>
+          <input id="in-ops" type="number" value="60" min="1" max="500">
+        </div>
+        <div class="field">
+          <label for="in-seed">시드</label>
+          <input id="in-seed" type="number" value="1" min="0" max="999999">
+        </div>
+        <button class="run" id="btn-run">테스트 실행</button>
+        <button class="ghost" id="btn-clear">로그 지우기</button>
+      </div>
+
+      <div id="lab-summary"></div>
+      <div id="lab-log"></div>
+    </div>
+  </section>
+
+  <footer>
+    버킷(제곱근 분할) 기법 정리 노트 · 구간 델타 누적 + 버킷별 정렬 집합으로 갱신·조회·Top-K를 모두 O(√N) 근방에 묶는다.
+  </footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---------- comparator matching the given Object.compareTo ----------
+  // value desc, then x asc, then y asc
+  function cmp(a, b){
+    if(a.value !== b.value) return b.value - a.value;
+    if(a.x !== b.x) return a.x - b.x;
+    return a.y - b.y;
+  }
+
+  // ---------- seeded RNG (mulberry32) ----------
+  function makeRng(seed){
+    let a = seed >>> 0;
+    return function(){
+      a |= 0; a = (a + 0x6D2B79F5) | 0;
+      let t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  // ---------- Bucket-based structure (mirrors the given source) ----------
+  function BucketDS(n, k, grid){
+    this.n = n; this.k = k;
+    const bn = n / k;
+    this.bn = bn;
+    // arr[y][x] holds the RELATIVE value (delta-adjusted), like arr[y][x].value in the source
+    this.arr = [];
+    for(let y=0;y<n;y++){
+      const row = [];
+      for(let x=0;x<n;x++) row.push({x, y, value: grid[y][x]});
+      this.arr.push(row);
+    }
+    this.bucket = Array.from({length:bn}, ()=>new Array(bn).fill(0));
+    // sorted arrays simulate the TreeSet<Object> per bucket
+    this.sets = [];
+    for(let by=0; by<bn; by++){
+      const rowSets = [];
+      for(let bx=0; bx<bn; bx++) rowSets.push([]);
+      this.sets.push(rowSets);
+    }
+    for(let y=0;y<n;y++){
+      for(let x=0;x<n;x++){
+        const by = Math.floor(y/k), bx = Math.floor(x/k);
+        this._insertSorted(this.sets[by][bx], this.arr[y][x]);
+      }
+    }
+  }
+  BucketDS.prototype._insertSorted = function(arr, obj){
+    let lo=0, hi=arr.length;
+    while(lo<hi){ const mid=(lo+hi)>>1; if(cmp(arr[mid],obj)<=0) lo=mid+1; else hi=mid; }
+    arr.splice(lo,0,obj);
+  };
+  BucketDS.prototype._removeObj = function(arr, obj){
+    const idx = arr.indexOf(obj);
+    if(idx>=0) arr.splice(idx,1);
+  };
+  BucketDS.prototype.work = function(ax,ay,bx,by,delta){
+    const k=this.k;
+    const bsx=Math.floor(ax/k), bsy=Math.floor(ay/k);
+    const bex=Math.floor(bx/k), bey=Math.floor(by/k);
+    for(let x=bsx;x<=bex;x++) for(let y=bsy;y<=bey;y++) this.bucket[y][x]+=delta;
+  };
+  BucketDS.prototype.get = function(x,y){
+    const k=this.k;
+    const bx=Math.floor(x/k), by=Math.floor(y/k);
+    return this.arr[y][x].value + this.bucket[by][bx];
+  };
+  BucketDS.prototype.set = function(x,y,mValue){
+    const k=this.k;
+    const bx=Math.floor(x/k), by=Math.floor(y/k);
+    const obj = this.arr[y][x];
+    this._removeObj(this.sets[by][bx], obj);
+    obj.value = mValue - this.bucket[by][bx];
+    this._insertSorted(this.sets[by][bx], obj);
+  };
+  BucketDS.prototype.query = function(ax,ay,bx,by,topK){
+    const k=this.k;
+    const bsx=Math.floor(ax/k), bsy=Math.floor(ay/k);
+    const bex=Math.floor(bx/k), bey=Math.floor(by/k);
+    const candidates = [];
+    for(let x=bsx;x<=bex;x++){
+      for(let y=bsy;y<=bey;y++){
+        const bv = this.bucket[y][x];
+        const arr = this.sets[y][x];
+        const lim = Math.min(topK, arr.length);
+        for(let i=0;i<lim;i++){
+          const o = arr[i];
+          candidates.push({x:o.x, y:o.y, value:o.value+bv});
+        }
+      }
+    }
+    candidates.sort(cmp); // == 5x pq.poll() done correctly
+    return candidates.slice(0, topK).map(o=>({x:o.x,y:o.y,value:o.value}));
+  };
+
+  // ---------- brute force reference ----------
+  function BruteDS(n, grid){
+    this.n=n;
+    this.g = grid.map(row=>row.slice());
+  }
+  BruteDS.prototype.work = function(ax,ay,bx,by,delta){
+    for(let y=ay;y<=by;y++) for(let x=ax;x<=bx;x++) this.g[y][x]+=delta;
+  };
+  BruteDS.prototype.get = function(x,y){ return this.g[y][x]; };
+  BruteDS.prototype.set = function(x,y,v){ this.g[y][x]=v; };
+  BruteDS.prototype.query = function(ax,ay,bx,by,topK){
+    const cand=[];
+    for(let y=ay;y<=by;y++) for(let x=ax;x<=bx;x++) cand.push({x,y,value:this.g[y][x]});
+    cand.sort(cmp);
+    return cand.slice(0,topK);
+  };
+
+  function sameCoordList(a,b){
+    if(a.length!==b.length) return false;
+    for(let i=0;i<a.length;i++) if(a[i].x!==b[i].x || a[i].y!==b[i].y || a[i].value!==b[i].value) return false;
+    return true;
+  }
+
+  function pickBucketAligned(rng, n, k){
+    const bn = n/k;
+    const bx1 = Math.floor(rng()*bn), bx2 = Math.floor(rng()*bn);
+    const by1 = Math.floor(rng()*bn), by2 = Math.floor(rng()*bn);
+    const ax=Math.min(bx1,bx2)*k, bx=Math.max(bx1,bx2)*k+(k-1);
+    const ay=Math.min(by1,by2)*k, by=Math.max(by1,by2)*k+(k-1);
+    return [ax,ay,bx,by];
+  }
+
+  function runLab(){
+    const n = parseInt(document.getElementById('in-n').value,10);
+    const k = parseInt(document.getElementById('in-k').value,10);
+    const ops = parseInt(document.getElementById('in-ops').value,10);
+    const seed = parseInt(document.getElementById('in-seed').value,10);
+    const log = document.getElementById('lab-log');
+    const summary = document.getElementById('lab-summary');
+
+    if(!(n>=1 && k>=1 && n%k===0)){
+      summary.className='fail';
+      summary.textContent = 'N은 K의 배수여야 합니다 (예: N=12, K=3). 값을 확인해 주세요.';
+      log.innerHTML='';
+      return;
+    }
+
+    const rng = makeRng(seed);
+    const grid = [];
+    for(let y=0;y<n;y++){
+      const row=[];
+      for(let x=0;x<n;x++) row.push(Math.floor(rng()*200)-100);
+      grid.push(row);
+    }
+    const bucketDS = new BucketDS(n,k, grid.map(r=>r.slice()));
+    const bruteDS  = new BruteDS(n, grid.map(r=>r.slice()));
+
+    let ok=true, mismatches=0;
+    const rows=[];
+
+    for(let i=0;i<ops;i++){
+      const roll = rng();
+      if(roll < 0.35){
+        const [ax,ay,bx,by] = pickBucketAligned(rng,n,k);
+        const delta = Math.floor(rng()*2001)-1000;
+        bucketDS.work(ax,ay,bx,by,delta);
+        bruteDS.work(ax,ay,bx,by,delta);
+        rows.push({op:'work', desc:`A(${ax},${ay}) B(${bx},${by}) delta=${delta}`, pass:true});
+      } else if(roll < 0.55){
+        const x=Math.floor(rng()*n), y=Math.floor(rng()*n);
+        const v1=bucketDS.get(x,y), v2=bruteDS.get(x,y);
+        const pass = v1===v2;
+        if(!pass){ok=false;mismatches++;}
+        rows.push({op:'get', desc:`P(${x},${y}) → bucket=${v1} / brute=${v2}`, pass});
+      } else if(roll < 0.75){
+        const x=Math.floor(rng()*n), y=Math.floor(rng()*n);
+        const v=Math.floor(rng()*400)-200;
+        bucketDS.set(x,y,v);
+        bruteDS.set(x,y,v);
+        rows.push({op:'set', desc:`P(${x},${y}) = ${v}`, pass:true});
+      } else {
+        const [ax,ay,bx,by] = pickBucketAligned(rng,n,k);
+        const r1 = bucketDS.query(ax,ay,bx,by,5);
+        const r2 = bruteDS.query(ax,ay,bx,by,5);
+        const pass = sameCoordList(r1,r2);
+        if(!pass){ok=false;mismatches++;}
+        const fmt=(arr)=>arr.map(o=>`(${o.x},${o.y}:${o.value})`).join(' ');
+        rows.push({op:'query', desc:`A(${ax},${ay}) B(${bx},${by}) → bucket[${fmt(r1)}] / brute[${fmt(r2)}]`, pass});
+      }
+    }
+
+    summary.className = ok ? 'pass' : 'fail';
+    summary.textContent = ok
+      ? `PASS — 연산 ${ops}회 모두 버킷 구현과 완전탐색 결과가 일치했습니다. (N=${n}, K=${k})`
+      : `FAIL — ${mismatches}건 불일치. 아래 로그에서 빨간 줄을 확인하세요.`;
+
+    log.innerHTML = rows.map((r,idx)=>
+      `<div class="row ${r.pass?'ok':'bad'}"><span class="op">[${String(idx+1).padStart(3,'0')} ${r.op}]</span> ${r.desc} ${r.pass? '✓':'✗ MISMATCH'}</div>`
+    ).join('');
+  }
+
+  document.getElementById('btn-run').addEventListener('click', runLab);
+  document.getElementById('btn-clear').addEventListener('click', function(){
+    document.getElementById('lab-log').innerHTML='';
+    document.getElementById('lab-summary').className='';
+    document.getElementById('lab-summary').textContent='';
+  });
+
+  // run once on load with defaults
+  runLab();
+})();
+</script>
+</body>
+</html>

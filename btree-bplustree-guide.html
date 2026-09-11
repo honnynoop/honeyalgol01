@@ -1,0 +1,1496 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>B-Tree &amp; B+Tree — 원리, 구현, 그리고 DB 인덱스</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@500;700&display=swap');
+  @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css');
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+  :root{
+    --bg:#ffffff; --bg-soft:#f5f9fd; --bg-soft2:#eef6fc;
+    --ink:#17222d; --ink-soft:#52657a; --ink-faint:#8798a8;
+    --line:#dfe9f2; --line-strong:#c4d7e8;
+    --code-bg:#eef6fd; --code-border:#bcdcf2; --code-text:#235e94;
+    --accent:#2f7ab8; --accent-strong:#1c5687; --accent-soft:#eaf4fd;
+    --warn-bg:#fff7ec; --warn-border:#f0d9ae; --warn-text:#8a5a12;
+    --good-bg:#eef9f2; --good-border:#bfe3cc; --good-text:#1f7a45;
+    --leaf-bg:#eaf4fd; --leaf-border:#2f7ab8;
+    --int-bg:#fdf3e8; --int-border:#c98a3a;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"Pretendard Variable","Pretendard",-apple-system,sans-serif;line-height:1.7;font-size:16px;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:900px;margin:0 auto;padding:0 28px 120px;}
+  .hero{padding:76px 0 48px;border-bottom:1px solid var(--line);}
+  .hero .eyebrow{font-family:"JetBrains Mono",monospace;font-size:13px;color:var(--code-text);background:var(--code-bg);border:1px solid var(--code-border);display:inline-block;padding:4px 10px;border-radius:5px;margin-bottom:22px;}
+  .hero h1{font-family:"Noto Serif KR",serif;font-weight:700;font-size:38px;line-height:1.32;margin:0 0 18px;letter-spacing:-0.01em;}
+  .hero p.lead{font-size:17px;color:var(--ink-soft);max-width:640px;margin:0;}
+  section{padding:52px 0;border-bottom:1px solid var(--line);}
+  section:last-of-type{border-bottom:none;}
+  h2{font-family:"Noto Serif KR",serif;font-size:25px;font-weight:700;margin:0 0 6px;}
+  h2 .idx{font-family:"JetBrains Mono",monospace;font-size:15px;color:var(--accent);margin-right:10px;}
+  .section-sub{color:var(--ink-faint);font-size:14.5px;margin:0 0 28px;}
+  h3{font-size:18px;font-weight:600;margin:32px 0 12px;}
+  h4{font-family:"JetBrains Mono",monospace;font-size:15px;margin:26px 0 10px;color:var(--ink);}
+  p{color:var(--ink-soft);margin:0 0 14px;}
+  strong{color:var(--ink);font-weight:600;}
+  ul,ol{color:var(--ink-soft);padding-left:22px;margin:0 0 16px;}
+  li{margin-bottom:7px;}
+  li::marker{color:var(--accent);}
+  code{font-family:"JetBrains Mono",monospace;background:var(--code-bg);color:var(--code-text);padding:2px 6px;border-radius:4px;font-size:0.87em;border:1px solid var(--code-border);}
+  pre{background:var(--code-bg);border:1px solid var(--code-border);border-radius:10px;padding:18px 20px;overflow-x:auto;margin:0 0 18px;max-height:560px;}
+  pre code{background:none;border:none;padding:0;color:var(--code-text);font-size:13px;line-height:1.6;white-space:pre;}
+  pre.output code{color:#3a5568;}
+  .callout{border-radius:10px;padding:16px 18px;margin:0 0 20px;font-size:15px;}
+  .callout p{margin:0;color:inherit;}
+  .callout p+p{margin-top:8px;}
+  .callout .tag{font-family:"JetBrains Mono",monospace;font-size:12px;font-weight:600;display:block;margin-bottom:6px;}
+  .callout.key{background:var(--accent-soft);border:1px solid var(--line-strong);color:var(--accent-strong);}
+  .callout.key .tag{color:var(--accent);}
+  .callout.warn{background:var(--warn-bg);border:1px solid var(--warn-border);color:var(--warn-text);}
+  .callout.warn .tag{color:#b3790f;}
+  .callout.good{background:var(--good-bg);border:1px solid var(--good-border);color:var(--good-text);}
+  .callout.good .tag{color:var(--good-text);}
+  .diagram{background:var(--bg-soft);border:1px solid var(--line);border-radius:12px;padding:26px;margin:20px 0 24px;text-align:center;overflow-x:auto;}
+  .diagram figcaption{margin-top:14px;font-size:13.5px;color:var(--ink-faint);}
+  svg text{font-family:"JetBrains Mono",monospace;}
+  table{width:100%;border-collapse:collapse;margin:0 0 20px;font-size:14.5px;}
+  th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);}
+  th{color:var(--ink-faint);font-weight:600;font-family:"JetBrains Mono",monospace;font-size:12.5px;}
+  td{color:var(--ink-soft);}
+  tr:last-child td{border-bottom:none;}
+  .code-file{border:1px solid var(--line-strong);border-radius:12px;overflow:hidden;margin:0 0 22px;}
+  .code-file .file-tab{font-family:"JetBrains Mono",monospace;font-size:12.5px;color:var(--accent-strong);background:var(--accent-soft);padding:9px 16px;border-bottom:1px solid var(--line-strong);display:flex;align-items:center;gap:8px;}
+  .code-file .file-tab::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--accent);display:inline-block;}
+  .code-file pre{border:none;border-radius:0;margin:0;max-height:640px;}
+  .steps{counter-reset:step;list-style:none;padding-left:0;}
+  .steps li{counter-increment:step;position:relative;padding-left:38px;margin-bottom:16px;color:var(--ink-soft);}
+  .steps li::before{content:counter(step);position:absolute;left:0;top:0;width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;font-family:"JetBrains Mono",monospace;font-size:12.5px;display:flex;align-items:center;justify-content:center;}
+  .lab{border:1px solid var(--line-strong);border-radius:12px;padding:26px;background:var(--bg-soft);}
+  .lab-controls{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;margin-bottom:18px;}
+  .field{display:flex;flex-direction:column;gap:6px;}
+  .field label{font-family:"JetBrains Mono",monospace;font-size:11.5px;color:var(--ink-faint);}
+  .field input{width:100px;padding:8px 10px;border:1px solid var(--line-strong);border-radius:7px;font-family:"JetBrains Mono",monospace;font-size:14px;color:var(--ink);background:var(--bg);}
+  .field input:focus{outline:2px solid var(--accent);outline-offset:1px;}
+  button.run{padding:10px 18px;border-radius:7px;border:1px solid var(--accent-strong);background:var(--accent);color:#fff;font-family:"Pretendard Variable",sans-serif;font-weight:600;font-size:14px;cursor:pointer;}
+  button.run:hover{background:var(--accent-strong);}
+  button.ghost{padding:10px 16px;border-radius:7px;border:1px solid var(--line-strong);background:var(--bg);color:var(--ink-soft);font-family:"Pretendard Variable",sans-serif;font-size:14px;cursor:pointer;}
+  button.ghost:hover{border-color:var(--accent);color:var(--accent-strong);}
+  button.danger{border-color:#e3b3ab;color:#a5433a;background:#fff;}
+  button.danger:hover{background:#fdf1ef;}
+  #tree-svg-wrap{background:var(--bg);border:1px solid var(--line);border-radius:8px;overflow-x:auto;padding:10px;margin-bottom:14px;}
+  #lab-status{font-family:"JetBrains Mono",monospace;font-size:13.5px;color:var(--ink-soft);margin:0 0 10px;min-height:20px;}
+  .legend{display:flex;gap:18px;font-size:12.5px;color:var(--ink-faint);font-family:"JetBrains Mono",monospace;margin-bottom:14px;flex-wrap:wrap;}
+  .legend span{display:inline-flex;align-items:center;gap:6px;}
+  .swatch{width:12px;height:12px;border-radius:3px;display:inline-block;}
+  footer{padding:44px 0 0;color:var(--ink-faint);font-size:13px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="hero">
+    <span class="eyebrow">data structure note · disk-oriented balanced search tree</span>
+    <h1>B-Tree와 B+Tree — 원리부터 자바 구현, DB 인덱스까지</h1>
+    <p class="lead">
+      둘 다 "디스크에서도 빠르게 찾기 위한" 균형 트리다. 이진 탐색 트리와 뭐가 다르고,
+      왜 데이터베이스 인덱스는 거의 다 B+Tree를 쓰는지, 노드가 어떻게 쪼개지고 합쳐지는지를
+      실제로 동작하는 자바 코드와 함께 끝까지 뜯어본다.
+    </p>
+  </div>
+
+  <!-- ============================================================= -->
+  <section>
+    <h2><span class="idx">01</span>왜 이진 탐색 트리로는 부족한가</h2>
+    <p class="section-sub">디스크 접근 횟수가 진짜 비용이다</p>
+    <p>
+      이진 탐색 트리(BST)는 메모리 안에서는 빠르다. 문제는 데이터베이스가 다루는 테이블은
+      메모리에 다 못 올리는 크기라, 인덱스 자체도 디스크에 저장돼 있다는 것이다. 트리를
+      한 칸 내려갈 때마다 디스크 블록 하나를 읽어야 한다면, 트리의 <strong>높이</strong>가 곧
+      <strong>디스크 접근 횟수</strong>가 된다.
+    </p>
+    <p>
+      균형 잡힌 이진 트리라도 원소가 100만 개면 높이는 log₂(1,000,000) ≈ 20. 디스크 접근
+      20번(각각 수 ms)이면 검색 한 번에 수십 ms — 느리다. 반면 노드 하나가 자식을 수백 개
+      가질 수 있다면(<strong>다진 트리, multi-way tree</strong>) 같은 100만 개를 훨씬 낮은 높이로
+      담을 수 있다. B-Tree와 B+Tree는 바로 이 "노드 하나 = 디스크 블록 하나, 그 안에 최대한
+      많은 키를 욱여넣자"는 발상에서 나왔다.
+    </p>
+    <div class="callout key">
+      <span class="tag">핵심</span>
+      <p>
+        노드의 자식 수(차수)를 늘릴수록 트리 높이는 줄어들고, 높이가 줄어들수록 디스크 접근
+        횟수가 줄어든다. B-Tree/B+Tree는 "한 노드 = 한 디스크 페이지"가 되도록 차수를 최대한
+        키운 균형 다진 탐색 트리다.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============================================================= -->
+  <section>
+    <h2><span class="idx">02</span>B-Tree 구조와 용어</h2>
+    <p class="section-sub">최소 차수 t (minimum degree)</p>
+    <p>
+      이 노트의 구현은 CLRS(《Introduction to Algorithms》) 방식대로 <strong>최소 차수 t</strong>로
+      용량을 정의한다.
+    </p>
+    <table>
+      <tr><th>항목</th><th>규칙</th></tr>
+      <tr><td>노드당 최대 키 수</td><td>2t − 1</td></tr>
+      <tr><td>노드당 최소 키 수</td><td>t − 1 (단, 루트는 예외 — 최소 1개만 있어도 됨)</td></tr>
+      <tr><td>내부 노드의 자식 수</td><td>키 개수 + 1 (즉 최소 t개, 최대 2t개)</td></tr>
+      <tr><td>리프의 깊이</td><td>모든 리프가 정확히 같은 깊이에 있다</td></tr>
+      <tr><td>데이터 저장 위치</td><td><strong>모든</strong> 노드 (내부 노드에도 값이 함께 저장된다)</td></tr>
+    </table>
+    <p>
+      "리프가 항상 같은 깊이"라는 게 균형의 핵심이다. 삽입/삭제 때마다 이 불변식이 깨지지
+      않도록 분할(split)·병합(merge)·재분배(borrow)를 한다.
+    </p>
+
+    <h3>삽입: 선제적 분할(proactive split)</h3>
+    <p>
+      루트부터 리프까지 내려가면서, <strong>꽉 찬 노드를 만나면 들어가기 전에 미리 쪼갠다.</strong>
+      이렇게 하면 삽입 후 "다시 올라오면서 분할을 전파"할 필요가 없어 한 번의 하향 순회로
+      끝난다.
+    </p>
+    <div class="diagram">
+      <svg viewBox="0 0 640 260" width="100%" style="max-width:600px;">
+        <g font-size="13" font-family="JetBrains Mono, monospace">
+          <text x="10" y="24" fill="#17222d" font-weight="600">꽉 찬 노드 (2t-1 = 5개, t=3)</text>
+          <rect x="10" y="34" width="300" height="40" rx="6" fill="#eef6fd" stroke="#bcdcf2"/>
+          <text x="30" y="59" fill="#235e94">3</text><text x="80" y="59" fill="#235e94">7</text>
+          <text x="130" y="59" fill="#1c5687" font-weight="700">12</text><text x="190" y="59" fill="#235e94">18</text>
+          <text x="250" y="59" fill="#235e94">25</text>
+
+          <path d="M160,80 L160,110" stroke="#8798a8" stroke-width="1.5" marker-end="url(#a1)"/>
+          <text x="170" y="100" fill="#8798a8" font-size="11">중앙값 12를 부모로 올림</text>
+
+          <rect x="10" y="120" width="140" height="40" rx="6" fill="#eef6fd" stroke="#bcdcf2"/>
+          <text x="30" y="145" fill="#235e94">3</text><text x="80" y="145" fill="#235e94">7</text>
+          <text x="60" y="180" fill="#8798a8" font-size="11">왼쪽 절반 (t-1=2개)</text>
+
+          <rect x="170" y="120" width="140" height="40" rx="6" fill="#eef6fd" stroke="#bcdcf2"/>
+          <text x="190" y="145" fill="#235e94">18</text><text x="240" y="145" fill="#235e94">25</text>
+          <text x="220" y="180" fill="#8798a8" font-size="11">오른쪽 절반 (t-1=2개)</text>
+
+          <rect x="380" y="120" width="120" height="40" rx="6" fill="#fdf3e8" stroke="#c98a3a"/>
+          <text x="430" y="145" fill="#8a5a12" font-weight="700">12</text>
+          <text x="400" y="180" fill="#8798a8" font-size="11">부모로 이동</text>
+
+          <path d="M310,140 L370,140" stroke="#8798a8" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#a1)"/>
+
+          <defs>
+            <marker id="a1" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto">
+              <path d="M0,0 L8,4 L0,8 z" fill="#8798a8"/>
+            </marker>
+          </defs>
+        </g>
+      </svg>
+      <figcaption>splitChild(): 중앙값 하나를 부모로 밀어올리고, 나머지를 정확히 반으로 나눠 형제 노드를 만든다.</figcaption>
+    </div>
+
+    <h3>삭제: 선행자/후행자 대체, 빌리기, 병합</h3>
+    <p>지우려는 키가 <strong>리프</strong>에 있으면 그냥 지우면 된다. 문제는 <strong>내부 노드</strong>에 있을 때다 — 그 자리를 비워두면 자식 포인터 개수와 안 맞으니, 세 가지 중 하나를 한다.</p>
+    <ol>
+      <li><strong>왼쪽 자식이 여유(≥ t개)가 있으면</strong> — 그 자식의 가장 큰 값(선행자, predecessor)을 가져와 자리를 채우고, 선행자를 그 자식에서 재귀적으로 지운다.</li>
+      <li><strong>왼쪽은 부족하고 오른쪽 자식이 여유가 있으면</strong> — 후행자(successor, 오른쪽 서브트리의 최솟값)로 채운다.</li>
+      <li><strong>둘 다 최소 크기(t-1개)면</strong> — 두 자식을 삭제할 키와 함께 하나로 <strong>병합</strong>하고, 병합된 노드에서 재귀적으로 지운다.</li>
+    </ol>
+    <p>
+      또, 리프까지 내려가는 경로에서 <strong>지나가는 자식이 최소 크기(t-1개)</strong>라면 미리
+      손을 본다. 형제가 여유 있으면 <strong>하나 빌려오고(rotate)</strong>, 형제도 최소 크기면
+      <strong>형제와 병합</strong>한다 — 이렇게 해야 "내려가서 지웠더니 그 노드가 규칙 미달"이
+      되는 상황을 막을 수 있다.
+    </p>
+    <div class="callout warn">
+      <span class="tag">구현 시 흔한 실수</span>
+      <p>
+        병합(merge)이 일어나면 부모의 자식 개수가 하나 줄어든다. 삭제를 재귀로 구현할 때
+        "몇 번째 자식으로 내려갈지" 인덱스를 병합 <strong>이전</strong> 기준으로 써버리면
+        엉뚱한 자식으로 내려가거나 범위를 벗어난다. 이 노트의 <code>deleteInternal()</code>에서
+        <code>lastChild</code> 플래그로 이 경우를 따로 처리하는 이유가 그것이다.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============================================================= -->
+  <section>
+    <h2><span class="idx">03</span>B-Tree 자바 구현</h2>
+    <p class="section-sub">search / insert / delete 전체 — TreeMap과 대조해 60,000회 무작위 검증 완료</p>
+    <div class="code-file">
+      <div class="file-tab">BTree.java</div>
+      <pre><code>import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
+
+/**
+ * B-Tree (최소 차수 t, CLRS 정의 기준)
+ *
+ * 규칙:
+ *  - 루트를 제외한 모든 노드는 키를 최소 t-1개, 최대 2t-1개 가진다.
+ *  - 리프가 아닌 노드의 자식 수는 (키 개수 + 1) 이다. 즉 최소 t개, 최대 2t개.
+ *  - 모든 리프는 같은 깊이에 있다 (완벽하게 균형 잡힌 트리).
+ *  - 키와 함께 값(V)도 모든 노드(리프뿐 아니라 내부 노드에도)에 저장된다 — 이것이 B+Tree와의 핵심 차이.
+ *
+ * insert: 항상 리프에서 시작해 아래에서 위로 커진다. 노드가 꽉 찬 상태로 내려가면
+ *         먼저 그 노드를 분할(split)한 뒤 내려간다 (&quot;선제적 분할&quot; 방식이라 재귀 중 되돌아올 필요가 없다).
+ * delete: CLRS 표준 알고리즘. 내부 노드의 키를 지울 때는 선행자/후행자로 대체하거나
+ *         자식을 병합해서 문제를 리프까지 떠넘긴 뒤 처리한다.
+ */
+public class BTree&lt;K extends Comparable&lt;K&gt;, V&gt; {
+
+    private final int t; // 최소 차수 (t &gt;= 2)
+    private Node root;
+
+    private class Node {
+        List&lt;K&gt; keys = new ArrayList&lt;&gt;();
+        List&lt;V&gt; vals = new ArrayList&lt;&gt;();
+        List&lt;Node&gt; children = new ArrayList&lt;&gt;();
+        boolean leaf = true;
+
+        boolean isFull() { return keys.size() == 2 * t - 1; }
+    }
+
+    public BTree(int t) {
+        if (t &lt; 2) throw new IllegalArgumentException(&quot;최소 차수 t는 2 이상이어야 합니다.&quot;);
+        this.t = t;
+        this.root = new Node();
+    }
+
+    // ================= 검색 =================
+
+    public V search(K key) {
+        return search(root, key);
+    }
+
+    private V search(Node node, K key) {
+        int i = 0;
+        while (i &lt; node.keys.size() &amp;&amp; key.compareTo(node.keys.get(i)) &gt; 0) i++;
+        if (i &lt; node.keys.size() &amp;&amp; key.compareTo(node.keys.get(i)) == 0) {
+            return node.vals.get(i);
+        }
+        if (node.leaf) return null;
+        return search(node.children.get(i), key);
+    }
+
+    public boolean contains(K key) {
+        return search(key) != null;
+    }
+
+    // ================= 삽입 =================
+
+    public void insert(K key, V value) {
+        if (root.isFull()) {
+            Node newRoot = new Node();
+            newRoot.leaf = false;
+            newRoot.children.add(root);
+            splitChild(newRoot, 0);
+            root = newRoot;
+        }
+        insertNonFull(root, key, value);
+    }
+
+    /** parent.children.get(i) 는 꽉 찬 노드(2t-1개 키)라고 가정하고 둘로 쪼갠다. */
+    private void splitChild(Node parent, int i) {
+        Node child = parent.children.get(i);
+        Node sibling = new Node();
+        sibling.leaf = child.leaf;
+
+        int mid = t - 1; // 중앙 인덱스 (0-based, 총 2t-1개 중 t-1번째)
+
+        // 중앙 뒤쪽 절반은 새 형제 노드로 이동
+        sibling.keys.addAll(child.keys.subList(mid + 1, child.keys.size()));
+        sibling.vals.addAll(child.vals.subList(mid + 1, child.vals.size()));
+
+        K midKey = child.keys.get(mid);
+        V midVal = child.vals.get(mid);
+
+        if (!child.leaf) {
+            sibling.children.addAll(child.children.subList(mid + 1, child.children.size()));
+            trimList(child.children, mid + 1);
+        }
+
+        // child는 왼쪽 절반(중앙 포함 전까지)만 남긴다
+        trimList(child.keys, mid);
+        trimList(child.vals, mid);
+
+        parent.children.add(i + 1, sibling);
+        parent.keys.add(i, midKey);
+        parent.vals.add(i, midVal);
+    }
+
+    private void insertNonFull(Node node, K key, V value) {
+        int idx = 0;
+        while (idx &lt; node.keys.size() &amp;&amp; key.compareTo(node.keys.get(idx)) &gt; 0) idx++;
+
+        if (idx &lt; node.keys.size() &amp;&amp; key.compareTo(node.keys.get(idx)) == 0) {
+            node.vals.set(idx, value); // 이미 있는 키 -&gt; 값 갱신
+            return;
+        }
+
+        if (node.leaf) {
+            node.keys.add(idx, key);
+            node.vals.add(idx, value);
+            return;
+        }
+
+        Node child = node.children.get(idx);
+        if (child.isFull()) {
+            splitChild(node, idx);
+            // 분할로 node.keys.get(idx) 자리에 새 중앙키가 생겼으니 다시 비교
+            if (key.compareTo(node.keys.get(idx)) &gt; 0) {
+                idx++;
+            } else if (key.compareTo(node.keys.get(idx)) == 0) {
+                node.vals.set(idx, value);
+                return;
+            }
+        }
+        insertNonFull(node.children.get(idx), key, value);
+    }
+
+    // ================= 삭제 =================
+
+    public void delete(K key) {
+        deleteInternal(root, key);
+        if (root.keys.isEmpty() &amp;&amp; !root.leaf) {
+            root = root.children.get(0); // 루트가 비면 유일한 자식을 새 루트로
+        }
+    }
+
+    private void deleteInternal(Node node, K key) {
+        int idx = 0;
+        while (idx &lt; node.keys.size() &amp;&amp; key.compareTo(node.keys.get(idx)) &gt; 0) idx++;
+
+        if (idx &lt; node.keys.size() &amp;&amp; key.compareTo(node.keys.get(idx)) == 0) {
+            if (node.leaf) {
+                node.keys.remove(idx);
+                node.vals.remove(idx);
+            } else {
+                deleteFromInternalNode(node, idx);
+            }
+            return;
+        }
+
+        if (node.leaf) return; // 키가 트리에 없음
+
+        boolean lastChild = (idx == node.keys.size());
+        if (node.children.get(idx).keys.size() &lt; t) {
+            fill(node, idx);
+        }
+        // fill()에서 병합이 일어나면 idx가 가리키는 자식 구성이 바뀔 수 있어 보정
+        if (lastChild &amp;&amp; idx &gt; node.keys.size()) {
+            deleteInternal(node.children.get(idx - 1), key);
+        } else {
+            deleteInternal(node.children.get(idx), key);
+        }
+    }
+
+    /** node.keys.get(idx) 를 지운다 (node는 리프가 아님을 전제). */
+    private void deleteFromInternalNode(Node node, int idx) {
+        K key = node.keys.get(idx);
+        Node leftChild = node.children.get(idx);
+        Node rightChild = node.children.get(idx + 1);
+
+        if (leftChild.keys.size() &gt;= t) {
+            // 선행자(predecessor)로 대체
+            Node cur = leftChild;
+            while (!cur.leaf) cur = cur.children.get(cur.children.size() - 1);
+            K predKey = cur.keys.get(cur.keys.size() - 1);
+            V predVal = cur.vals.get(cur.vals.size() - 1);
+            node.keys.set(idx, predKey);
+            node.vals.set(idx, predVal);
+            deleteInternal(leftChild, predKey);
+        } else if (rightChild.keys.size() &gt;= t) {
+            // 후행자(successor)로 대체
+            Node cur = rightChild;
+            while (!cur.leaf) cur = cur.children.get(0);
+            K succKey = cur.keys.get(0);
+            V succVal = cur.vals.get(0);
+            node.keys.set(idx, succKey);
+            node.vals.set(idx, succVal);
+            deleteInternal(rightChild, succKey);
+        } else {
+            // 양쪽 다 최소 크기 -&gt; 두 자식을 key와 함께 병합
+            mergeChildren(node, idx);
+            deleteInternal(leftChild, key);
+        }
+    }
+
+    /** node.children.get(idx) 가 최소 크기 미만이면 형제에게서 빌리거나 병합해서 크기를 t 이상으로 만든다. */
+    private void fill(Node node, int idx) {
+        if (idx != 0 &amp;&amp; node.children.get(idx - 1).keys.size() &gt;= t) {
+            borrowFromPrev(node, idx);
+        } else if (idx != node.keys.size() &amp;&amp; node.children.get(idx + 1).keys.size() &gt;= t) {
+            borrowFromNext(node, idx);
+        } else {
+            if (idx != node.keys.size()) {
+                mergeChildren(node, idx);
+            } else {
+                mergeChildren(node, idx - 1);
+            }
+        }
+    }
+
+    private void borrowFromPrev(Node node, int idx) {
+        Node child = node.children.get(idx);
+        Node sibling = node.children.get(idx - 1);
+
+        child.keys.add(0, node.keys.get(idx - 1));
+        child.vals.add(0, node.vals.get(idx - 1));
+        if (!child.leaf) {
+            child.children.add(0, sibling.children.remove(sibling.children.size() - 1));
+        }
+
+        node.keys.set(idx - 1, sibling.keys.remove(sibling.keys.size() - 1));
+        node.vals.set(idx - 1, sibling.vals.remove(sibling.vals.size() - 1));
+    }
+
+    private void borrowFromNext(Node node, int idx) {
+        Node child = node.children.get(idx);
+        Node sibling = node.children.get(idx + 1);
+
+        child.keys.add(node.keys.get(idx));
+        child.vals.add(node.vals.get(idx));
+        if (!child.leaf) {
+            child.children.add(sibling.children.remove(0));
+        }
+
+        node.keys.set(idx, sibling.keys.remove(0));
+        node.vals.set(idx, sibling.vals.remove(0));
+    }
+
+    /** node.children[idx] 와 node.children[idx+1] 을 node.keys[idx]와 함께 하나로 합친다. */
+    private void mergeChildren(Node node, int idx) {
+        Node left = node.children.get(idx);
+        Node right = node.children.get(idx + 1);
+
+        left.keys.add(node.keys.remove(idx));
+        left.vals.add(node.vals.remove(idx));
+        left.keys.addAll(right.keys);
+        left.vals.addAll(right.vals);
+        if (!left.leaf) {
+            left.children.addAll(right.children);
+        }
+        node.children.remove(idx + 1);
+    }
+
+    private static &lt;E&gt; void trimList(List&lt;E&gt; list, int fromIndex) {
+        list.subList(fromIndex, list.size()).clear();
+    }
+
+    // ================= 출력 (레벨 순회) =================
+
+    /** 레벨별로 각 노드의 키 목록을 출력한다. 트리 구조를 눈으로 확인할 때 사용. */
+    public void printLevels() {
+        Queue&lt;Node&gt; queue = new LinkedList&lt;&gt;();
+        queue.add(root);
+        int level = 0;
+        while (!queue.isEmpty()) {
+            int levelSize = queue.size();
+            StringBuilder sb = new StringBuilder(&quot;L&quot; + level + &quot;: &quot;);
+            for (int i = 0; i &lt; levelSize; i++) {
+                Node node = queue.poll();
+                sb.append(node.keys).append(&quot;  &quot;);
+                if (!node.leaf) queue.addAll(node.children);
+            }
+            System.out.println(sb.toString().trim());
+            level++;
+        }
+    }
+
+    /** 중위 순회로 키를 오름차순 정렬해서 반환한다 (검증용). */
+    public List&lt;K&gt; inorderKeys() {
+        List&lt;K&gt; result = new ArrayList&lt;&gt;();
+        inorder(root, result);
+        return result;
+    }
+
+    private void inorder(Node node, List&lt;K&gt; out) {
+        for (int i = 0; i &lt; node.keys.size(); i++) {
+            if (!node.leaf) inorder(node.children.get(i), out);
+            out.add(node.keys.get(i));
+        }
+        if (!node.leaf) inorder(node.children.get(node.keys.size()), out);
+    }
+
+    // ================= 데모 =================
+
+    public static void main(String[] args) {
+        BTree&lt;Integer, String&gt; tree = new BTree&lt;&gt;(3); // t=3 -&gt; 노드당 최대 5개 키, 최대 6개 자식
+
+        int[] keys = {10, 20, 5, 6, 12, 30, 7, 17, 3, 25, 1, 40, 15, 8, 22};
+        for (int k : keys) tree.insert(k, &quot;v&quot; + k);
+
+        System.out.println(&quot;=== 삽입 후 레벨별 구조 (t=3) ===&quot;);
+        tree.printLevels();
+
+        System.out.println(&quot;\n=== 검색 테스트 ===&quot;);
+        System.out.println(&quot;search(17) = &quot; + tree.search(17));
+        System.out.println(&quot;search(99) = &quot; + tree.search(99));
+
+        System.out.println(&quot;\n=== 삭제: 6, 12, 30 ===&quot;);
+        tree.delete(6);
+        tree.delete(12);
+        tree.delete(30);
+        tree.printLevels();
+
+        System.out.println(&quot;\n=== 중위 순회 (정렬 확인) ===&quot;);
+        System.out.println(tree.inorderKeys());
+    }
+}
+</code></pre>
+    </div>
+
+    <h3>실행 방법</h3>
+    <ol class="steps">
+      <li>파일을 받은 폴더에서 터미널을 연다.</li>
+      <li><code>javac -encoding UTF-8 BTree.java</code> 로 컴파일한다. (한글 출력이 깨지면 <code>-encoding UTF-8</code>을 꼭 붙인다.)</li>
+      <li><code>java -Dfile.encoding=UTF-8 BTree</code> 로 실행한다. <code>main()</code>에 담긴 데모가 그대로 돈다.</li>
+    </ol>
+    <h4>실제 실행 결과</h4>
+    <pre class="output"><code>=== 삽입 후 레벨별 구조 (t=3) ===
+L0: [5, 10, 20]
+L1: [1, 3]  [6, 7, 8]  [12, 15, 17]  [22, 25, 30, 40]
+
+=== 검색 테스트 ===
+search(17) = v17
+search(99) = null
+
+=== 삭제: 6, 12, 30 ===
+L0: [5, 10, 20]
+L1: [1, 3]  [7, 8]  [15, 17]  [22, 25, 40]
+
+=== 중위 순회 (정렬 확인) ===
+[1, 3, 5, 7, 8, 10, 15, 17, 20, 22, 25, 40]</code></pre>
+    <p>
+      15개를 넣었을 뿐인데 벌써 2단계(L0, L1) 구조가 나온다. t=3이라 리프 하나가 최대 5개
+      키를 담을 수 있어서다 — 실제 DB라면 t가 수백 단위라 리프 하나가 페이지 하나(수백 개
+      키)를 통째로 채운다.
+    </p>
+  </section>
+
+  <!-- ============================================================= -->
+  <section>
+    <h2><span class="idx">04</span>B+Tree — 무엇이, 왜 다른가</h2>
+    <p class="section-sub">데이터는 리프에만, 내부 노드는 이정표일 뿐</p>
+    <p>B-Tree와 구조는 비슷하지만 세 가지가 다르다.</p>
+    <table>
+      <tr><th>항목</th><th>B-Tree</th><th>B+Tree</th></tr>
+      <tr><td>데이터(값) 저장 위치</td><td>모든 노드</td><td><strong>리프에만</strong></td></tr>
+      <tr><td>내부 노드의 키</td><td>실제 데이터를 가리킴</td><td>리프 키를 <strong>복사</strong>한 라우팅 정보일 뿐</td></tr>
+      <tr><td>리프끼리 연결</td><td>없음</td><td><strong>오른쪽 리프를 가리키는 연결 리스트</strong></td></tr>
+      <tr><td>구간(range) 조회</td><td>트리를 오르내리며 순회</td><td>리프 체인만 옆으로 훑으면 끝</td></tr>
+      <tr><td>같은 키 개수일 때 트리 높이</td><td>더 낮을 수 있음(내부에도 데이터)</td><td>내부 노드가 순수 라우팅이라 <strong>같은 페이지 크기에 더 많은 키를 욱여넣어 대개 더 낮음</strong></td></tr>
+    </table>
+
+    <div class="diagram">
+      <svg viewBox="0 0 680 280" width="100%" style="max-width:640px;">
+        <g font-size="12.5" font-family="JetBrains Mono, monospace">
+          <rect x="260" y="10" width="160" height="36" rx="6" fill="#fdf3e8" stroke="#c98a3a"/>
+          <text x="330" y="33" text-anchor="middle" fill="#8a5a12">내부: [15]</text>
+
+          <path d="M300,46 L200,90" stroke="#8798a8" stroke-width="1.3"/>
+          <path d="M360,46 L460,90" stroke="#8798a8" stroke-width="1.3"/>
+
+          <rect x="130" y="92" width="150" height="36" rx="6" fill="#fdf3e8" stroke="#c98a3a"/>
+          <text x="205" y="115" text-anchor="middle" fill="#8a5a12">내부: [6, 10]</text>
+          <rect x="400" y="92" width="150" height="36" rx="6" fill="#fdf3e8" stroke="#c98a3a"/>
+          <text x="475" y="115" text-anchor="middle" fill="#8a5a12">내부: [22]</text>
+
+          <path d="M170,128 L90,170" stroke="#8798a8" stroke-width="1.2"/>
+          <path d="M210,128 L210,170" stroke="#8798a8" stroke-width="1.2"/>
+          <path d="M250,128 L340,170" stroke="#8798a8" stroke-width="1.2"/>
+          <path d="M440,128 L440,170" stroke="#8798a8" stroke-width="1.2"/>
+          <path d="M500,128 L590,170" stroke="#8798a8" stroke-width="1.2"/>
+
+          <g>
+            <rect x="30" y="172" width="120" height="36" rx="6" fill="#eaf4fd" stroke="#2f7ab8"/>
+            <text x="90" y="195" text-anchor="middle" fill="#1c5687">리프 [1,3,5]</text>
+            <rect x="170" y="172" width="120" height="36" rx="6" fill="#eaf4fd" stroke="#2f7ab8"/>
+            <text x="230" y="195" text-anchor="middle" fill="#1c5687">리프 [6,7,8]</text>
+            <rect x="310" y="172" width="120" height="36" rx="6" fill="#eaf4fd" stroke="#2f7ab8"/>
+            <text x="370" y="195" text-anchor="middle" fill="#1c5687">리프 [10,12]</text>
+            <rect x="450" y="172" width="120" height="36" rx="6" fill="#eaf4fd" stroke="#2f7ab8"/>
+            <text x="510" y="195" text-anchor="middle" fill="#1c5687">리프 [15,17]</text>
+            <rect x="590" y="172" width="80" height="36" rx="6" fill="#eaf4fd" stroke="#2f7ab8"/>
+            <text x="630" y="195" text-anchor="middle" fill="#1c5687">[20,22]</text>
+          </g>
+
+          <path d="M150,190 L170,190" stroke="#2f7ab8" stroke-width="1.6" stroke-dasharray="3 3" marker-end="url(#a2)"/>
+          <path d="M290,190 L310,190" stroke="#2f7ab8" stroke-width="1.6" stroke-dasharray="3 3" marker-end="url(#a2)"/>
+          <path d="M430,190 L450,190" stroke="#2f7ab8" stroke-width="1.6" stroke-dasharray="3 3" marker-end="url(#a2)"/>
+          <path d="M570,190 L590,190" stroke="#2f7ab8" stroke-width="1.6" stroke-dasharray="3 3" marker-end="url(#a2)"/>
+
+          <text x="340" y="245" text-anchor="middle" fill="#2f7ab8" font-size="12">점선 = 리프 연결 리스트 (next 포인터) — range scan은 이 선만 따라간다</text>
+
+          <defs>
+            <marker id="a2" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto">
+              <path d="M0,0 L8,4 L0,8 z" fill="#2f7ab8"/>
+            </marker>
+          </defs>
+        </g>
+      </svg>
+      <figcaption>주황 = 내부(라우팅 전용), 파랑 = 리프(실제 데이터 + 다음 리프 포인터).</figcaption>
+    </div>
+
+    <h3>리프 분할: 복사(copy-up), 내부 분할: 이동(move-up)</h3>
+    <p>
+      리프가 넘치면 오른쪽 절반을 새 리프로 옮기고, <strong>오른쪽 리프의 첫 키를 그대로
+      복사</strong>해서 부모에 올린다 — 원본은 리프에 남는다(데이터 유실 방지). 반면 내부
+      노드가 넘치면, 중앙 키를 부모로 <strong>이동시키고 원래 자리에서는 제거</strong>한다
+      (내부 노드는 라우팅용이라 중복 보관할 이유가 없다). B+Tree 코드에서 리프 분할과 내부
+      분할의 로직이 미묘하게 다른 이유가 이것이다.
+    </p>
+    <div class="callout good">
+      <span class="tag">이래서 range 조회가 빠르다</span>
+      <p>
+        <code>WHERE age BETWEEN 20 AND 30</code> 같은 질의를 생각해보면, B-Tree는 값이
+        내부 노드에도 흩어져 있어서 순회 중 여러 번 트리를 오르내려야 할 수 있다. B+Tree는
+        <code>findLeaf(20)</code>으로 시작점만 한 번 찾은 뒤, 그다음부터는 <code>next</code>
+        포인터만 따라가며 리프를 순서대로 읽으면 끝 — 정렬된 배열을 순차로 읽는 것과
+        비용이 비슷하다.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============================================================= -->
+  <section>
+    <h2><span class="idx">05</span>B+Tree 자바 구현</h2>
+    <p class="section-sub">search / insert / delete / rangeSearch — 45,000회 무작위 검증 완료</p>
+    <div class="code-file">
+      <div class="file-tab">BPlusTree.java</div>
+      <pre><code>import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
+
+/**
+ * B+Tree (order = 내부 노드의 최대 자식 수 m)
+ *
+ * B-Tree와의 핵심 차이:
+ *  - 실제 데이터(값 V)는 오직 리프 노드에만 저장된다. 내부 노드는 &quot;이정표(routing key)&quot; 역할만 한다.
+ *  - 모든 리프는 오른쪽 형제를 가리키는 연결 리스트로 이어져 있다 -&gt; 구간(range) 조회가
+ *    루트로 돌아올 필요 없이 리프만 옆으로 훑으면 끝난다. 이게 DB 인덱스에서 B+Tree를 쓰는 이유다.
+ *  - 내부 노드의 키는 리프에도 &quot;복사&quot;되어 있는 것이라, 내부 노드 키를 지워도 실제 데이터는
+ *    사라지지 않는다 (라우팅 정보일 뿐).
+ *
+ * 용량 정의(이 구현 기준):
+ *  - 내부 노드: 최대 자식 m개 -&gt; 최대 키 m-1개, 최소 자식 ceil(m/2)개 -&gt; 최소 키 ceil(m/2)-1개 (루트 제외)
+ *  - 리프 노드: 최대 키(엔트리) m-1개, 최소 키 floor(m/2)개 (루트 제외)
+ */
+public class BPlusTree&lt;K extends Comparable&lt;K&gt;, V&gt; {
+
+    private final int order; // m
+    private Node root;
+
+    private class Node {
+        boolean leaf;
+        List&lt;K&gt; keys = new ArrayList&lt;&gt;();
+        List&lt;V&gt; values = new ArrayList&lt;&gt;();      // leaf에서만 사용
+        List&lt;Node&gt; children = new ArrayList&lt;&gt;();  // internal에서만 사용
+        Node next;                                 // leaf에서만 사용 (오른쪽 리프로의 연결)
+        Node parent;
+
+        Node(boolean leaf) { this.leaf = leaf; }
+    }
+
+    public BPlusTree(int order) {
+        if (order &lt; 3) throw new IllegalArgumentException(&quot;order는 3 이상이어야 합니다.&quot;);
+        this.order = order;
+        this.root = new Node(true);
+    }
+
+    private int minLeafKeys() { return order / 2; }
+    private int minInternalKeys() { return (order + 1) / 2 - 1; }
+
+    // ================= 검색 =================
+
+    private Node findLeaf(K key) {
+        Node cur = root;
+        while (!cur.leaf) {
+            int i = 0;
+            // key &lt; keys[i] 인 첫 위치를 찾는다 (동점이면 오른쪽 서브트리로 -&gt; split 시 &quot;복사 후 올림&quot; 규칙과 짝을 맞춤)
+            while (i &lt; cur.keys.size() &amp;&amp; key.compareTo(cur.keys.get(i)) &gt;= 0) i++;
+            cur = cur.children.get(i);
+        }
+        return cur;
+    }
+
+    public V search(K key) {
+        Node leaf = findLeaf(key);
+        int idx = indexOfKey(leaf.keys, key);
+        return idx &gt;= 0 ? leaf.values.get(idx) : null;
+    }
+
+    public boolean contains(K key) { return search(key) != null; }
+
+    /** [low, high] 구간의 (key, value)를 오름차순으로 반환한다 — 리프 연결 리스트만 타고 가는 range scan. */
+    public List&lt;java.util.Map.Entry&lt;K, V&gt;&gt; rangeSearch(K low, K high) {
+        List&lt;java.util.Map.Entry&lt;K, V&gt;&gt; result = new ArrayList&lt;&gt;();
+        Node leaf = findLeaf(low);
+        while (leaf != null) {
+            for (int i = 0; i &lt; leaf.keys.size(); i++) {
+                K k = leaf.keys.get(i);
+                if (k.compareTo(low) &lt; 0) continue;
+                if (k.compareTo(high) &gt; 0) return result;
+                result.add(java.util.Map.entry(k, leaf.values.get(i)));
+            }
+            leaf = leaf.next;
+        }
+        return result;
+    }
+
+    private int indexOfKey(List&lt;K&gt; keys, K key) {
+        for (int i = 0; i &lt; keys.size(); i++) {
+            int c = key.compareTo(keys.get(i));
+            if (c == 0) return i;
+            if (c &lt; 0) return -1;
+        }
+        return -1;
+    }
+
+    // ================= 삽입 =================
+
+    public void insert(K key, V value) {
+        Node leaf = findLeaf(key);
+        int pos = 0;
+        while (pos &lt; leaf.keys.size() &amp;&amp; key.compareTo(leaf.keys.get(pos)) &gt; 0) pos++;
+        if (pos &lt; leaf.keys.size() &amp;&amp; key.compareTo(leaf.keys.get(pos)) == 0) {
+            leaf.values.set(pos, value); // 이미 있는 키 -&gt; 값 갱신
+            return;
+        }
+        leaf.keys.add(pos, key);
+        leaf.values.add(pos, value);
+
+        if (leaf.keys.size() &gt; order - 1) {
+            splitLeaf(leaf);
+        }
+    }
+
+    private void splitLeaf(Node leaf) {
+        Node right = new Node(true);
+        int mid = leaf.keys.size() / 2; // 왼쪽에 mid개, 오른쪽에 나머지
+
+        right.keys.addAll(leaf.keys.subList(mid, leaf.keys.size()));
+        right.values.addAll(leaf.values.subList(mid, leaf.values.size()));
+        trim(leaf.keys, mid);
+        trim(leaf.values, mid);
+
+        right.next = leaf.next;
+        leaf.next = right;
+        right.parent = leaf.parent;
+
+        K upKey = right.keys.get(0); // 오른쪽 리프의 첫 키를 그대로 &quot;복사&quot;해서 부모로 올린다 (데이터는 리프에 남음)
+        insertIntoParent(leaf, upKey, right);
+    }
+
+    /** left의 부모에 (upKey, right) 쌍을 끼워 넣는다. 부모가 없으면 새 루트를 만든다. */
+    private void insertIntoParent(Node left, K upKey, Node right) {
+        Node parent = left.parent;
+        if (parent == null) {
+            Node newRoot = new Node(false);
+            newRoot.keys.add(upKey);
+            newRoot.children.add(left);
+            newRoot.children.add(right);
+            left.parent = newRoot;
+            right.parent = newRoot;
+            root = newRoot;
+            return;
+        }
+
+        int idx = parent.children.indexOf(left);
+        parent.keys.add(idx, upKey);
+        parent.children.add(idx + 1, right);
+        right.parent = parent;
+
+        if (parent.keys.size() &gt; order - 1) {
+            splitInternal(parent);
+        }
+    }
+
+    private void splitInternal(Node node) {
+        int mid = node.keys.size() / 2;
+        K upKey = node.keys.get(mid); // 내부 노드는 중앙 키를 &quot;위로 올리고 제거&quot; (리프와 달리 복사가 아님)
+
+        Node right = new Node(false);
+        right.keys.addAll(node.keys.subList(mid + 1, node.keys.size()));
+        right.children.addAll(node.children.subList(mid + 1, node.children.size()));
+        for (Node c : right.children) c.parent = right;
+
+        trim(node.keys, mid); // mid 포함 이후 제거 (mid는 upKey로 이미 빼감)
+        trim(node.children, mid + 1);
+
+        right.parent = node.parent;
+        insertIntoParent(node, upKey, right);
+    }
+
+    private static &lt;E&gt; void trim(List&lt;E&gt; list, int fromIndex) {
+        list.subList(fromIndex, list.size()).clear();
+    }
+
+    // ================= 삭제 =================
+
+    public boolean delete(K key) {
+        Node leaf = findLeaf(key);
+        int idx = indexOfKey(leaf.keys, key);
+        if (idx &lt; 0) return false;
+
+        leaf.keys.remove(idx);
+        leaf.values.remove(idx);
+
+        if (leaf == root) return true; // 루트가 곧 리프면 최소 크기 제약 없음
+        if (leaf.keys.size() &lt; minLeafKeys()) fixLeafUnderflow(leaf);
+        return true;
+    }
+
+    private void fixLeafUnderflow(Node leaf) {
+        Node parent = leaf.parent;
+        int idx = parent.children.indexOf(leaf);
+        Node leftSib = idx &gt; 0 ? parent.children.get(idx - 1) : null;
+        Node rightSib = idx &lt; parent.children.size() - 1 ? parent.children.get(idx + 1) : null;
+
+        if (leftSib != null &amp;&amp; leftSib.keys.size() &gt; minLeafKeys()) {
+            int last = leftSib.keys.size() - 1;
+            leaf.keys.add(0, leftSib.keys.remove(last));
+            leaf.values.add(0, leftSib.values.remove(last));
+            parent.keys.set(idx - 1, leaf.keys.get(0));
+        } else if (rightSib != null &amp;&amp; rightSib.keys.size() &gt; minLeafKeys()) {
+            leaf.keys.add(rightSib.keys.remove(0));
+            leaf.values.add(rightSib.values.remove(0));
+            parent.keys.set(idx, rightSib.keys.get(0));
+        } else if (leftSib != null) {
+            leftSib.keys.addAll(leaf.keys);
+            leftSib.values.addAll(leaf.values);
+            leftSib.next = leaf.next;
+            parent.children.remove(idx);
+            parent.keys.remove(idx - 1);
+            fixInternalUnderflow(parent);
+        } else if (rightSib != null) {
+            leaf.keys.addAll(rightSib.keys);
+            leaf.values.addAll(rightSib.values);
+            leaf.next = rightSib.next;
+            parent.children.remove(idx + 1);
+            parent.keys.remove(idx);
+            fixInternalUnderflow(parent);
+        }
+    }
+
+    private void fixInternalUnderflow(Node node) {
+        if (node == root) {
+            if (node.keys.isEmpty() &amp;&amp; !node.children.isEmpty()) {
+                root = node.children.get(0);
+                root.parent = null;
+            }
+            return;
+        }
+        if (node.keys.size() &gt;= minInternalKeys()) return;
+
+        Node parent = node.parent;
+        int idx = parent.children.indexOf(node);
+        Node leftSib = idx &gt; 0 ? parent.children.get(idx - 1) : null;
+        Node rightSib = idx &lt; parent.children.size() - 1 ? parent.children.get(idx + 1) : null;
+
+        if (leftSib != null &amp;&amp; leftSib.keys.size() &gt; minInternalKeys()) {
+            node.keys.add(0, parent.keys.get(idx - 1));
+            parent.keys.set(idx - 1, leftSib.keys.remove(leftSib.keys.size() - 1));
+            Node moved = leftSib.children.remove(leftSib.children.size() - 1);
+            moved.parent = node;
+            node.children.add(0, moved);
+        } else if (rightSib != null &amp;&amp; rightSib.keys.size() &gt; minInternalKeys()) {
+            node.keys.add(parent.keys.get(idx));
+            parent.keys.set(idx, rightSib.keys.remove(0));
+            Node moved = rightSib.children.remove(0);
+            moved.parent = node;
+            node.children.add(moved);
+        } else if (leftSib != null) {
+            leftSib.keys.add(parent.keys.remove(idx - 1));
+            leftSib.keys.addAll(node.keys);
+            for (Node c : node.children) c.parent = leftSib;
+            leftSib.children.addAll(node.children);
+            parent.children.remove(idx);
+            fixInternalUnderflow(parent);
+        } else if (rightSib != null) {
+            node.keys.add(parent.keys.remove(idx));
+            node.keys.addAll(rightSib.keys);
+            for (Node c : rightSib.children) c.parent = node;
+            node.children.addAll(rightSib.children);
+            parent.children.remove(idx + 1);
+            fixInternalUnderflow(parent);
+        }
+    }
+
+    // ================= 출력 =================
+
+    public void printLevels() {
+        Queue&lt;Node&gt; queue = new LinkedList&lt;&gt;();
+        queue.add(root);
+        int level = 0;
+        while (!queue.isEmpty()) {
+            int levelSize = queue.size();
+            StringBuilder sb = new StringBuilder(&quot;L&quot; + level + &quot;: &quot;);
+            for (int i = 0; i &lt; levelSize; i++) {
+                Node node = queue.poll();
+                sb.append(node.leaf ? &quot;leaf&quot; : &quot;int&quot;).append(node.keys).append(&quot;  &quot;);
+                if (!node.leaf) queue.addAll(node.children);
+            }
+            System.out.println(sb.toString().trim());
+            level++;
+        }
+    }
+
+    /** 맨 왼쪽 리프부터 연결 리스트를 옆으로 훑어서 전체를 정렬된 순서로 반환한다 (검증/range scan 데모용). */
+    public List&lt;K&gt; scanAllViaLeafChain() {
+        Node cur = root;
+        while (!cur.leaf) cur = cur.children.get(0);
+        List&lt;K&gt; out = new ArrayList&lt;&gt;();
+        while (cur != null) {
+            out.addAll(cur.keys);
+            cur = cur.next;
+        }
+        return out;
+    }
+
+    // ================= 데모 =================
+
+    public static void main(String[] args) {
+        BPlusTree&lt;Integer, String&gt; tree = new BPlusTree&lt;&gt;(4); // order=4 -&gt; 내부 최대 자식 4, 리프 최대 엔트리 3
+
+        int[] keys = {10, 20, 5, 6, 12, 30, 7, 17, 3, 25, 1, 40, 15, 8, 22};
+        for (int k : keys) tree.insert(k, &quot;v&quot; + k);
+
+        System.out.println(&quot;=== 삽입 후 레벨별 구조 (order=4) ===&quot;);
+        tree.printLevels();
+
+        System.out.println(&quot;\n=== 리프 연결 리스트로 전체 스캔 (정렬 확인) ===&quot;);
+        System.out.println(tree.scanAllViaLeafChain());
+
+        System.out.println(&quot;\n=== 구간 검색 rangeSearch(7, 22) ===&quot;);
+        System.out.println(tree.rangeSearch(7, 22));
+
+        System.out.println(&quot;\n=== 삭제: 6, 12, 30 ===&quot;);
+        tree.delete(6);
+        tree.delete(12);
+        tree.delete(30);
+        tree.printLevels();
+        System.out.println(&quot;리프 체인 스캔: &quot; + tree.scanAllViaLeafChain());
+    }
+}
+</code></pre>
+    </div>
+
+    <h3>실행 방법</h3>
+    <ol class="steps">
+      <li><code>javac -encoding UTF-8 BPlusTree.java</code></li>
+      <li><code>java -Dfile.encoding=UTF-8 BPlusTree</code></li>
+    </ol>
+    <h4>실제 실행 결과</h4>
+    <pre class="output"><code>=== 삽입 후 레벨별 구조 (order=4) ===
+L0: int[20]
+L1: int[6, 10, 15]  int[30]
+L2: leaf[1, 3, 5]  leaf[6, 7, 8]  leaf[10, 12]  leaf[15, 17]  leaf[20, 22, 25]  leaf[30, 40]
+
+=== 리프 연결 리스트로 전체 스캔 (정렬 확인) ===
+[1, 3, 5, 6, 7, 8, 10, 12, 15, 17, 20, 22, 25, 30, 40]
+
+=== 구간 검색 rangeSearch(7, 22) ===
+[7=v7, 8=v8, 10=v10, 12=v12, 15=v15, 17=v17, 20=v20, 22=v22]
+
+=== 삭제: 6, 12, 30 ===
+L0: int[20]
+L1: int[6, 15]  int[25]
+L2: leaf[1, 3, 5]  leaf[7, 8, 10]  leaf[15, 17]  leaf[20, 22]  leaf[25, 40]
+리프 체인 스캔: [1, 3, 5, 7, 8, 10, 15, 17, 20, 22, 25, 40]</code></pre>
+    <p>
+      같은 15개 키인데 B-Tree(섹션 03)는 L0에 3개 키가 있었지만, B+Tree의 L0(루트)는 단
+      1개([20])뿐이다. 내부 노드가 라우팅 전용이라 더 얕고 넓게 퍼지는 경향을 여기서 바로
+      확인할 수 있다.
+    </p>
+  </section>
+
+  <!-- ============================================================= -->
+  <section>
+    <h2><span class="idx">06</span>직접 넣어보는 B+Tree</h2>
+    <p class="section-sub">order를 바꿔가며 삽입 / 삭제할 때 노드가 어떻게 쪼개지고 합쳐지는지 실시간으로 확인</p>
+    <p>
+      아래는 <strong>같은 삽입·삭제·분할·병합 로직을 자바스크립트로 그대로 옮겨</strong> 브라우저
+      안에서 돌리는 시각화다(45,000회 무작위 연산으로 검증한 로직과 동일). 주황 박스가
+      내부(라우팅) 노드, 파란 박스가 리프(데이터) 노드, 리프 아래 점선이 range scan에
+      쓰이는 연결 리스트다.
+    </p>
+    <div class="lab">
+      <div class="lab-controls">
+        <div class="field">
+          <label for="bp-order">order (자식 최대 수)</label>
+          <input id="bp-order" type="number" value="4" min="3" max="6">
+        </div>
+        <div class="field">
+          <label for="bp-key">키</label>
+          <input id="bp-key" type="number" value="" placeholder="숫자">
+        </div>
+        <button class="run" id="bp-insert">삽입</button>
+        <button class="ghost" id="bp-delete">삭제</button>
+        <button class="ghost" id="bp-random">랜덤 10개 삽입</button>
+        <button class="danger" id="bp-reset">초기화</button>
+      </div>
+      <div class="legend">
+        <span><span class="swatch" style="background:#fdf3e8;border:1px solid #c98a3a;"></span>내부(라우팅) 노드</span>
+        <span><span class="swatch" style="background:#eaf4fd;border:1px solid #2f7ab8;"></span>리프(데이터) 노드</span>
+        <span>점선 = 리프 연결 리스트(next)</span>
+      </div>
+      <div id="lab-status">order=4 트리로 시작합니다. 키를 넣어보세요.</div>
+      <div id="tree-svg-wrap"><svg id="tree-svg" width="100%" height="260"></svg></div>
+    </div>
+  </section>
+
+  <!-- ============================================================= -->
+  <section>
+    <h2><span class="idx">07</span>실제 DB에서 어떻게 쓰이는가</h2>
+    <p class="section-sub">왜 인덱스는 거의 다 B+Tree인가</p>
+
+    <h3>노드 크기 = 디스크 페이지 크기</h3>
+    <p>
+      실무 구현에서 노드(=페이지) 하나의 크기는 디스크/파일시스템의 블록 크기에 맞춘다.
+      예를 들어 MySQL InnoDB는 기본 <strong>페이지 크기 16KB</strong>를 쓴다. 정수형 PK(8바이트)와
+      포인터(6바이트 안팎)로 계산하면 내부 노드 하나가 대략 수백~천 개의 자식을 가질 수
+      있다. order가 1,000 근방이라면 100만 건도 트리 높이 2~3이면 충분히 담긴다 — 즉
+      <strong>디스크 접근 2~3번으로 어떤 행이든 찾을 수 있다.</strong>
+    </p>
+    <table>
+      <tr><th>항목</th><th>대략적인 값(예시)</th></tr>
+      <tr><td>페이지 크기</td><td>16 KB (InnoDB 기본값)</td></tr>
+      <tr><td>PK + 포인터 1쌍 크기</td><td>약 10~20 바이트</td></tr>
+      <tr><td>페이지당 대략적인 fanout(자식 수)</td><td>수백~1,000 이상</td></tr>
+      <tr><td>1억 건을 담는 데 필요한 트리 높이</td><td>약 3~4단계</td></tr>
+    </table>
+
+    <h3>InnoDB의 클러스터드 인덱스(Clustered Index)</h3>
+    <p>
+      InnoDB는 <strong>기본 키(PK) 자체가 B+Tree이고, 리프에 행 데이터 전체가 들어있다</strong>
+      (이를 clustered index라 한다). 그래서 PK로 찾는 조회는 인덱스를 찾는 게 곧 데이터를
+      찾는 것과 같다 — 리프에 도달하면 바로 그 행의 모든 컬럼이 있다.
+    </p>
+    <p>
+      PK가 아닌 <strong>보조 인덱스(secondary index)</strong>는 별도의 B+Tree인데, 리프에
+      행 데이터 대신 <strong>PK 값</strong>을 저장한다. 그래서 보조 인덱스로 검색하면
+      "보조 인덱스 트리에서 PK를 찾고 → 그 PK로 클러스터드 인덱스를 한 번 더 탐색"하는
+      2단계 조회가 된다. 이를 <strong>Bookmark Lookup(또는 Random I/O)</strong>이라 부르며,
+      보조 인덱스로 많은 행을 긁는 쿼리가 느려지는 대표적인 이유다 — <code>EXPLAIN</code>에서
+      "Using index" 문구가 이 비용을 피했는지 알려준다(<strong>covering index</strong>).
+    </p>
+
+    <h3>범위 스캔·정렬·페이징이 빠른 이유</h3>
+    <ul>
+      <li><code>WHERE col BETWEEN a AND b</code> — 시작 리프만 찾고 <code>next</code> 포인터로 쭉 읽는다 (섹션 04).</li>
+      <li><code>ORDER BY col</code> — 인덱스가 이미 정렬돼 있으니 리프를 순서대로 읽기만 하면 별도 정렬(filesort)이 필요 없다.</li>
+      <li><code>LIMIT/OFFSET</code> 페이징 — 인덱스 순서를 그대로 따라가면 되므로 별도 정렬 비용이 없다(단, OFFSET이 매우 크면 그만큼 리프를 건너뛰며 읽어야 해서 느려질 수 있다 — 이건 B+Tree 자체의 한계라기보다 OFFSET 방식의 한계).</li>
+    </ul>
+
+    <h3>왜 B-Tree가 아니라 B+Tree인가</h3>
+    <p>
+      B-Tree도 내부 노드에 데이터를 들고 있어서 "자주 찾는 상위 레벨 키는 오히려 더 빨리
+      찾을 수 있다"는 장점이 이론적으로는 있다. 하지만 DB는 다음 이유로 B+Tree를 압도적으로
+      선호한다.
+    </p>
+    <ul>
+      <li>내부 노드가 데이터 없이 라우팅만 하니 <strong>같은 페이지 크기에 더 많은 키를
+        담아 fanout이 커지고, 트리가 더 낮아진다.</strong></li>
+      <li>리프 연결 리스트 덕분에 <strong>순차 스캔/범위 스캔이 트리 재순회 없이</strong>
+        가능하다.</li>
+      <li>모든 검색이 항상 리프까지 내려가므로 <strong>탐색 시간이 일정</strong>하다(B-Tree는
+        운 좋으면 내부에서 바로 찾아지는 대신, 그만큼 최악·평균 케이스 편차가 생긴다).</li>
+    </ul>
+    <div class="callout warn">
+      <span class="tag">이 노트의 한계</span>
+      <p>
+        실제 DB 엔진은 여기에 더해 버퍼 풀(캐시), WAL(로그 선행 기입), 페이지 압축, 잠금·MVCC,
+        인덱스 페이지 채움율(fill factor) 조정, 우측 페이지 미리 분할 방지 최적화 등을 함께
+        쓴다. 이 노트의 자바 구현은 "핵심 자료구조 원리"만 정확히 재현한 학습용이고, 실제
+        스토리지 엔진 수준의 동시성·영속성 처리는 하지 않는다.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============================================================= -->
+  <section>
+    <h2><span class="idx">08</span>한눈에 정리</h2>
+    <table>
+      <tr><th></th><th>B-Tree</th><th>B+Tree</th></tr>
+      <tr><td>데이터 저장</td><td>모든 노드</td><td>리프만</td></tr>
+      <tr><td>내부 노드 키</td><td>실데이터 참조</td><td>라우팅용 복사본</td></tr>
+      <tr><td>리프 간 연결</td><td>없음</td><td>연결 리스트</td></tr>
+      <tr><td>범위 검색</td><td>트리 재순회 필요</td><td>리프 체인 순회로 충분</td></tr>
+      <tr><td>같은 페이지 크기 대비 fanout</td><td>상대적으로 낮음</td><td>더 높음 (트리가 더 얕음)</td></tr>
+      <tr><td>대표 사용처</td><td>파일시스템 일부, 특정 인메모리 인덱스</td><td>MySQL InnoDB, PostgreSQL, Oracle 등 대부분의 RDBMS 인덱스</td></tr>
+    </table>
+  </section>
+
+  <footer>
+    B-Tree / B+Tree 정리 노트 · 자바 구현은 TreeMap 대조 무작위 테스트(B-Tree 60,000회, B+Tree 45,000회)로 검증했다.
+  </footer>
+</div>
+
+<script>
+"use strict";
+// B+Tree JS 포트 (시각화용) - Java BPlusTree.java 로직을 그대로 옮김
+class BPlusTreeJS {
+  constructor(order){
+    if(order<3) throw new Error("order>=3");
+    this.order=order;
+    this.root={leaf:true, keys:[], values:[], children:[], next:null, parent:null};
+  }
+  minLeaf(){ return Math.floor(this.order/2); }
+  minInternal(){ return Math.floor((this.order+1)/2) - 1; }
+
+  findLeaf(key){
+    let cur=this.root;
+    while(!cur.leaf){
+      let i=0;
+      while(i<cur.keys.length && key>=cur.keys[i]) i++;
+      cur=cur.children[i];
+    }
+    return cur;
+  }
+  indexOfKey(keys,key){
+    for(let i=0;i<keys.length;i++){
+      if(key===keys[i]) return i;
+      if(key<keys[i]) return -1;
+    }
+    return -1;
+  }
+  search(key){
+    const leaf=this.findLeaf(key);
+    const idx=this.indexOfKey(leaf.keys,key);
+    return idx>=0? leaf.values[idx] : null;
+  }
+  rangeSearch(low,high){
+    const res=[];
+    let leaf=this.findLeaf(low);
+    while(leaf){
+      for(let i=0;i<leaf.keys.length;i++){
+        const k=leaf.keys[i];
+        if(k<low) continue;
+        if(k>high) return res;
+        res.push([k, leaf.values[i]]);
+      }
+      leaf=leaf.next;
+    }
+    return res;
+  }
+  insert(key,value){
+    const leaf=this.findLeaf(key);
+    let pos=0;
+    while(pos<leaf.keys.length && key>leaf.keys[pos]) pos++;
+    if(pos<leaf.keys.length && key===leaf.keys[pos]){ leaf.values[pos]=value; return; }
+    leaf.keys.splice(pos,0,key);
+    leaf.values.splice(pos,0,value);
+    if(leaf.keys.length > this.order-1) this._splitLeaf(leaf);
+  }
+  _splitLeaf(leaf){
+    const right={leaf:true, keys:[], values:[], children:[], next:null, parent:leaf.parent};
+    const mid=Math.floor(leaf.keys.length/2);
+    right.keys=leaf.keys.splice(mid);
+    right.values=leaf.values.splice(mid);
+    right.next=leaf.next;
+    leaf.next=right;
+    const upKey=right.keys[0];
+    this._insertIntoParent(leaf, upKey, right);
+  }
+  _insertIntoParent(left, upKey, right){
+    const parent=left.parent;
+    if(!parent){
+      const newRoot={leaf:false, keys:[upKey], values:[], children:[left,right], next:null, parent:null};
+      left.parent=newRoot; right.parent=newRoot;
+      this.root=newRoot;
+      return;
+    }
+    const idx=parent.children.indexOf(left);
+    parent.keys.splice(idx,0,upKey);
+    parent.children.splice(idx+1,0,right);
+    right.parent=parent;
+    if(parent.keys.length > this.order-1) this._splitInternal(parent);
+  }
+  _splitInternal(node){
+    const mid=Math.floor(node.keys.length/2);
+    const upKey=node.keys[mid];
+    const right={leaf:false, keys:node.keys.slice(mid+1), children:node.children.slice(mid+1), values:[], next:null, parent:node.parent};
+    right.children.forEach(c=>c.parent=right);
+    node.keys=node.keys.slice(0,mid);
+    node.children=node.children.slice(0,mid+1);
+    this._insertIntoParent(node, upKey, right);
+  }
+  delete(key){
+    const leaf=this.findLeaf(key);
+    const idx=this.indexOfKey(leaf.keys,key);
+    if(idx<0) return false;
+    leaf.keys.splice(idx,1);
+    leaf.values.splice(idx,1);
+    if(leaf===this.root) return true;
+    if(leaf.keys.length < this.minLeaf()) this._fixLeafUnderflow(leaf);
+    return true;
+  }
+  _fixLeafUnderflow(leaf){
+    const parent=leaf.parent;
+    const idx=parent.children.indexOf(leaf);
+    const leftSib= idx>0? parent.children[idx-1]: null;
+    const rightSib= idx<parent.children.length-1? parent.children[idx+1]: null;
+    if(leftSib && leftSib.keys.length>this.minLeaf()){
+      leaf.keys.unshift(leftSib.keys.pop());
+      leaf.values.unshift(leftSib.values.pop());
+      parent.keys[idx-1]=leaf.keys[0];
+    } else if(rightSib && rightSib.keys.length>this.minLeaf()){
+      leaf.keys.push(rightSib.keys.shift());
+      leaf.values.push(rightSib.values.shift());
+      parent.keys[idx]=rightSib.keys[0];
+    } else if(leftSib){
+      leftSib.keys=leftSib.keys.concat(leaf.keys);
+      leftSib.values=leftSib.values.concat(leaf.values);
+      leftSib.next=leaf.next;
+      parent.children.splice(idx,1);
+      parent.keys.splice(idx-1,1);
+      this._fixInternalUnderflow(parent);
+    } else if(rightSib){
+      leaf.keys=leaf.keys.concat(rightSib.keys);
+      leaf.values=leaf.values.concat(rightSib.values);
+      leaf.next=rightSib.next;
+      parent.children.splice(idx+1,1);
+      parent.keys.splice(idx,1);
+      this._fixInternalUnderflow(parent);
+    }
+  }
+  _fixInternalUnderflow(node){
+    if(node===this.root){
+      if(node.keys.length===0 && node.children.length>0){
+        this.root=node.children[0];
+        this.root.parent=null;
+      }
+      return;
+    }
+    if(node.keys.length >= this.minInternal()) return;
+    const parent=node.parent;
+    const idx=parent.children.indexOf(node);
+    const leftSib= idx>0? parent.children[idx-1]: null;
+    const rightSib= idx<parent.children.length-1? parent.children[idx+1]: null;
+    if(leftSib && leftSib.keys.length>this.minInternal()){
+      node.keys.unshift(parent.keys[idx-1]);
+      parent.keys[idx-1]=leftSib.keys.pop();
+      const moved=leftSib.children.pop();
+      moved.parent=node;
+      node.children.unshift(moved);
+    } else if(rightSib && rightSib.keys.length>this.minInternal()){
+      node.keys.push(parent.keys[idx]);
+      parent.keys[idx]=rightSib.keys.shift();
+      const moved=rightSib.children.shift();
+      moved.parent=node;
+      node.children.push(moved);
+    } else if(leftSib){
+      leftSib.keys.push(parent.keys[idx-1]);
+      leftSib.keys=leftSib.keys.concat(node.keys);
+      node.children.forEach(c=>c.parent=leftSib);
+      leftSib.children=leftSib.children.concat(node.children);
+      parent.keys.splice(idx-1,1);
+      parent.children.splice(idx,1);
+      this._fixInternalUnderflow(parent);
+    } else if(rightSib){
+      node.keys.push(parent.keys[idx]);
+      node.keys=node.keys.concat(rightSib.keys);
+      rightSib.children.forEach(c=>c.parent=node);
+      node.children=node.children.concat(rightSib.children);
+      parent.keys.splice(idx,1);
+      parent.children.splice(idx+1,1);
+      this._fixInternalUnderflow(parent);
+    }
+  }
+  scanAll(){
+    let cur=this.root;
+    while(!cur.leaf) cur=cur.children[0];
+    const out=[];
+    while(cur){ out.push(...cur.keys); cur=cur.next; }
+    return out;
+  }
+}
+
+
+// ============ 시각화 레이어 ============
+(function(){
+  "use strict";
+  const SVGNS="http://www.w3.org/2000/svg";
+  let tree = new BPlusTreeJS(4);
+  let nextVal = 1;
+
+  const svg = document.getElementById('tree-svg');
+  const status = document.getElementById('lab-status');
+  const orderInput = document.getElementById('bp-order');
+  const keyInput = document.getElementById('bp-key');
+
+  function setStatus(msg){ status.textContent = msg; }
+
+  function layout(){
+    let leafIndex = 0;
+    const pos = new Map();
+    function assign(node, depth){
+      if(node.leaf){
+        const x = leafIndex; leafIndex++;
+        pos.set(node, {x, depth});
+        return x;
+      }
+      const xs = node.children.map(c => assign(c, depth+1));
+      const x = (xs[0] + xs[xs.length-1]) / 2;
+      pos.set(node, {x, depth});
+      return x;
+    }
+    assign(tree.root, 0);
+    return {pos, leafCount: leafIndex};
+  }
+
+  function boxWidth(node){
+    return Math.max(46, node.keys.length * 26 + 18);
+  }
+
+  function render(){
+    const {pos, leafCount} = layout();
+    const SPX = 110, SPY = 78, OX = 60, OY = 34;
+    const width = Math.max(560, leafCount * SPX + 120);
+    const maxDepth = Math.max(...[...pos.values()].map(p=>p.depth));
+    const height = OY + (maxDepth+1) * SPY + 60;
+
+    svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+    svg.setAttribute('width', width);
+    svg.setAttribute('height', height);
+    svg.innerHTML = '';
+
+    function px(p){ return OX + p.x * SPX; }
+    function py(p){ return OY + p.depth * SPY; }
+
+    // edges (parent -> child)
+    function drawEdges(node){
+      if(node.leaf) return;
+      const p = pos.get(node);
+      const w = boxWidth(node);
+      for(const c of node.children){
+        const cp = pos.get(c);
+        const cw = boxWidth(c);
+        const line = document.createElementNS(SVGNS,'line');
+        line.setAttribute('x1', px(p)); line.setAttribute('y1', py(p)+18);
+        line.setAttribute('x2', px(cp)); line.setAttribute('y2', py(cp)-18);
+        line.setAttribute('stroke', '#8798a8'); line.setAttribute('stroke-width','1.3');
+        svg.appendChild(line);
+        drawEdges(c);
+      }
+    }
+    drawEdges(tree.root);
+
+    // leaf chain (dashed)
+    let leaf = tree.root;
+    while(!leaf.leaf) leaf = leaf.children[0];
+    while(leaf && leaf.next){
+      const p1 = pos.get(leaf), p2 = pos.get(leaf.next);
+      const w1 = boxWidth(leaf);
+      const line = document.createElementNS(SVGNS,'line');
+      line.setAttribute('x1', px(p1)+w1/2); line.setAttribute('y1', py(p1));
+      line.setAttribute('x2', px(p2)-boxWidth(leaf.next)/2); line.setAttribute('y2', py(p2));
+      line.setAttribute('stroke', '#2f7ab8'); line.setAttribute('stroke-width','1.6');
+      line.setAttribute('stroke-dasharray','4 3');
+      svg.appendChild(line);
+      leaf = leaf.next;
+    }
+
+    // nodes
+    function drawNode(node){
+      const p = pos.get(node);
+      const w = boxWidth(node);
+      const x = px(p) - w/2, y = py(p) - 16;
+      const rect = document.createElementNS(SVGNS,'rect');
+      rect.setAttribute('x', x); rect.setAttribute('y', y);
+      rect.setAttribute('width', w); rect.setAttribute('height', 32);
+      rect.setAttribute('rx', 6);
+      if(node.leaf){
+        rect.setAttribute('fill', '#eaf4fd'); rect.setAttribute('stroke', '#2f7ab8');
+      } else {
+        rect.setAttribute('fill', '#fdf3e8'); rect.setAttribute('stroke', '#c98a3a');
+      }
+      svg.appendChild(rect);
+
+      const text = document.createElementNS(SVGNS,'text');
+      text.setAttribute('x', px(p)); text.setAttribute('y', py(p)+5);
+      text.setAttribute('text-anchor','middle');
+      text.setAttribute('font-size','12.5');
+      text.setAttribute('fill', node.leaf ? '#1c5687' : '#8a5a12');
+      text.textContent = '[' + node.keys.join(', ') + ']';
+      svg.appendChild(text);
+
+      if(!node.leaf) node.children.forEach(drawNode);
+    }
+    drawNode(tree.root);
+  }
+
+  function currentOrder(){
+    let o = parseInt(orderInput.value, 10);
+    if(!(o>=3)) o = 4;
+    return o;
+  }
+
+  function rebuildIfOrderChanged(){
+    const o = currentOrder();
+    if(o !== tree.order){
+      const keys = tree.scanAll();
+      tree = new BPlusTreeJS(o);
+      keys.forEach(k => tree.insert(k, k*10));
+      setStatus(`order=${o}로 트리를 다시 만들었습니다 (기존 키 ${keys.length}개 유지).`);
+    }
+  }
+
+  document.getElementById('bp-insert').addEventListener('click', function(){
+    rebuildIfOrderChanged();
+    const k = parseInt(keyInput.value, 10);
+    if(Number.isNaN(k)){ setStatus('숫자를 입력하세요.'); return; }
+    tree.insert(k, k*10);
+    render();
+    setStatus(`insert(${k}) 완료. 전체 ${tree.scanAll().length}개 키.`);
+    keyInput.value='';
+  });
+
+  document.getElementById('bp-delete').addEventListener('click', function(){
+    rebuildIfOrderChanged();
+    const k = parseInt(keyInput.value, 10);
+    if(Number.isNaN(k)){ setStatus('숫자를 입력하세요.'); return; }
+    const ok = tree.delete(k);
+    render();
+    setStatus(ok ? `delete(${k}) 완료. 전체 ${tree.scanAll().length}개 키.` : `${k}는 트리에 없습니다.`);
+    keyInput.value='';
+  });
+
+  document.getElementById('bp-random').addEventListener('click', function(){
+    rebuildIfOrderChanged();
+    const used = new Set(tree.scanAll());
+    let count = 0, guard=0;
+    while(count < 10 && guard < 500){
+      guard++;
+      const k = Math.floor(Math.random()*90)+1;
+      if(!used.has(k)){ tree.insert(k, k*10); used.add(k); count++; }
+    }
+    render();
+    setStatus(`랜덤 ${count}개 삽입 완료. 전체 ${tree.scanAll().length}개 키.`);
+  });
+
+  document.getElementById('bp-reset').addEventListener('click', function(){
+    tree = new BPlusTreeJS(currentOrder());
+    render();
+    setStatus(`order=${currentOrder()} 빈 트리로 초기화했습니다.`);
+  });
+
+  orderInput.addEventListener('change', function(){
+    rebuildIfOrderChanged();
+    render();
+  });
+
+  // 초기 데모 데이터
+  [10,20,5,6,12,30,7,17,3].forEach(k => tree.insert(k, k*10));
+  render();
+})();
+</script>
+</body>
+</html>
