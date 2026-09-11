@@ -1,0 +1,1437 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python vs Java — 자료구조 비교</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Noto+Sans+KR:wght@300;400;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --py: #2563eb;
+    --py-light: #1d4ed8;
+    --py-dark: #93c5fd;
+    --java: #ea6c00;
+    --java-light: #c2410c;
+    --java-dark: #fed7aa;
+    --bg: #ffffff;
+    --surface: #f8fafc;
+    --surface2: #f1f5f9;
+    --border: #e2e8f0;
+    --text: #0f172a;
+    --muted: #64748b;
+    --accent: #7c3aed;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans KR', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* HERO */
+  .hero {
+    text-align: center;
+    padding: 60px 20px 40px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -100px; left: 50%;
+    transform: translateX(-50%);
+    width: 700px; height: 400px;
+    background: radial-gradient(ellipse, rgba(37,99,235,0.07) 0%, rgba(234,108,0,0.07) 60%, transparent 80%);
+    pointer-events: none;
+  }
+  .hero-badge {
+    display: inline-block;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    padding: 4px 14px;
+    border-radius: 2px;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+  }
+  .hero h1 {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 900;
+    line-height: 1.1;
+    margin-bottom: 16px;
+  }
+  .hero h1 span.py { color: var(--py); }
+  .hero h1 span.java { color: var(--java); }
+  .hero p {
+    color: var(--muted);
+    font-size: 15px;
+    font-weight: 300;
+  }
+
+  /* NAV TABS */
+  .tab-nav {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    padding: 20px;
+    flex-wrap: wrap;
+  }
+  .tab-btn {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1px;
+    padding: 8px 18px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    border-radius: 3px;
+    transition: all 0.2s;
+    text-transform: uppercase;
+  }
+  .tab-btn:hover { border-color: var(--py); color: var(--py); }
+  .tab-btn.active { background: var(--py); border-color: var(--py); color: #fff; }
+
+  /* MAIN GRID */
+  .main { max-width: 1300px; margin: 0 auto; padding: 0 20px 60px; }
+
+  /* SECTION */
+  .ds-section { display: none; animation: fadeIn 0.3s ease; }
+  .ds-section.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* SPLIT CARD */
+  .split-card {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 24px;
+    background: var(--border);
+  }
+  .split-side {
+    background: var(--surface);
+    padding: 28px;
+  }
+  .split-side.py-side { border-top: 3px solid var(--py); }
+  .split-side.java-side { border-top: 3px solid var(--java); }
+
+  .lang-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .lang-label.py { color: var(--py); }
+  .lang-label.java { color: var(--java); }
+  .lang-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: currentColor;
+  }
+
+  .ds-title { font-size: 20px; font-weight: 700; margin-bottom: 6px; }
+  .ds-sub { font-size: 12px; color: var(--muted); margin-bottom: 18px; font-weight: 300; }
+
+  /* CODE BLOCK */
+  pre {
+    background: #f8fafc;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 16px;
+    font-family: 'Space Mono', monospace;
+    font-size: 11.5px;
+    line-height: 1.7;
+    overflow-x: auto;
+    margin-bottom: 16px;
+  }
+  .kw { color: #7c3aed; }
+  .st { color: #16a34a; }
+  .cm { color: #94a3b8; font-style: italic; }
+  .num { color: #ea580c; }
+  .fn { color: #2563eb; }
+  .ty { color: #0891b2; }
+
+  /* TAGS */
+  .tag-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+  .tag {
+    font-size: 10px;
+    font-family: 'Space Mono', monospace;
+    padding: 3px 10px;
+    border-radius: 2px;
+    border: 1px solid;
+    letter-spacing: 0.5px;
+  }
+  .tag.py { color: #1d4ed8; border-color: #93c5fd; background: rgba(37,99,235,0.06); }
+  .tag.java { color: #c2410c; border-color: #fed7aa; background: rgba(234,108,0,0.06); }
+
+  /* COMPARE TABLE */
+  .compare-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 28px;
+    font-size: 13px;
+  }
+  .compare-table th {
+    padding: 12px 16px;
+    text-align: left;
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    border-bottom: 2px solid var(--border);
+    color: var(--muted);
+  }
+  .compare-table th.py { color: var(--py); border-bottom-color: var(--py); }
+  .compare-table th.java { color: var(--java); border-bottom-color: var(--java); }
+  .compare-table td {
+    padding: 11px 16px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    line-height: 1.5;
+  }
+  .compare-table tr:hover td { background: rgba(255,255,255,0.02); }
+  .compare-table td:first-child { color: var(--muted); font-size: 12px; white-space: nowrap; }
+
+  /* VISUALIZATION */
+  .viz-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 28px;
+    margin-bottom: 24px;
+  }
+  .viz-title {
+    font-size: 13px;
+    font-family: 'Space Mono', monospace;
+    color: var(--accent);
+    margin-bottom: 20px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  /* MEMORY DIAGRAM */
+  .mem-diagram {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .mem-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .mem-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    width: 80px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+  .mem-blocks {
+    display: flex;
+    gap: 2px;
+    align-items: center;
+  }
+  .mem-block {
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    border-radius: 3px;
+    min-width: 44px;
+    padding: 0 8px;
+    white-space: nowrap;
+  }
+  .mem-block.py-block { background: rgba(37,99,235,0.08); border: 1px solid #93c5fd; color: #1d4ed8; }
+  .mem-block.java-block { background: rgba(234,108,0,0.08); border: 1px solid #fed7aa; color: #c2410c; }
+  .mem-block.null { background: rgba(100,116,139,0.06); border: 1px dashed var(--border); color: var(--muted); }
+  .mem-arrow {
+    color: var(--muted);
+    font-size: 14px;
+    margin: 0 4px;
+  }
+  .mem-ptr {
+    height: 36px;
+    min-width: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    border: 1px dashed var(--border);
+    border-radius: 3px;
+    color: var(--muted);
+    padding: 0 8px;
+  }
+
+  /* LINKED LIST SVG STYLE */
+  .node-chain {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin: 10px 0;
+    flex-wrap: wrap;
+  }
+  .node-box {
+    display: flex;
+    border-radius: 4px;
+    overflow: hidden;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    height: 40px;
+  }
+  .node-data {
+    padding: 0 12px;
+    display: flex;
+    align-items: center;
+    background: rgba(37,99,235,0.08);
+    border: 1px solid #93c5fd;
+    color: #1d4ed8;
+  }
+  .node-data.java-style {
+    background: rgba(234,108,0,0.08);
+    border-color: #fed7aa;
+    color: #c2410c;
+  }
+  .node-next {
+    padding: 0 10px;
+    display: flex;
+    align-items: center;
+    background: rgba(124,58,237,0.07);
+    border: 1px solid rgba(124,58,237,0.25);
+    border-left: none;
+    color: #7c3aed;
+    font-size: 10px;
+  }
+  .chain-arrow {
+    color: var(--muted);
+    font-size: 18px;
+    margin: 0 2px;
+  }
+  .chain-null {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    border: 1px dashed var(--border);
+    padding: 0 10px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    border-radius: 3px;
+  }
+
+  /* TREE VIZ */
+  .tree-container { display: flex; flex-direction: column; align-items: center; gap: 0; }
+  .tree-level { display: flex; justify-content: center; gap: 12px; position: relative; margin-bottom: 0; }
+  .tree-node {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px; font-weight: 700;
+  }
+  .tree-node.py-node { background: rgba(37,99,235,0.08); border: 2px solid var(--py); color: #1d4ed8; }
+  .tree-node.java-node { background: rgba(234,108,0,0.08); border: 2px solid var(--java); color: #c2410c; }
+  .tree-edges { position: relative; height: 30px; display: flex; align-items: center; }
+  .tree-svg { overflow: visible; }
+
+  /* STACK/QUEUE VIZ */
+  .stack-viz {
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 2px;
+    width: 120px;
+  }
+  .stack-item {
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    border-radius: 3px;
+  }
+  .stack-item.py-stack { background: rgba(37,99,235,0.07); border: 1px solid #93c5fd; color: #1d4ed8; }
+  .stack-item.java-stack { background: rgba(234,108,0,0.07); border: 1px solid #fed7aa; color: #c2410c; }
+  .stack-top { border: 2px solid var(--py) !important; }
+  .stack-top-java { border: 2px solid var(--java) !important; }
+
+  .queue-viz {
+    display: flex;
+    gap: 2px;
+    align-items: center;
+  }
+  .queue-item {
+    height: 40px; padding: 0 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Space Mono', monospace; font-size: 11px;
+    border-radius: 3px;
+  }
+  .queue-item.py-queue { background: rgba(37,99,235,0.07); border: 1px solid #93c5fd; color: #1d4ed8; }
+  .queue-item.java-queue { background: rgba(234,108,0,0.07); border: 1px solid #fed7aa; color: #c2410c; }
+
+  /* HASH MAP VIZ */
+  .hash-table { display: flex; gap: 20px; }
+  .hash-col { display: flex; flex-direction: column; gap: 2px; }
+  .hash-idx {
+    font-family: 'Space Mono', monospace; font-size: 10px;
+    color: var(--muted); width: 24px; height: 32px;
+    display: flex; align-items: center;
+  }
+  .hash-bucket {
+    height: 32px; min-width: 120px; padding: 0 10px;
+    display: flex; align-items: center;
+    font-family: 'Space Mono', monospace; font-size: 10px;
+    border-radius: 3px;
+  }
+  .hash-bucket.py-bucket { background: rgba(37,99,235,0.06); border: 1px solid #93c5fd; color: #1d4ed8; }
+  .hash-bucket.java-bucket { background: rgba(234,108,0,0.06); border: 1px solid #fed7aa; color: #c2410c; }
+  .hash-bucket.empty { background: transparent; border: 1px dashed var(--border); color: var(--muted); }
+
+  /* OVERALL COMPARE */
+  .overall-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+  .overall-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+  }
+  .overall-card h3 {
+    font-size: 14px; font-weight: 700; margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .overall-card ul {
+    list-style: none;
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .overall-card ul li {
+    font-size: 12px; color: var(--muted); line-height: 1.5;
+    padding-left: 12px; position: relative;
+  }
+  .overall-card ul li::before { content: '›'; position: absolute; left: 0; color: var(--accent); }
+
+  /* SECTION HEADER */
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-icon {
+    width: 40px; height: 40px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+  }
+  .section-header h2 { font-size: 22px; font-weight: 700; }
+  .section-header p { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+
+  @media (max-width: 768px) {
+    .split-card { grid-template-columns: 1fr; }
+    .hash-table { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-badge">Data Structures</div>
+  <h1><span class="py">Python</span> vs <span class="java">Java</span></h1>
+  <p>자료구조 완전 비교 — 코드 · 특성 · 시각화</p>
+</div>
+
+<div class="tab-nav">
+  <button class="tab-btn active" onclick="showTab('overview')">전체 비교</button>
+  <button class="tab-btn" onclick="showTab('array')">배열 / 리스트</button>
+  <button class="tab-btn" onclick="showTab('linked')">연결 리스트</button>
+  <button class="tab-btn" onclick="showTab('stack')">스택 / 큐</button>
+  <button class="tab-btn" onclick="showTab('hash')">해시맵 / 딕셔너리</button>
+  <button class="tab-btn" onclick="showTab('set')">집합 (Set)</button>
+  <button class="tab-btn" onclick="showTab('tree')">트리</button>
+</div>
+
+<div class="main">
+
+  <!-- ===== OVERVIEW ===== -->
+  <div class="ds-section active" id="tab-overview">
+    <div class="section-header">
+      <div class="section-icon">⚡</div>
+      <div>
+        <h2>전체 자료구조 비교</h2>
+        <p>Python과 Java의 핵심 자료구조를 한눈에</p>
+      </div>
+    </div>
+
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th>자료구조</th>
+          <th class="py">🐍 Python</th>
+          <th class="java">☕ Java</th>
+          <th>특성</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>동적 배열</td>
+          <td><code style="color:var(--py-light)">list</code></td>
+          <td><code style="color:var(--java-light)">ArrayList&lt;T&gt;</code></td>
+          <td>인덱스 접근 O(1), 동적 크기</td>
+        </tr>
+        <tr>
+          <td>고정 배열</td>
+          <td><code style="color:var(--py-light)">array (module)</code></td>
+          <td><code style="color:var(--java-light)">int[] / T[]</code></td>
+          <td>타입 고정, 연속 메모리</td>
+        </tr>
+        <tr>
+          <td>연결 리스트</td>
+          <td><code style="color:var(--py-light)">직접 구현 / deque</code></td>
+          <td><code style="color:var(--java-light)">LinkedList&lt;T&gt;</code></td>
+          <td>삽입/삭제 O(1), 검색 O(n)</td>
+        </tr>
+        <tr>
+          <td>스택</td>
+          <td><code style="color:var(--py-light)">list (append/pop)</code></td>
+          <td><code style="color:var(--java-light)">Stack&lt;T&gt; / Deque</code></td>
+          <td>LIFO, push/pop O(1)</td>
+        </tr>
+        <tr>
+          <td>큐</td>
+          <td><code style="color:var(--py-light)">collections.deque</code></td>
+          <td><code style="color:var(--java-light)">LinkedList / ArrayDeque</code></td>
+          <td>FIFO, enqueue/dequeue O(1)</td>
+        </tr>
+        <tr>
+          <td>해시맵</td>
+          <td><code style="color:var(--py-light)">dict</code></td>
+          <td><code style="color:var(--java-light)">HashMap&lt;K,V&gt;</code></td>
+          <td>Key-Value, 평균 O(1)</td>
+        </tr>
+        <tr>
+          <td>집합</td>
+          <td><code style="color:var(--py-light)">set</code></td>
+          <td><code style="color:var(--java-light)">HashSet&lt;T&gt;</code></td>
+          <td>중복 없음, 평균 O(1)</td>
+        </tr>
+        <tr>
+          <td>정렬 집합</td>
+          <td><code style="color:var(--py-light)">sortedcontainers</code></td>
+          <td><code style="color:var(--java-light)">TreeSet&lt;T&gt;</code></td>
+          <td>정렬 유지, O(log n)</td>
+        </tr>
+        <tr>
+          <td>우선순위 큐</td>
+          <td><code style="color:var(--py-light)">heapq</code></td>
+          <td><code style="color:var(--java-light)">PriorityQueue&lt;T&gt;</code></td>
+          <td>Min-heap 기반</td>
+        </tr>
+        <tr>
+          <td>튜플 (불변)</td>
+          <td><code style="color:var(--py-light)">tuple</code></td>
+          <td><code style="color:var(--java-light)">Record (Java 16+)</code></td>
+          <td>불변, 여러 타입 가능</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Big Picture Viz -->
+    <div class="viz-section">
+      <div class="viz-title">// 자료구조 계층도</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px;">
+        <!-- Python -->
+        <div>
+          <div class="lang-label py"><span class="lang-dot"></span>Python 자료구조</div>
+          <div style="display:flex;flex-direction:column;gap:8px;margin-top:12px;">
+            <div style="background:rgba(59,130,246,0.08);border:1px solid var(--py-dark);border-radius:6px;padding:10px 14px;">
+              <div style="font-size:11px;color:var(--muted);margin-bottom:6px;font-family:'Space Mono',monospace;">내장 (Built-in)</div>
+              <div style="display:flex;flex-wrap:wrap;gap:6px;">
+                <span class="tag py">list</span><span class="tag py">dict</span><span class="tag py">set</span><span class="tag py">tuple</span><span class="tag py">str</span>
+              </div>
+            </div>
+            <div style="background:rgba(59,130,246,0.05);border:1px solid rgba(59,130,246,0.2);border-radius:6px;padding:10px 14px;">
+              <div style="font-size:11px;color:var(--muted);margin-bottom:6px;font-family:'Space Mono',monospace;">collections 모듈</div>
+              <div style="display:flex;flex-wrap:wrap;gap:6px;">
+                <span class="tag py">deque</span><span class="tag py">OrderedDict</span><span class="tag py">Counter</span><span class="tag py">defaultdict</span>
+              </div>
+            </div>
+            <div style="background:rgba(59,130,246,0.03);border:1px solid rgba(59,130,246,0.15);border-radius:6px;padding:10px 14px;">
+              <div style="font-size:11px;color:var(--muted);margin-bottom:6px;font-family:'Space Mono',monospace;">heapq / array</div>
+              <div style="display:flex;flex-wrap:wrap;gap:6px;">
+                <span class="tag py">heapq</span><span class="tag py">array.array</span><span class="tag py">bisect</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Java -->
+        <div>
+          <div class="lang-label java"><span class="lang-dot"></span>Java 자료구조</div>
+          <div style="display:flex;flex-direction:column;gap:8px;margin-top:12px;">
+            <div style="background:rgba(249,115,22,0.08);border:1px solid var(--java-dark);border-radius:6px;padding:10px 14px;">
+              <div style="font-size:11px;color:var(--muted);margin-bottom:6px;font-family:'Space Mono',monospace;">List 계열</div>
+              <div style="display:flex;flex-wrap:wrap;gap:6px;">
+                <span class="tag java">ArrayList</span><span class="tag java">LinkedList</span><span class="tag java">Vector</span>
+              </div>
+            </div>
+            <div style="background:rgba(249,115,22,0.05);border:1px solid rgba(249,115,22,0.2);border-radius:6px;padding:10px 14px;">
+              <div style="font-size:11px;color:var(--muted);margin-bottom:6px;font-family:'Space Mono',monospace;">Map / Set 계열</div>
+              <div style="display:flex;flex-wrap:wrap;gap:6px;">
+                <span class="tag java">HashMap</span><span class="tag java">TreeMap</span><span class="tag java">HashSet</span><span class="tag java">TreeSet</span>
+              </div>
+            </div>
+            <div style="background:rgba(249,115,22,0.03);border:1px solid rgba(249,115,22,0.15);border-radius:6px;padding:10px 14px;">
+              <div style="font-size:11px;color:var(--muted);margin-bottom:6px;font-family:'Space Mono',monospace;">Queue / Stack 계열</div>
+              <div style="display:flex;flex-wrap:wrap;gap:6px;">
+                <span class="tag java">Stack</span><span class="tag java">ArrayDeque</span><span class="tag java">PriorityQueue</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Key Differences -->
+    <div class="overall-grid">
+      <div class="overall-card">
+        <h3 style="color:var(--py)">🐍 Python의 특징</h3>
+        <ul>
+          <li>동적 타입 — list에 혼합 타입 저장 가능</li>
+          <li>내장 자료구조가 강력하고 직관적</li>
+          <li>list comprehension으로 간결한 생성</li>
+          <li>GIL 때문에 멀티스레드 성능 주의</li>
+          <li>dict는 삽입 순서를 보장 (Python 3.7+)</li>
+        </ul>
+      </div>
+      <div class="overall-card">
+        <h3 style="color:var(--java)">☕ Java의 특징</h3>
+        <ul>
+          <li>정적 타입 — 제네릭으로 타입 안전성 보장</li>
+          <li>Collection 프레임워크로 체계적 구조</li>
+          <li>interface 기반 (List, Map, Set, Queue)</li>
+          <li>primitive 배열 (int[])과 객체 배열 구분</li>
+          <li>Collections, Arrays 유틸리티 클래스 풍부</li>
+        </ul>
+      </div>
+      <div class="overall-card">
+        <h3 style="color:var(--accent)">⚡ 성능 비교</h3>
+        <ul>
+          <li>랜덤 접근: 동등 O(1) — list vs ArrayList</li>
+          <li>해시 조회: 동등 O(1) — dict vs HashMap</li>
+          <li>Java는 JIT 컴파일로 반복 작업 빠름</li>
+          <li>Python은 numpy로 수치연산 보완</li>
+          <li>메모리: Java 객체 오버헤드 > Python</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== ARRAY / LIST ===== -->
+  <div class="ds-section" id="tab-array">
+    <div class="section-header">
+      <div class="section-icon">📋</div>
+      <div><h2>배열 / 리스트</h2><p>순서 있는 데이터의 기본 컨테이너</p></div>
+    </div>
+
+    <div class="split-card">
+      <div class="split-side py-side">
+        <div class="lang-label py"><span class="lang-dot"></span>Python</div>
+        <div class="ds-title">list</div>
+        <div class="ds-sub">동적 크기, 혼합 타입 허용</div>
+        <pre><span class="cm"># 리스트 생성</span>
+arr = [<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="num">4</span>, <span class="num">5</span>]
+mixed = [<span class="num">1</span>, <span class="st">"hello"</span>, <span class="num">3.14</span>, <span class="kw">True</span>]
+
+<span class="cm"># 접근 & 슬라이싱</span>
+arr[<span class="num">0</span>]       <span class="cm"># 1</span>
+arr[-<span class="num">1</span>]      <span class="cm"># 5 (음수 인덱스)</span>
+arr[<span class="num">1</span>:<span class="num">3</span>]     <span class="cm"># [2, 3]</span>
+
+<span class="cm"># 수정</span>
+arr.<span class="fn">append</span>(<span class="num">6</span>)      <span class="cm"># 끝에 추가</span>
+arr.<span class="fn">insert</span>(<span class="num">0</span>, <span class="num">0</span>)   <span class="cm"># 앞에 삽입</span>
+arr.<span class="fn">pop</span>()           <span class="cm"># 끝 제거</span>
+arr.<span class="fn">remove</span>(<span class="num">3</span>)      <span class="cm"># 값으로 제거</span>
+
+<span class="cm"># List comprehension</span>
+squares = [x**<span class="num">2</span> <span class="kw">for</span> x <span class="kw">in</span> <span class="fn">range</span>(<span class="num">5</span>)]</pre>
+        <div class="tag-row">
+          <span class="tag py">동적 크기</span>
+          <span class="tag py">혼합 타입</span>
+          <span class="tag py">슬라이싱</span>
+          <span class="tag py">음수 인덱스</span>
+        </div>
+      </div>
+      <div class="split-side java-side">
+        <div class="lang-label java"><span class="lang-dot"></span>Java</div>
+        <div class="ds-title">ArrayList&lt;T&gt; / int[]</div>
+        <div class="ds-sub">정적 배열 + 동적 ArrayList</div>
+        <pre><span class="cm">// 고정 배열</span>
+<span class="ty">int</span>[] arr = {<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="num">4</span>, <span class="num">5</span>};
+<span class="ty">int</span>[] arr2 = <span class="kw">new</span> <span class="ty">int</span>[<span class="num">5</span>];
+
+<span class="cm">// ArrayList (동적)</span>
+List&lt;<span class="ty">Integer</span>&gt; list = <span class="kw">new</span> <span class="ty">ArrayList</span>&lt;&gt;();
+
+<span class="cm">// 접근</span>
+arr[<span class="num">0</span>];              <span class="cm">// 1</span>
+list.<span class="fn">get</span>(<span class="num">0</span>);        <span class="cm">// 요소 조회</span>
+
+<span class="cm">// 수정</span>
+list.<span class="fn">add</span>(<span class="num">6</span>);           <span class="cm">// 끝에 추가</span>
+list.<span class="fn">add</span>(<span class="num">0</span>, <span class="num">0</span>);       <span class="cm">// 앞에 삽입</span>
+list.<span class="fn">remove</span>(<span class="num">0</span>);      <span class="cm">// 인덱스로 제거</span>
+list.<span class="fn">set</span>(<span class="num">1</span>, <span class="num">99</span>);     <span class="cm">// 값 변경</span>
+
+<span class="cm">// Stream API</span>
+list.<span class="fn">stream</span>().<span class="fn">filter</span>(x -&gt; x &gt; <span class="num">2</span>).<span class="fn">toList</span>();</pre>
+        <div class="tag-row">
+          <span class="tag java">타입 안전</span>
+          <span class="tag java">제네릭</span>
+          <span class="tag java">primitive 배열</span>
+          <span class="tag java">Stream API</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 메모리 구조 시각화 -->
+    <div class="viz-section">
+      <div class="viz-title">// 메모리 레이아웃 시각화</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px;">
+        <div>
+          <div class="lang-label py" style="margin-bottom:14px;"><span class="lang-dot"></span>Python list — 포인터 배열</div>
+          <div class="mem-diagram">
+            <div class="mem-row">
+              <div class="mem-label">인덱스</div>
+              <div class="mem-blocks">
+                <div class="mem-block py-block">[0]</div>
+                <div class="mem-block py-block">[1]</div>
+                <div class="mem-block py-block">[2]</div>
+                <div class="mem-block py-block">[3]</div>
+              </div>
+            </div>
+            <div class="mem-row">
+              <div class="mem-label">ptr</div>
+              <div class="mem-blocks">
+                <div class="mem-block py-block">→obj</div>
+                <div class="mem-block py-block">→obj</div>
+                <div class="mem-block py-block">→obj</div>
+                <div class="mem-block py-block">→obj</div>
+              </div>
+            </div>
+            <div class="mem-row">
+              <div class="mem-label">값</div>
+              <div class="mem-blocks">
+                <div class="mem-block py-block">1</div>
+                <div class="mem-block py-block">"hi"</div>
+                <div class="mem-block py-block">3.14</div>
+                <div class="mem-block py-block">True</div>
+              </div>
+            </div>
+          </div>
+          <p style="font-size:11px;color:var(--muted);margin-top:10px;font-family:'Space Mono',monospace;">※ PyObject 포인터 저장 → 혼합 타입 가능</p>
+        </div>
+        <div>
+          <div class="lang-label java" style="margin-bottom:14px;"><span class="lang-dot"></span>Java int[] — 연속 메모리</div>
+          <div class="mem-diagram">
+            <div class="mem-row">
+              <div class="mem-label">인덱스</div>
+              <div class="mem-blocks">
+                <div class="mem-block java-block">[0]</div>
+                <div class="mem-block java-block">[1]</div>
+                <div class="mem-block java-block">[2]</div>
+                <div class="mem-block java-block">[3]</div>
+              </div>
+            </div>
+            <div class="mem-row">
+              <div class="mem-label">값 (4B)</div>
+              <div class="mem-blocks">
+                <div class="mem-block java-block">1</div>
+                <div class="mem-block java-block">2</div>
+                <div class="mem-block java-block">3</div>
+                <div class="mem-block java-block">4</div>
+              </div>
+            </div>
+          </div>
+          <p style="font-size:11px;color:var(--muted);margin-top:10px;font-family:'Space Mono',monospace;">※ 값 직접 저장 → 캐시 효율 우수</p>
+        </div>
+      </div>
+    </div>
+
+    <table class="compare-table">
+      <thead><tr><th>항목</th><th class="py">Python list</th><th class="java">Java ArrayList</th></tr></thead>
+      <tbody>
+        <tr><td>타입 선언</td><td>불필요 (동적)</td><td>필요 <code style="color:var(--java-light)">List&lt;Integer&gt;</code></td></tr>
+        <tr><td>혼합 타입</td><td>✅ 가능</td><td>❌ 불가 (Object 사용 시 가능)</td></tr>
+        <tr><td>크기 변경</td><td>자동</td><td>자동 (초기 용량 설정 가능)</td></tr>
+        <tr><td>슬라이싱</td><td>✅ arr[1:3]</td><td>❌ subList() 메서드</td></tr>
+        <tr><td>음수 인덱스</td><td>✅ arr[-1]</td><td>❌ arr[arr.length-1]</td></tr>
+        <tr><td>null 저장</td><td>None 저장 가능</td><td>null 저장 가능</td></tr>
+        <tr><td>정렬</td><td>arr.sort() / sorted()</td><td>Collections.sort()</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ===== LINKED LIST ===== -->
+  <div class="ds-section" id="tab-linked">
+    <div class="section-header">
+      <div class="section-icon">🔗</div>
+      <div><h2>연결 리스트</h2><p>노드가 포인터로 연결된 선형 자료구조</p></div>
+    </div>
+
+    <div class="split-card">
+      <div class="split-side py-side">
+        <div class="lang-label py"><span class="lang-dot"></span>Python</div>
+        <div class="ds-title">직접 구현 / collections.deque</div>
+        <div class="ds-sub">표준 라이브러리에 LinkedList 없음</div>
+        <pre><span class="cm"># 노드 직접 구현</span>
+<span class="kw">class</span> <span class="ty">Node</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="kw">self</span>, data):
+        <span class="kw">self</span>.data = data
+        <span class="kw">self</span>.next = <span class="kw">None</span>
+
+<span class="kw">class</span> <span class="ty">LinkedList</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="kw">self</span>):
+        <span class="kw">self</span>.head = <span class="kw">None</span>
+
+    <span class="kw">def</span> <span class="fn">append</span>(<span class="kw">self</span>, data):
+        node = <span class="ty">Node</span>(data)
+        <span class="kw">if not</span> <span class="kw">self</span>.head:
+            <span class="kw">self</span>.head = node
+            <span class="kw">return</span>
+        cur = <span class="kw">self</span>.head
+        <span class="kw">while</span> cur.next:
+            cur = cur.next
+        cur.next = node
+
+<span class="cm"># 실용적으론 deque 사용</span>
+<span class="kw">from</span> collections <span class="kw">import</span> deque
+dq = <span class="ty">deque</span>([<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>])
+dq.<span class="fn">appendleft</span>(<span class="num">0</span>)  <span class="cm"># O(1)</span>
+dq.<span class="fn">popleft</span>()      <span class="cm"># O(1)</span></pre>
+      </div>
+      <div class="split-side java-side">
+        <div class="lang-label java"><span class="lang-dot"></span>Java</div>
+        <div class="ds-title">LinkedList&lt;T&gt;</div>
+        <div class="ds-sub">이중 연결 리스트, List + Deque 구현</div>
+        <pre><span class="cm">// LinkedList — 이중 연결</span>
+List&lt;<span class="ty">Integer</span>&gt; ll =
+    <span class="kw">new</span> <span class="ty">LinkedList</span>&lt;&gt;();
+
+ll.<span class="fn">add</span>(<span class="num">1</span>);          <span class="cm">// 끝에 추가</span>
+ll.<span class="fn">add</span>(<span class="num">0</span>, <span class="num">0</span>);      <span class="cm">// 앞에 삽입 O(1)</span>
+ll.<span class="fn">remove</span>(<span class="num">0</span>);     <span class="cm">// O(1)</span>
+ll.<span class="fn">get</span>(<span class="num">2</span>);         <span class="cm">// O(n) ← 느림!</span>
+
+<span class="cm">// Deque로도 사용 가능</span>
+Deque&lt;<span class="ty">Integer</span>&gt; dq =
+    <span class="kw">new</span> <span class="ty">LinkedList</span>&lt;&gt;();
+dq.<span class="fn">addFirst</span>(<span class="num">0</span>);   <span class="cm">// 앞 삽입</span>
+dq.<span class="fn">addLast</span>(<span class="num">4</span>);    <span class="cm">// 뒤 삽입</span>
+dq.<span class="fn">pollFirst</span>();   <span class="cm">// 앞 제거</span>
+
+<span class="cm">// 노드 직접 구현</span>
+<span class="kw">class</span> <span class="ty">Node</span>&lt;<span class="ty">T</span>&gt; {
+    <span class="ty">T</span> data;
+    <span class="ty">Node</span>&lt;<span class="ty">T</span>&gt; next;
+}</pre>
+      </div>
+    </div>
+
+    <!-- LinkedList 시각화 -->
+    <div class="viz-section">
+      <div class="viz-title">// 연결 리스트 구조 시각화</div>
+      <div style="display:flex;flex-direction:column;gap:28px;">
+        <div>
+          <div class="lang-label py" style="margin-bottom:12px;"><span class="lang-dot"></span>Python — 단방향 연결 리스트</div>
+          <div class="node-chain">
+            <div style="font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);margin-right:8px;">head →</div>
+            <div class="node-box"><div class="node-data">1</div><div class="node-next">next</div></div>
+            <div class="chain-arrow">→</div>
+            <div class="node-box"><div class="node-data">2</div><div class="node-next">next</div></div>
+            <div class="chain-arrow">→</div>
+            <div class="node-box"><div class="node-data">3</div><div class="node-next">next</div></div>
+            <div class="chain-arrow">→</div>
+            <div class="chain-null">None</div>
+          </div>
+        </div>
+        <div>
+          <div class="lang-label java" style="margin-bottom:12px;"><span class="lang-dot"></span>Java — 이중 연결 리스트 (LinkedList)</div>
+          <div class="node-chain" style="flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px;">
+            <div style="font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);margin-right:8px;">head →</div>
+            <div class="node-box">
+              <div class="node-next" style="background:rgba(249,115,22,0.1);border-color:rgba(249,115,22,0.3);color:var(--java-light);border-right:none;">prev</div>
+              <div class="node-data java-style">1</div>
+              <div class="node-next" style="background:rgba(249,115,22,0.1);border-color:rgba(249,115,22,0.3);color:var(--java-light);border-left:none;">next</div>
+            </div>
+            <div class="chain-arrow">⇄</div>
+            <div class="node-box">
+              <div class="node-next" style="background:rgba(249,115,22,0.1);border-color:rgba(249,115,22,0.3);color:var(--java-light);border-right:none;">prev</div>
+              <div class="node-data java-style">2</div>
+              <div class="node-next" style="background:rgba(249,115,22,0.1);border-color:rgba(249,115,22,0.3);color:var(--java-light);border-left:none;">next</div>
+            </div>
+            <div class="chain-arrow">⇄</div>
+            <div class="node-box">
+              <div class="node-next" style="background:rgba(249,115,22,0.1);border-color:rgba(249,115,22,0.3);color:var(--java-light);border-right:none;">prev</div>
+              <div class="node-data java-style">3</div>
+              <div class="node-next" style="background:rgba(249,115,22,0.1);border-color:rgba(249,115,22,0.3);color:var(--java-light);border-left:none;">next</div>
+            </div>
+            <div class="chain-arrow">→</div>
+            <div class="chain-null">null</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <table class="compare-table">
+      <thead><tr><th>항목</th><th class="py">Python</th><th class="java">Java LinkedList</th></tr></thead>
+      <tbody>
+        <tr><td>표준 제공</td><td>❌ 없음 (직접 구현)</td><td>✅ java.util.LinkedList</td></tr>
+        <tr><td>연결 방식</td><td>단방향 (직접 구현 시)</td><td>이중 연결 (기본)</td></tr>
+        <tr><td>앞 삽입</td><td>deque.appendleft() O(1)</td><td>addFirst() O(1)</td></tr>
+        <tr><td>임의 접근</td><td>O(n)</td><td>O(n)</td></tr>
+        <tr><td>실사용</td><td>deque 권장</td><td>LinkedList or ArrayDeque</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ===== STACK / QUEUE ===== -->
+  <div class="ds-section" id="tab-stack">
+    <div class="section-header">
+      <div class="section-icon">📦</div>
+      <div><h2>스택 / 큐</h2><p>LIFO와 FIFO 원칙의 선형 자료구조</p></div>
+    </div>
+
+    <div class="split-card">
+      <div class="split-side py-side">
+        <div class="lang-label py"><span class="lang-dot"></span>Python — 스택</div>
+        <div class="ds-title">list (append / pop)</div>
+        <pre><span class="cm"># 스택 — list 사용</span>
+stack = []
+stack.<span class="fn">append</span>(<span class="num">1</span>)   <span class="cm"># push O(1)</span>
+stack.<span class="fn">append</span>(<span class="num">2</span>)
+stack.<span class="fn">append</span>(<span class="num">3</span>)
+stack.<span class="fn">pop</span>()        <span class="cm"># pop O(1) → 3</span>
+stack[-<span class="num">1</span>]          <span class="cm"># peek → 2</span>
+
+<span class="cm"># 큐 — deque 사용 (권장)</span>
+<span class="kw">from</span> collections <span class="kw">import</span> deque
+queue = <span class="ty">deque</span>()
+queue.<span class="fn">append</span>(<span class="num">1</span>)    <span class="cm"># enqueue</span>
+queue.<span class="fn">append</span>(<span class="num">2</span>)
+queue.<span class="fn">popleft</span>()    <span class="cm"># dequeue O(1) → 1</span>
+
+<span class="cm"># list로 큐 하면 O(n) 주의!</span>
+<span class="cm"># queue.Queue (스레드 안전)</span>
+<span class="kw">from</span> queue <span class="kw">import</span> Queue
+q = <span class="ty">Queue</span>()
+q.<span class="fn">put</span>(<span class="num">1</span>); q.<span class="fn">get</span>()</pre>
+      </div>
+      <div class="split-side java-side">
+        <div class="lang-label java"><span class="lang-dot"></span>Java — 스택 / 큐</div>
+        <div class="ds-title">Stack / ArrayDeque / Queue</div>
+        <pre><span class="cm">// 스택 (레거시 — 비권장)</span>
+Stack&lt;<span class="ty">Integer</span>&gt; stack = <span class="kw">new</span> <span class="ty">Stack</span>&lt;&gt;();
+stack.<span class="fn">push</span>(<span class="num">1</span>); stack.<span class="fn">push</span>(<span class="num">2</span>);
+stack.<span class="fn">pop</span>();    <span class="cm">// → 2</span>
+stack.<span class="fn">peek</span>();   <span class="cm">// → 1 (제거 안 함)</span>
+
+<span class="cm">// 스택 (권장 — ArrayDeque)</span>
+Deque&lt;<span class="ty">Integer</span>&gt; stack2 =
+    <span class="kw">new</span> <span class="ty">ArrayDeque</span>&lt;&gt;();
+stack2.<span class="fn">push</span>(<span class="num">1</span>);   <span class="cm">// addFirst</span>
+stack2.<span class="fn">pop</span>();     <span class="cm">// removeFirst</span>
+
+<span class="cm">// 큐 (권장 — ArrayDeque)</span>
+Queue&lt;<span class="ty">Integer</span>&gt; queue =
+    <span class="kw">new</span> <span class="ty">ArrayDeque</span>&lt;&gt;();
+queue.<span class="fn">offer</span>(<span class="num">1</span>);   <span class="cm">// enqueue</span>
+queue.<span class="fn">poll</span>();     <span class="cm">// dequeue → 1</span>
+queue.<span class="fn">peek</span>();     <span class="cm">// front 조회</span></pre>
+      </div>
+    </div>
+
+    <!-- Stack / Queue 시각화 -->
+    <div class="viz-section">
+      <div class="viz-title">// 스택과 큐 동작 시각화</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:24px;align-items:start;">
+        <!-- Python Stack -->
+        <div style="text-align:center;">
+          <div class="lang-label py" style="justify-content:center;margin-bottom:12px;"><span class="lang-dot"></span>Python 스택</div>
+          <div style="display:flex;justify-content:center;">
+            <div class="stack-viz">
+              <div class="stack-item py-stack">1</div>
+              <div class="stack-item py-stack">2</div>
+              <div class="stack-item py-stack stack-top">3 ← top</div>
+            </div>
+          </div>
+          <div style="font-size:10px;color:var(--muted);margin-top:8px;font-family:'Space Mono',monospace;">append/pop</div>
+        </div>
+        <!-- Java Stack -->
+        <div style="text-align:center;">
+          <div class="lang-label java" style="justify-content:center;margin-bottom:12px;"><span class="lang-dot"></span>Java 스택</div>
+          <div style="display:flex;justify-content:center;">
+            <div class="stack-viz">
+              <div class="stack-item java-stack">1</div>
+              <div class="stack-item java-stack">2</div>
+              <div class="stack-item java-stack stack-top-java">3 ← top</div>
+            </div>
+          </div>
+          <div style="font-size:10px;color:var(--muted);margin-top:8px;font-family:'Space Mono',monospace;">push/pop</div>
+        </div>
+        <!-- Python Queue -->
+        <div style="text-align:center;">
+          <div class="lang-label py" style="justify-content:center;margin-bottom:12px;"><span class="lang-dot"></span>Python 큐</div>
+          <div style="display:flex;justify-content:center;">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+              <div style="font-size:10px;color:var(--muted);font-family:'Space Mono',monospace;">← popleft</div>
+              <div class="queue-viz" style="flex-direction:column;gap:2px;">
+                <div class="queue-item py-queue">1 ← front</div>
+                <div class="queue-item py-queue">2</div>
+                <div class="queue-item py-queue">3 ← rear</div>
+              </div>
+              <div style="font-size:10px;color:var(--muted);font-family:'Space Mono',monospace;">append →</div>
+            </div>
+          </div>
+        </div>
+        <!-- Java Queue -->
+        <div style="text-align:center;">
+          <div class="lang-label java" style="justify-content:center;margin-bottom:12px;"><span class="lang-dot"></span>Java 큐</div>
+          <div style="display:flex;justify-content:center;">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+              <div style="font-size:10px;color:var(--muted);font-family:'Space Mono',monospace;">← poll</div>
+              <div class="queue-viz" style="flex-direction:column;gap:2px;">
+                <div class="queue-item java-queue">1 ← front</div>
+                <div class="queue-item java-queue">2</div>
+                <div class="queue-item java-queue">3 ← rear</div>
+              </div>
+              <div style="font-size:10px;color:var(--muted);font-family:'Space Mono',monospace;">offer →</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <table class="compare-table">
+      <thead><tr><th>항목</th><th class="py">Python</th><th class="java">Java</th></tr></thead>
+      <tbody>
+        <tr><td>스택 구현</td><td>list (append/pop)</td><td>ArrayDeque (권장), Stack (레거시)</td></tr>
+        <tr><td>큐 구현</td><td>collections.deque</td><td>ArrayDeque, LinkedList</td></tr>
+        <tr><td>우선순위 큐</td><td>heapq (min-heap)</td><td>PriorityQueue (min-heap)</td></tr>
+        <tr><td>스레드 안전</td><td>queue.Queue</td><td>LinkedBlockingQueue, ConcurrentLinkedQueue</td></tr>
+        <tr><td>스택 push O(1)</td><td>✅</td><td>✅</td></tr>
+        <tr><td>큐 enqueue O(1)</td><td>✅ (deque)</td><td>✅ (ArrayDeque)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ===== HASH ===== -->
+  <div class="ds-section" id="tab-hash">
+    <div class="section-header">
+      <div class="section-icon">#️⃣</div>
+      <div><h2>해시맵 / 딕셔너리</h2><p>Key-Value 쌍을 저장하는 핵심 자료구조</p></div>
+    </div>
+
+    <div class="split-card">
+      <div class="split-side py-side">
+        <div class="lang-label py"><span class="lang-dot"></span>Python</div>
+        <div class="ds-title">dict</div>
+        <div class="ds-sub">삽입 순서 보장 (3.7+), 해시 테이블</div>
+        <pre><span class="cm"># 생성</span>
+d = {<span class="st">"a"</span>: <span class="num">1</span>, <span class="st">"b"</span>: <span class="num">2</span>, <span class="st">"c"</span>: <span class="num">3</span>}
+d = <span class="fn">dict</span>(a=<span class="num">1</span>, b=<span class="num">2</span>, c=<span class="num">3</span>)
+
+<span class="cm"># 접근 & 수정</span>
+d[<span class="st">"a"</span>]             <span class="cm"># 1</span>
+d.<span class="fn">get</span>(<span class="st">"x"</span>, <span class="num">0</span>)     <span class="cm"># 기본값 0</span>
+d[<span class="st">"d"</span>] = <span class="num">4</span>         <span class="cm"># 추가/수정</span>
+<span class="kw">del</span> d[<span class="st">"a"</span>]         <span class="cm"># 삭제</span>
+
+<span class="cm"># 순회</span>
+<span class="kw">for</span> k, v <span class="kw">in</span> d.<span class="fn">items</span>():
+    <span class="fn">print</span>(k, v)
+
+<span class="cm"># 유용한 패턴</span>
+<span class="kw">from</span> collections <span class="kw">import</span> defaultdict
+cnt = <span class="ty">defaultdict</span>(<span class="ty">int</span>)
+cnt[<span class="st">"x"</span>] += <span class="num">1</span>   <span class="cm"># KeyError 없음</span>
+
+<span class="kw">from</span> collections <span class="kw">import</span> Counter
+c = <span class="ty">Counter</span>(<span class="st">"hello"</span>)  <span class="cm"># 빈도수</span></pre>
+      </div>
+      <div class="split-side java-side">
+        <div class="lang-label java"><span class="lang-dot"></span>Java</div>
+        <div class="ds-title">HashMap&lt;K,V&gt;</div>
+        <div class="ds-sub">순서 미보장, 최고 성능 해시맵</div>
+        <pre><span class="cm">// 생성</span>
+Map&lt;<span class="ty">String</span>, <span class="ty">Integer</span>&gt; map =
+    <span class="kw">new</span> <span class="ty">HashMap</span>&lt;&gt;();
+
+<span class="cm">// 수정</span>
+map.<span class="fn">put</span>(<span class="st">"a"</span>, <span class="num">1</span>);
+map.<span class="fn">put</span>(<span class="st">"b"</span>, <span class="num">2</span>);
+
+<span class="cm">// 접근</span>
+map.<span class="fn">get</span>(<span class="st">"a"</span>);           <span class="cm">// 1</span>
+map.<span class="fn">getOrDefault</span>(<span class="st">"x"</span>, <span class="num">0</span>); <span class="cm">// 0</span>
+map.<span class="fn">containsKey</span>(<span class="st">"b"</span>);   <span class="cm">// true</span>
+map.<span class="fn">remove</span>(<span class="st">"a"</span>);        <span class="cm">// 삭제</span>
+
+<span class="cm">// 순회</span>
+<span class="kw">for</span> (Map.Entry&lt;<span class="ty">String</span>,<span class="ty">Integer</span>&gt; e
+        : map.<span class="fn">entrySet</span>())
+    System.out.<span class="fn">println</span>(e.<span class="fn">getKey</span>());
+
+<span class="cm">// 빈도수 패턴</span>
+map.<span class="fn">merge</span>(<span class="st">"x"</span>, <span class="num">1</span>, <span class="ty">Integer</span>::sum);
+
+<span class="cm">// 순서 유지: LinkedHashMap</span>
+<span class="cm">// 정렬 유지: TreeMap</span></pre>
+      </div>
+    </div>
+
+    <!-- 해시맵 시각화 -->
+    <div class="viz-section">
+      <div class="viz-title">// 해시 테이블 내부 구조</div>
+      <div class="hash-table">
+        <!-- Python dict -->
+        <div>
+          <div class="lang-label py" style="margin-bottom:10px;"><span class="lang-dot"></span>Python dict</div>
+          <div style="display:flex;gap:4px;">
+            <div class="hash-col">
+              <div class="hash-idx">0</div>
+              <div class="hash-idx">1</div>
+              <div class="hash-idx">2</div>
+              <div class="hash-idx">3</div>
+              <div class="hash-idx">4</div>
+              <div class="hash-idx">5</div>
+              <div class="hash-idx">6</div>
+              <div class="hash-idx">7</div>
+            </div>
+            <div class="hash-col">
+              <div class="hash-bucket empty">(empty)</div>
+              <div class="hash-bucket py-bucket">"a" → 1</div>
+              <div class="hash-bucket empty">(empty)</div>
+              <div class="hash-bucket py-bucket">"b" → 2</div>
+              <div class="hash-bucket empty">(empty)</div>
+              <div class="hash-bucket py-bucket">"c" → 3</div>
+              <div class="hash-bucket empty">(empty)</div>
+              <div class="hash-bucket empty">(empty)</div>
+            </div>
+          </div>
+          <p style="font-size:10px;color:var(--muted);margin-top:8px;font-family:'Space Mono',monospace;">open addressing</p>
+        </div>
+        <!-- Java HashMap -->
+        <div>
+          <div class="lang-label java" style="margin-bottom:10px;"><span class="lang-dot"></span>Java HashMap</div>
+          <div style="display:flex;gap:4px;">
+            <div class="hash-col">
+              <div class="hash-idx">0</div>
+              <div class="hash-idx">1</div>
+              <div class="hash-idx">2</div>
+              <div class="hash-idx">3</div>
+              <div class="hash-idx">4</div>
+              <div class="hash-idx">5</div>
+              <div class="hash-idx">6</div>
+              <div class="hash-idx">7</div>
+            </div>
+            <div class="hash-col">
+              <div class="hash-bucket java-bucket">"a"=1 → "x"=10</div>
+              <div class="hash-bucket empty">(null)</div>
+              <div class="hash-bucket empty">(null)</div>
+              <div class="hash-bucket java-bucket">"b" → 2</div>
+              <div class="hash-bucket empty">(null)</div>
+              <div class="hash-bucket java-bucket">"c" → 3</div>
+              <div class="hash-bucket empty">(null)</div>
+              <div class="hash-bucket empty">(null)</div>
+            </div>
+          </div>
+          <p style="font-size:10px;color:var(--muted);margin-top:8px;font-family:'Space Mono',monospace;">chaining (→ TreeNode if ≥8)</p>
+        </div>
+      </div>
+    </div>
+
+    <table class="compare-table">
+      <thead><tr><th>항목</th><th class="py">Python dict</th><th class="java">Java HashMap</th></tr></thead>
+      <tbody>
+        <tr><td>삽입 순서</td><td>✅ 보장 (3.7+)</td><td>❌ 미보장 → LinkedHashMap</td></tr>
+        <tr><td>정렬 순서</td><td>❌ → sortedcontainers</td><td>✅ TreeMap (O log n)</td></tr>
+        <tr><td>null 키</td><td>None 사용 가능</td><td>null 키 1개 허용</td></tr>
+        <tr><td>충돌 해결</td><td>Open addressing</td><td>Chaining (8개 이상 → Red-Black Tree)</td></tr>
+        <tr><td>기본값 패턴</td><td>defaultdict</td><td>getOrDefault / merge</td></tr>
+        <tr><td>빈도수 패턴</td><td>Counter</td><td>merge(k, 1, Integer::sum)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ===== SET ===== -->
+  <div class="ds-section" id="tab-set">
+    <div class="section-header">
+      <div class="section-icon">🔵</div>
+      <div><h2>집합 (Set)</h2><p>중복 없는 원소의 컬렉션</p></div>
+    </div>
+
+    <div class="split-card">
+      <div class="split-side py-side">
+        <div class="lang-label py"><span class="lang-dot"></span>Python</div>
+        <div class="ds-title">set / frozenset</div>
+        <pre><span class="cm"># 생성</span>
+s = {<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>}
+s = <span class="fn">set</span>([<span class="num">1</span>, <span class="num">2</span>, <span class="num">2</span>, <span class="num">3</span>])  <span class="cm"># → {1,2,3}</span>
+
+<span class="cm"># 연산</span>
+s.<span class="fn">add</span>(<span class="num">4</span>)
+s.<span class="fn">discard</span>(<span class="num">2</span>)    <span class="cm"># 없어도 에러 없음</span>
+s.<span class="fn">remove</span>(<span class="num">1</span>)    <span class="cm"># 없으면 KeyError</span>
+
+<span class="cm"># 집합 연산 (매우 직관적!)</span>
+a = {<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>}
+b = {<span class="num">2</span>, <span class="num">3</span>, <span class="num">4</span>}
+a | b    <span class="cm"># 합집합 {1,2,3,4}</span>
+a & b    <span class="cm"># 교집합 {2,3}</span>
+a - b    <span class="cm"># 차집합 {1}</span>
+a ^ b    <span class="cm"># 대칭차 {1,4}</span>
+
+<span class="cm"># 불변 set</span>
+fs = <span class="fn">frozenset</span>([<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>])</pre>
+      </div>
+      <div class="split-side java-side">
+        <div class="lang-label java"><span class="lang-dot"></span>Java</div>
+        <div class="ds-title">HashSet / TreeSet / LinkedHashSet</div>
+        <pre><span class="cm">// HashSet — 순서 없음</span>
+Set&lt;<span class="ty">Integer</span>&gt; set = <span class="kw">new</span> <span class="ty">HashSet</span>&lt;&gt;();
+set.<span class="fn">add</span>(<span class="num">1</span>); set.<span class="fn">add</span>(<span class="num">2</span>); set.<span class="fn">add</span>(<span class="num">3</span>);
+set.<span class="fn">add</span>(<span class="num">2</span>);   <span class="cm">// 중복 무시</span>
+set.<span class="fn">remove</span>(<span class="num">1</span>);
+set.<span class="fn">contains</span>(<span class="num">2</span>);   <span class="cm">// true</span>
+
+<span class="cm">// TreeSet — 정렬 유지</span>
+Set&lt;<span class="ty">Integer</span>&gt; ts = <span class="kw">new</span> <span class="ty">TreeSet</span>&lt;&gt;();
+ts.<span class="fn">add</span>(<span class="num">3</span>); ts.<span class="fn">add</span>(<span class="num">1</span>); ts.<span class="fn">add</span>(<span class="num">2</span>);
+<span class="cm">// → [1, 2, 3] 자동 정렬</span>
+
+<span class="cm">// 집합 연산 (Java는 직접)</span>
+Set&lt;<span class="ty">Integer</span>&gt; a = <span class="kw">new</span> <span class="ty">HashSet</span>&lt;&gt;(...);
+Set&lt;<span class="ty">Integer</span>&gt; b = <span class="kw">new</span> <span class="ty">HashSet</span>&lt;&gt;(...);
+a.<span class="fn">retainAll</span>(b);  <span class="cm">// 교집합</span>
+a.<span class="fn">addAll</span>(b);     <span class="cm">// 합집합</span>
+a.<span class="fn">removeAll</span>(b);  <span class="cm">// 차집합</span></pre>
+      </div>
+    </div>
+
+    <div class="viz-section">
+      <div class="viz-title">// 집합 연산 시각화</div>
+      <div style="display:flex;gap:32px;flex-wrap:wrap;align-items:center;">
+        <div style="text-align:center;">
+          <svg width="200" height="140">
+            <circle cx="75" cy="70" r="55" fill="rgba(37,99,235,0.1)" stroke="var(--py)" stroke-width="2"/>
+            <circle cx="125" cy="70" r="55" fill="rgba(234,108,0,0.1)" stroke="var(--java)" stroke-width="2"/>
+            <text x="50" y="65" fill="#1d4ed8" font-family="Space Mono" font-size="11" text-anchor="middle">1</text>
+            <text x="50" y="82" fill="#1d4ed8" font-family="Space Mono" font-size="11" text-anchor="middle">A</text>
+            <text x="100" y="65" fill="#334155" font-family="Space Mono" font-size="11" text-anchor="middle">2</text>
+            <text x="100" y="82" fill="#334155" font-family="Space Mono" font-size="11" text-anchor="middle">3</text>
+            <text x="150" y="65" fill="#c2410c" font-family="Space Mono" font-size="11" text-anchor="middle">4</text>
+            <text x="150" y="82" fill="#c2410c" font-family="Space Mono" font-size="11" text-anchor="middle">B</text>
+            <text x="50" y="130" fill="var(--py)" font-family="Space Mono" font-size="10" text-anchor="middle">set A</text>
+            <text x="150" y="130" fill="var(--java)" font-family="Space Mono" font-size="10" text-anchor="middle">set B</text>
+          </svg>
+          <div style="font-size:11px;color:var(--muted);font-family:'Space Mono',monospace;">벤 다이어그램</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;font-family:'Space Mono',monospace;font-size:12px;">
+          <div><span style="color:var(--py)">A | B</span> → <span style="color:var(--text)">{1,2,3,4,A,B}</span> <span style="color:var(--muted)">합집합</span></div>
+          <div><span style="color:var(--py)">A & B</span> → <span style="color:var(--text)">{2,3}</span> <span style="color:var(--muted)">교집합</span></div>
+          <div><span style="color:var(--py)">A - B</span> → <span style="color:var(--text)">{1,A}</span> <span style="color:var(--muted)">차집합</span></div>
+          <div><span style="color:var(--py)">A ^ B</span> → <span style="color:var(--text)">{1,4,A,B}</span> <span style="color:var(--muted)">대칭차</span></div>
+          <div style="margin-top:8px;border-top:1px solid var(--border);padding-top:8px;">
+            <div><span style="color:var(--java)">retainAll</span> → 교집합</div>
+            <div><span style="color:var(--java)">addAll</span> → 합집합</div>
+            <div><span style="color:var(--java)">removeAll</span> → 차집합</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== TREE ===== -->
+  <div class="ds-section" id="tab-tree">
+    <div class="section-header">
+      <div class="section-icon">🌳</div>
+      <div><h2>트리</h2><p>계층적 비선형 자료구조</p></div>
+    </div>
+
+    <div class="split-card">
+      <div class="split-side py-side">
+        <div class="lang-label py"><span class="lang-dot"></span>Python — BST 직접 구현</div>
+        <pre><span class="cm"># 이진 탐색 트리 (직접 구현)</span>
+<span class="kw">class</span> <span class="ty">TreeNode</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="kw">self</span>, val=<span class="num">0</span>):
+        <span class="kw">self</span>.val = val
+        <span class="kw">self</span>.left = <span class="kw">None</span>
+        <span class="kw">self</span>.right = <span class="kw">None</span>
+
+<span class="kw">def</span> <span class="fn">inorder</span>(root):
+    <span class="kw">if not</span> root: <span class="kw">return</span>
+    <span class="fn">inorder</span>(root.left)
+    <span class="fn">print</span>(root.val)
+    <span class="fn">inorder</span>(root.right)
+
+<span class="cm"># 정렬된 컨테이너 (SortedList)</span>
+<span class="kw">from</span> sortedcontainers <span class="kw">import</span> SortedList
+sl = <span class="ty">SortedList</span>([<span class="num">3</span>,<span class="num">1</span>,<span class="num">4</span>,<span class="num">1</span>,<span class="num">5</span>])
+sl.<span class="fn">add</span>(<span class="num">2</span>)   <span class="cm"># 자동 정렬 삽입</span>
+
+<span class="cm"># heapq — 최소 힙</span>
+<span class="kw">import</span> heapq
+h = [<span class="num">3</span>, <span class="num">1</span>, <span class="num">4</span>]
+heapq.<span class="fn">heapify</span>(h)
+heapq.<span class="fn">heappush</span>(h, <span class="num">2</span>)
+heapq.<span class="fn">heappop</span>(h)   <span class="cm"># → 1</span></pre>
+      </div>
+      <div class="split-side java-side">
+        <div class="lang-label java"><span class="lang-dot"></span>Java — TreeMap / TreeSet / PriorityQueue</div>
+        <pre><span class="cm">// 이진 탐색 트리 (직접 구현)</span>
+<span class="kw">class</span> <span class="ty">TreeNode</span> {
+    <span class="ty">int</span> val;
+    <span class="ty">TreeNode</span> left, right;
+    <span class="ty">TreeNode</span>(<span class="ty">int</span> v) { val = v; }
+}
+
+<span class="cm">// TreeMap — Red-Black Tree 기반</span>
+TreeMap&lt;<span class="ty">Integer</span>, <span class="ty">String</span>&gt; tm =
+    <span class="kw">new</span> <span class="ty">TreeMap</span>&lt;&gt;();
+tm.<span class="fn">put</span>(<span class="num">3</span>, <span class="st">"c"</span>);
+tm.<span class="fn">put</span>(<span class="num">1</span>, <span class="st">"a"</span>);
+tm.<span class="fn">put</span>(<span class="num">2</span>, <span class="st">"b"</span>);
+tm.<span class="fn">firstKey</span>();   <span class="cm">// 1 (최솟값)</span>
+tm.<span class="fn">lastKey</span>();    <span class="cm">// 3 (최댓값)</span>
+tm.<span class="fn">floorKey</span>(<span class="num">2</span>); <span class="cm">// ≤2 중 최대</span>
+
+<span class="cm">// PriorityQueue — 최소 힙</span>
+PriorityQueue&lt;<span class="ty">Integer</span>&gt; pq =
+    <span class="kw">new</span> <span class="ty">PriorityQueue</span>&lt;&gt;();
+pq.<span class="fn">offer</span>(<span class="num">3</span>); pq.<span class="fn">offer</span>(<span class="num">1</span>);
+pq.<span class="fn">poll</span>();   <span class="cm">// → 1 (최솟값)</span></pre>
+      </div>
+    </div>
+
+    <!-- 트리 시각화 -->
+    <div class="viz-section">
+      <div class="viz-title">// 이진 탐색 트리 시각화 [5,3,7,1,4,6,8]</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px;">
+        <div>
+          <div class="lang-label py" style="margin-bottom:16px;"><span class="lang-dot"></span>Python BST (직접 구현)</div>
+          <svg width="280" height="180" viewBox="0 0 280 180">
+            <!-- Lines -->
+            <line x1="140" y1="35" x2="80" y2="85" stroke="#93c5fd" stroke-width="1.5"/>
+            <line x1="140" y1="35" x2="200" y2="85" stroke="#93c5fd" stroke-width="1.5"/>
+            <line x1="80" y1="85" x2="40" y2="140" stroke="#93c5fd" stroke-width="1.5"/>
+            <line x1="80" y1="85" x2="115" y2="140" stroke="#93c5fd" stroke-width="1.5"/>
+            <line x1="200" y1="85" x2="165" y2="140" stroke="#93c5fd" stroke-width="1.5"/>
+            <line x1="200" y1="85" x2="240" y2="140" stroke="#93c5fd" stroke-width="1.5"/>
+            <!-- Nodes -->
+            <circle cx="140" cy="35" r="20" fill="rgba(37,99,235,0.12)" stroke="#2563eb" stroke-width="2"/>
+            <text x="140" y="40" fill="#1d4ed8" font-family="Space Mono" font-size="13" text-anchor="middle" font-weight="bold">5</text>
+            <circle cx="80" cy="85" r="18" fill="rgba(37,99,235,0.08)" stroke="#2563eb" stroke-width="1.5"/>
+            <text x="80" y="90" fill="#1d4ed8" font-family="Space Mono" font-size="12" text-anchor="middle">3</text>
+            <circle cx="200" cy="85" r="18" fill="rgba(37,99,235,0.08)" stroke="#2563eb" stroke-width="1.5"/>
+            <text x="200" y="90" fill="#1d4ed8" font-family="Space Mono" font-size="12" text-anchor="middle">7</text>
+            <circle cx="40" cy="140" r="16" fill="rgba(37,99,235,0.05)" stroke="#93c5fd" stroke-width="1.5"/>
+            <text x="40" y="145" fill="#1d4ed8" font-family="Space Mono" font-size="11" text-anchor="middle">1</text>
+            <circle cx="115" cy="140" r="16" fill="rgba(37,99,235,0.05)" stroke="#93c5fd" stroke-width="1.5"/>
+            <text x="115" y="145" fill="#1d4ed8" font-family="Space Mono" font-size="11" text-anchor="middle">4</text>
+            <circle cx="165" cy="140" r="16" fill="rgba(37,99,235,0.05)" stroke="#93c5fd" stroke-width="1.5"/>
+            <text x="165" y="145" fill="#1d4ed8" font-family="Space Mono" font-size="11" text-anchor="middle">6</text>
+            <circle cx="240" cy="140" r="16" fill="rgba(37,99,235,0.05)" stroke="#93c5fd" stroke-width="1.5"/>
+            <text x="240" y="145" fill="#1d4ed8" font-family="Space Mono" font-size="11" text-anchor="middle">8</text>
+          </svg>
+          <p style="font-size:10px;color:var(--muted);font-family:'Space Mono',monospace;">중위 순회: 1 3 4 5 6 7 8</p>
+        </div>
+        <div>
+          <div class="lang-label java" style="margin-bottom:16px;"><span class="lang-dot"></span>Java TreeMap (Red-Black Tree)</div>
+          <svg width="280" height="180" viewBox="0 0 280 180">
+            <!-- Lines -->
+            <line x1="140" y1="35" x2="80" y2="85" stroke="#fed7aa" stroke-width="1.5"/>
+            <line x1="140" y1="35" x2="200" y2="85" stroke="#fed7aa" stroke-width="1.5"/>
+            <line x1="80" y1="85" x2="40" y2="140" stroke="#fed7aa" stroke-width="1.5"/>
+            <line x1="80" y1="85" x2="115" y2="140" stroke="#fed7aa" stroke-width="1.5"/>
+            <line x1="200" y1="85" x2="165" y2="140" stroke="#fed7aa" stroke-width="1.5"/>
+            <line x1="200" y1="85" x2="240" y2="140" stroke="#fed7aa" stroke-width="1.5"/>
+            <!-- Root (Black) -->
+            <circle cx="140" cy="35" r="20" fill="#1e293b" stroke="#475569" stroke-width="2"/>
+            <text x="140" y="40" fill="#f8fafc" font-family="Space Mono" font-size="13" text-anchor="middle" font-weight="bold">5</text>
+            <!-- Red nodes -->
+            <circle cx="80" cy="85" r="18" fill="rgba(239,68,68,0.12)" stroke="#ef4444" stroke-width="1.5"/>
+            <text x="80" y="90" fill="#dc2626" font-family="Space Mono" font-size="12" text-anchor="middle">3</text>
+            <circle cx="200" cy="85" r="18" fill="rgba(239,68,68,0.12)" stroke="#ef4444" stroke-width="1.5"/>
+            <text x="200" y="90" fill="#dc2626" font-family="Space Mono" font-size="12" text-anchor="middle">7</text>
+            <!-- Black leaf nodes -->
+            <circle cx="40" cy="140" r="16" fill="#1e293b" stroke="#475569" stroke-width="1.5"/>
+            <text x="40" y="145" fill="#f8fafc" font-family="Space Mono" font-size="11" text-anchor="middle">1</text>
+            <circle cx="115" cy="140" r="16" fill="#1e293b" stroke="#475569" stroke-width="1.5"/>
+            <text x="115" y="145" fill="#f8fafc" font-family="Space Mono" font-size="11" text-anchor="middle">4</text>
+            <circle cx="165" cy="140" r="16" fill="#1e293b" stroke="#475569" stroke-width="1.5"/>
+            <text x="165" y="145" fill="#f8fafc" font-family="Space Mono" font-size="11" text-anchor="middle">6</text>
+            <circle cx="240" cy="140" r="16" fill="#1e293b" stroke="#475569" stroke-width="1.5"/>
+            <text x="240" y="145" fill="#f8fafc" font-family="Space Mono" font-size="11" text-anchor="middle">8</text>
+            <!-- Legend -->
+            <circle cx="20" cy="170" r="5" fill="#1e293b" stroke="#475569"/>
+            <text x="30" y="174" fill="var(--muted)" font-family="Space Mono" font-size="9">Black</text>
+            <circle cx="80" cy="170" r="5" fill="rgba(239,68,68,0.15)" stroke="#ef4444"/>
+            <text x="90" y="174" fill="var(--muted)" font-family="Space Mono" font-size="9">Red</text>
+          </svg>
+          <p style="font-size:10px;color:var(--muted);font-family:'Space Mono',monospace;">자가 균형 → 항상 O(log n) 보장</p>
+        </div>
+      </div>
+    </div>
+
+    <table class="compare-table">
+      <thead><tr><th>항목</th><th class="py">Python</th><th class="java">Java</th></tr></thead>
+      <tbody>
+        <tr><td>BST</td><td>직접 구현 필요</td><td>직접 구현 필요</td></tr>
+        <tr><td>균형 BST</td><td>sortedcontainers</td><td>TreeMap / TreeSet (Red-Black Tree)</td></tr>
+        <tr><td>힙</td><td>heapq (min-heap)</td><td>PriorityQueue (min-heap)</td></tr>
+        <tr><td>최대 힙</td><td>heapq + 음수 트릭</td><td>PriorityQueue(Collections.reverseOrder())</td></tr>
+        <tr><td>삽입/삭제</td><td>O(log n) — SortedList</td><td>O(log n) — TreeMap</td></tr>
+        <tr><td>범위 쿼리</td><td>SortedList.irange()</td><td>TreeMap.subMap()</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<script>
+function showTab(name) {
+  document.querySelectorAll('.ds-section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>
+</body>
+</html>

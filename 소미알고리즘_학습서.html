@@ -1,0 +1,1822 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>소미 알고리즘 학습서 — Algorithm Study Complete Guide</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#ffffff;
+  --paper:#fffefc;
+  --paper-alt:#f9f6f0;
+  --ink:#2a2520;
+  --ink-soft:#5b5346;
+  --line:#e7e0d4;
+  --accent:#c1622d;
+  --accent-dark:#9c4a1f;
+  --accent-soft:#f3e2d3;
+  --accent2:#3d6b5c;
+  --accent2-soft:#e1ede8;
+  --blue:#3a5f8a;
+  --blue-soft:#e3ebf3;
+  --code-bg:#232019;
+  --code-ink:#f1ece2;
+  --code-accent:#e8a355;
+  --radius:10px;
+  --shadow:0 2px 10px rgba(60,45,25,0.06);
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:'Pretendard',-apple-system,sans-serif;
+  line-height:1.75;
+  font-size:16px;
+}
+h1,h2,h3,h4{font-family:'Spectral','Pretendard',serif;font-weight:700;color:var(--ink);letter-spacing:-0.01em;}
+.layout{display:flex;max-width:1440px;margin:0 auto;}
+/* Sidebar */
+nav.sidebar{
+  width:280px;flex-shrink:0;
+  height:100vh;position:sticky;top:0;
+  overflow-y:auto;
+  background:var(--paper-alt);
+  border-right:1px solid var(--line);
+  padding:28px 18px 60px 22px;
+}
+nav.sidebar::-webkit-scrollbar{width:6px;}
+nav.sidebar::-webkit-scrollbar-thumb{background:var(--line);border-radius:3px;}
+.brand{font-family:'Spectral',serif;font-size:1.25rem;font-weight:700;color:var(--accent-dark);margin-bottom:2px;}
+.brand-sub{font-size:0.75rem;color:var(--ink-soft);margin-bottom:22px;letter-spacing:0.03em;}
+.navgroup{margin-bottom:6px;}
+.navgroup > a.cat{
+  display:block;font-weight:700;font-size:0.92rem;color:var(--accent-dark);
+  padding:9px 8px;border-radius:7px;text-decoration:none;
+  cursor:pointer;
+}
+.navgroup > a.cat:hover{background:var(--accent-soft);}
+.navgroup .sublist{display:flex;flex-direction:column;margin:2px 0 10px 10px;border-left:2px solid var(--line);}
+.navgroup .sublist a{
+  font-size:0.83rem;color:var(--ink-soft);text-decoration:none;
+  padding:5px 10px;border-radius:0 6px 6px 0;
+}
+.navgroup .sublist a:hover,.navgroup .sublist a.active{background:var(--accent-soft);color:var(--accent-dark);}
+/* Main */
+main{flex:1;min-width:0;padding:44px 56px 120px;max-width:980px;}
+.hero{
+  padding:38px 34px;margin-bottom:44px;
+  background:linear-gradient(135deg,var(--accent-soft),var(--paper-alt));
+  border-radius:16px;border:1px solid var(--line);
+}
+.hero h1{font-size:2.1rem;margin:0 0 10px;}
+.hero p{margin:0;color:var(--ink-soft);font-size:1.02rem;}
+.hero .tags{margin-top:16px;display:flex;flex-wrap:wrap;gap:8px;}
+.hero .tag{background:#fff;border:1px solid var(--line);padding:4px 12px;border-radius:20px;font-size:0.78rem;color:var(--accent-dark);font-weight:600;}
+section.major{margin-bottom:64px;padding-top:8px;}
+section.major > h2{
+  font-size:1.65rem;
+  padding:14px 20px;
+  background:var(--ink);
+  color:#fdf9f2;
+  border-radius:10px;
+  margin-bottom:26px;
+  display:flex;align-items:center;gap:12px;
+}
+section.major > h2 .num{font-family:'JetBrains Mono',monospace;color:var(--code-accent);font-size:1.1rem;}
+article.topic{
+  background:var(--paper);
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:28px 30px 26px;
+  margin-bottom:30px;
+  box-shadow:var(--shadow);
+  scroll-margin-top:20px;
+}
+article.topic > h3{
+  font-size:1.32rem;color:var(--accent-dark);
+  margin:0 0 6px;padding-bottom:12px;border-bottom:2px solid var(--accent-soft);
+}
+article.topic > h3 .en{font-family:'JetBrains Mono',monospace;font-size:0.72rem;color:var(--ink-soft);font-weight:500;display:block;margin-top:3px;letter-spacing:0.02em;}
+h4.sub{font-size:1rem;color:var(--ink);margin:22px 0 8px;display:flex;align-items:center;gap:7px;}
+h4.sub::before{content:'';width:5px;height:16px;background:var(--accent);border-radius:2px;display:inline-block;}
+p{color:var(--ink);}
+ul,ol{padding-left:22px;}
+li{margin-bottom:5px;}
+.callout{
+  background:var(--accent2-soft);border-left:4px solid var(--accent2);
+  padding:12px 16px;border-radius:0 8px 8px 0;margin:14px 0;font-size:0.93rem;
+}
+.callout.warn{background:var(--accent-soft);border-left-color:var(--accent);}
+.callout.tip{background:var(--blue-soft);border-left-color:var(--blue);}
+.complexity-box{
+  display:flex;gap:10px;flex-wrap:wrap;margin:14px 0;
+}
+.complexity-box .cbox{
+  background:var(--paper-alt);border:1px solid var(--line);border-radius:8px;
+  padding:8px 14px;font-size:0.85rem;
+}
+.complexity-box .cbox b{color:var(--accent-dark);font-family:'JetBrains Mono',monospace;}
+pre{
+  background:var(--code-bg);color:var(--code-ink);
+  padding:18px 20px;border-radius:10px;overflow-x:auto;
+  font-family:'JetBrains Mono',monospace;font-size:0.83rem;line-height:1.65;
+  margin:14px 0;
+}
+pre .cmt{color:#8a8478;}
+code.inline{
+  background:var(--paper-alt);border:1px solid var(--line);
+  padding:1px 6px;border-radius:5px;font-family:'JetBrains Mono',monospace;font-size:0.86em;color:var(--accent-dark);
+}
+table{width:100%;border-collapse:collapse;margin:14px 0;font-size:0.9rem;}
+th,td{border:1px solid var(--line);padding:8px 12px;text-align:left;}
+th{background:var(--paper-alt);color:var(--accent-dark);font-weight:700;}
+tr:nth-child(even) td{background:#fcfaf6;}
+.usecase{
+  background:var(--paper-alt);border:1px dashed var(--line);border-radius:8px;
+  padding:12px 16px;margin-top:10px;font-size:0.9rem;
+}
+.usecase b{color:var(--accent2);}
+.top-btn{
+  position:fixed;bottom:26px;right:26px;
+  background:var(--accent);color:#fff;border:none;
+  width:44px;height:44px;border-radius:50%;font-size:1.1rem;cursor:pointer;
+  box-shadow:0 4px 14px rgba(150,80,30,0.35);display:none;
+}
+footer{max-width:980px;padding:0 56px 60px;color:var(--ink-soft);font-size:0.85rem;}
+@media(max-width:900px){
+  nav.sidebar{display:none;}
+  main{padding:28px 20px 100px;}
+}
+</style>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar">
+  <div class="brand">소미 알고리즘</div>
+  <div class="brand-sub">Algorithm Study Complete Guide</div>
+
+  <div class="navgroup">
+    <a class="cat" href="#intro">01. 들어가기</a>
+    <div class="sublist">
+      <a href="#complexity">시간·공간 복잡도</a>
+      <a href="#fileio">파일 입출력</a>
+    </div>
+  </div>
+
+  <div class="navgroup">
+    <a class="cat" href="#datastructure">02. 자료구조</a>
+    <div class="sublist">
+      <a href="#ds-array">배열 Array</a>
+      <a href="#ds-list">리스트 List</a>
+      <a href="#ds-linkedlist">연결 리스트</a>
+      <a href="#ds-map">맵 Map</a>
+      <a href="#ds-set">세트 Set</a>
+      <a href="#ds-stack">스택 Stack</a>
+      <a href="#ds-queue">큐 Queue</a>
+      <a href="#ds-deque">덱 Deque</a>
+      <a href="#ds-tree">트리 Tree</a>
+    </div>
+  </div>
+
+  <div class="navgroup">
+    <a class="cat" href="#numbertheory">03. 수학</a>
+    <div class="sublist">
+      <a href="#nt-prime">소수 &amp; 에라토스테네스</a>
+      <a href="#nt-gcd">GCD / LCM</a>
+      <a href="#nt-geometry">기하학 (Vector, Convex-Hull)</a>
+    </div>
+  </div>
+
+  <div class="navgroup">
+    <a class="cat" href="#implementation">04. 구현</a>
+    <div class="sublist">
+      <a href="#impl-dfsbfs">DFS-BFS</a>
+      <a href="#impl-brute">브루트 포스</a>
+      <a href="#impl-backtrack">백트래킹</a>
+    </div>
+  </div>
+
+  <div class="navgroup">
+    <a class="cat" href="#algorithm">05. 알고리즘</a>
+    <div class="sublist">
+      <a href="#alg-slidewindow">슬라이드 윈도우</a>
+      <a href="#alg-binarysearch">이분 탐색</a>
+      <a href="#alg-twopointer">투 포인터</a>
+      <a href="#alg-greedy">탐욕 알고리즘</a>
+      <a href="#alg-recursion">재귀 함수 작성법</a>
+      <a href="#alg-sorting">정렬</a>
+      <a href="#alg-divideconquer">분할 정복</a>
+      <a href="#alg-string">문자열 검색 (KMP)</a>
+      <a href="#alg-trie">트라이 Trie</a>
+      <a href="#alg-unionfind">유니온-파인드</a>
+    </div>
+  </div>
+
+  <div class="navgroup">
+    <a class="cat" href="#combination">06. 조합-순열</a>
+    <div class="sublist">
+      <a href="#cp-nextperm">NextPerm / PrevPerm</a>
+      <a href="#cp-subset">부분집합 (BitSubset)</a>
+      <a href="#cp-combination">조합 Combination</a>
+      <a href="#cp-combrep">중복 조합 (BitPerm)</a>
+      <a href="#cp-permutation">순열 Permutation</a>
+      <a href="#cp-permrep">중복 순열</a>
+    </div>
+  </div>
+
+  <div class="navgroup">
+    <a class="cat" href="#graph">07. 그래프</a>
+    <div class="sublist">
+      <a href="#gr-repr">그래프 표현 방법</a>
+      <a href="#gr-mst">최소신장트리 (Kruskal/Prim)</a>
+      <a href="#gr-shortest">최단경로 (Dijkstra/Bellman-Ford/Floyd)</a>
+      <a href="#gr-bipartite">Bipartite (2-Color)</a>
+      <a href="#gr-articulation">단절점</a>
+      <a href="#gr-topo">위상 정렬</a>
+      <a href="#gr-lca">최소 공통 조상 (LCA)</a>
+      <a href="#gr-segfenwick">Segment Tree / Fenwick</a>
+    </div>
+  </div>
+
+  <div class="navgroup">
+    <a class="cat" href="#dp">08. 동적 계획법</a>
+    <div class="sublist">
+      <a href="#dp-basic">점화식 &amp; 관계식 유도</a>
+      <a href="#dp-lis">최장 증가 부분수열 (LIS)</a>
+      <a href="#dp-prefixsum">누적합 Prefix Sum</a>
+    </div>
+  </div>
+</nav>
+
+<main>
+<div class="hero">
+  <h1>소미 알고리즘 학습서</h1>
+  <p>자료구조부터 그래프·동적계획법까지, 원리 → Java 구현 → 복잡도 → 실전 활용을 한 흐름으로 정리한 종합 알고리즘 학습 자료입니다.</p>
+  <div class="tags">
+    <span class="tag">Java 기반 구현</span>
+    <span class="tag">시간·공간 복잡도 분석</span>
+    <span class="tag">코딩테스트 대비</span>
+    <span class="tag">40개 세부 주제</span>
+  </div>
+</div>
+<section class="major" id="intro">
+<h2><span class="num">01</span> 들어가기 (Intro)</h2>
+
+<article class="topic" id="complexity">
+<h3>시간·공간 복잡도 분석 방법<span class="en">Time-Space Complexity Analysis Method</span></h3>
+
+<p>복잡도는 알고리즘이 입력 크기 <code class="inline">n</code>이 커질 때 <b>실행 시간(시간 복잡도)</b>과 <b>메모리 사용량(공간 복잡도)</b>이 어떻게 증가하는지를 나타내는 척도입니다. 실제 실행 시간(ms)은 하드웨어·언어·컴파일러에 따라 달라지므로, 알고리즘 자체의 효율성을 비교하려면 입력 크기 증가에 따른 <b>연산 횟수의 증가 추세</b>를 봐야 합니다. 이때 사용하는 표기법이 빅오(Big-O) 표기법입니다.</p>
+
+<h4 class="sub">핵심 원리</h4>
+<ul>
+<li><b>Big-O(상한, O)</b>: 최악의 경우에도 이 이상 나빠지지 않는다는 상한선. 알고리즘 성능을 보수적으로 평가할 때 사용하며, 코딩테스트에서 가장 널리 쓰인다.</li>
+<li><b>Big-Ω(하한, Omega)</b>: 최선의 경우 최소한 이만큼은 걸린다는 하한선.</li>
+<li><b>Big-Θ(타이트 바운드, Theta)</b>: 상한과 하한이 같아 정확한 증가율을 나타낼 때 사용.</li>
+<li>복잡도 계산 시 <b>최고차항만 남기고 계수와 하위항은 무시</b>한다 (예: 3n² + 5n + 7 → O(n²)).</li>
+<li>반복문이 중첩되면 곱해지고(O(n)×O(n)=O(n²)), 순차적으로 나열되면 더해진 뒤 최고차항만 남는다(O(n)+O(n²)→O(n²)).</li>
+</ul>
+
+<h4 class="sub">시간 복잡도 등급 (빠른 순)</h4>
+<table>
+<tr><th>표기</th><th>이름</th><th>n=10⁶일 때 대략 연산 수</th><th>대표 예시</th></tr>
+<tr><td>O(1)</td><td>상수</td><td>1</td><td>배열 인덱스 접근, 해시맵 조회</td></tr>
+<tr><td>O(log n)</td><td>로그</td><td>~20</td><td>이분 탐색, 균형 트리 탐색</td></tr>
+<tr><td>O(n)</td><td>선형</td><td>10⁶</td><td>배열 순회, 선형 탐색</td></tr>
+<tr><td>O(n log n)</td><td>선형로그</td><td>~2×10⁷</td><td>병합/퀵 정렬, 이진힙 정렬</td></tr>
+<tr><td>O(n²)</td><td>이차</td><td>10¹² (매우 느림)</td><td>버블/선택 정렬, 이중 for문</td></tr>
+<tr><td>O(2ⁿ)</td><td>지수</td><td>사실상 불가</td><td>완전탐색 부분집합, 재귀 피보나치(비메모)</td></tr>
+<tr><td>O(n!)</td><td>팩토리얼</td><td>사실상 불가</td><td>순열 전체 탐색(외판원 문제 완전탐색)</td></tr>
+</table>
+
+<div class="callout tip">
+<b>실전 가이드:</b> 코딩테스트에서 "시간 제한 1초 = 약 1억(10⁸)번 연산"을 기준으로 삼는다. n≤10⁵이면 O(n log n) 이하, n≤5000이면 O(n²), n≤500이면 O(n³), n≤20이면 O(2ⁿ)까지 허용된다고 가정하고 알고리즘을 설계한다.
+</div>
+
+<h4 class="sub">공간 복잡도</h4>
+<p>알고리즘 실행에 필요한 메모리양이다. 입력 자체를 저장하는 공간(고정 공간)과 알고리즘 실행 중 추가로 사용하는 공간(가변 공간: 재귀 호출 스택, 보조 배열 등)으로 나뉜다. 재귀 함수는 호출 스택 깊이만큼 O(depth)의 공간을 추가로 사용한다는 점을 반드시 고려해야 한다.</p>
+
+<h4 class="sub">Java 코드 예시 — 복잡도 측정 및 비교</h4>
+<pre>import java.util.*;
+
+public class ComplexityDemo {
+
+    <span class="cmt">// O(n^2) — 이중 반복문, 모든 쌍을 비교</span>
+    static int countPairsON2(int[] arr) {
+        int count = 0;
+        for (int i = 0; i < arr.length; i++) {
+            for (int j = i + 1; j < arr.length; j++) {
+                if (arr[i] + arr[j] == 0) count++;
+            }
+        }
+        return count;
+    }
+
+    <span class="cmt">// O(n) — 해시셋을 이용해 이중 반복을 단일 반복으로 축소 (시간 vs 공간 트레이드오프)</span>
+    static int countPairsON(int[] arr) {
+        int count = 0;
+        Map<Integer, Integer> freq = new HashMap<>();
+        for (int num : arr) {
+            count += freq.getOrDefault(-num, 0);
+            freq.merge(num, 1, Integer::sum);
+        }
+        return count;
+    }
+
+    public static void main(String[] args) {
+        int[] arr = {1, -1, 2, -2, 3, 0};
+        long t1 = System.nanoTime();
+        System.out.println("O(n^2) 결과: " + countPairsON2(arr));
+        long t2 = System.nanoTime();
+        System.out.println("O(n) 결과: " + countPairsON(arr));
+        long t3 = System.nanoTime();
+        System.out.printf("O(n^2) 소요: %d ns, O(n) 소요: %d ns%n", (t2 - t1), (t3 - t2));
+    }
+}</pre>
+
+<div class="usecase"><b>활용:</b> 문제를 풀기 전 입력 제약(n의 범위)을 먼저 확인하고 허용 복잡도를 역산하는 습관을 들이면, 처음부터 완전탐색이 아닌 적절한 알고리즘(이분탐색, DP, 그래프 알고리즘 등)을 선택할 수 있다.</div>
+</article>
+
+<article class="topic" id="fileio">
+<h3>파일 입출력<span class="en">File I/O</span></h3>
+
+<p>코딩테스트·백준 등에서는 표준입출력(<code class="inline">System.in</code>/<code class="inline">System.out</code>)을 사용하지만, 대용량 입력에서는 <code class="inline">Scanner</code>가 느려 시간초과가 발생하기 쉽다. 이를 해결하기 위해 <code class="inline">BufferedReader</code>/<code class="inline">StringTokenizer</code>와 <code class="inline">BufferedWriter</code>/<code class="inline">StringBuilder</code>를 조합해 입출력 성능을 최적화하는 것이 표준 패턴이다.</p>
+
+<h4 class="sub">핵심 원리</h4>
+<ul>
+<li><b>Scanner</b>는 내부적으로 정규식 파싱을 사용해 느리다 — 소규모 입력(수백 줄 이하)에만 적합.</li>
+<li><b>BufferedReader</b>는 버퍼에 한 줄씩 읽어들여 I/O 호출 횟수를 줄인다 — <code class="inline">readLine()</code>으로 한 줄씩, <code class="inline">StringTokenizer</code>로 공백 기준 토큰 분리.</li>
+<li><b>System.out.println</b>을 반복 호출하면 매번 flush가 발생해 느리다 — <code class="inline">StringBuilder</code>에 결과를 모아 마지막에 한 번에 출력하거나 <code class="inline">BufferedWriter</code>를 사용한다.</li>
+<li>파일 입출력이 필요한 경우 <code class="inline">FileReader/FileWriter</code>를 <code class="inline">BufferedReader/BufferedWriter</code>로 감싸 사용한다.</li>
+</ul>
+
+<h4 class="sub">Java 코드 예시 — 고속 입출력 템플릿</h4>
+<pre>import java.io.*;
+import java.util.*;
+
+public class FastIO {
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        StringBuilder sb = new StringBuilder();
+
+        int n = Integer.parseInt(br.readLine().trim());
+        StringTokenizer st = new StringTokenizer(br.readLine());
+
+        int[] arr = new int[n];
+        for (int i = 0; i < n; i++) {
+            arr[i] = Integer.parseInt(st.nextToken());
+        }
+
+        for (int num : arr) {
+            sb.append(num * 2).append('\n');
+        }
+
+        <span class="cmt">// 표준출력은 한 번만 호출 — System.out.print를 반복 호출하지 않는다</span>
+        System.out.print(sb);
+
+        <span class="cmt">// 파일 입출력이 필요한 경우</span>
+        try (BufferedReader fileReader = new BufferedReader(new FileReader("input.txt"));
+             BufferedWriter fileWriter = new BufferedWriter(new FileWriter("output.txt"))) {
+            String line;
+            while ((line = fileReader.readLine()) != null) {
+                fileWriter.write(line.trim());
+                fileWriter.newLine();
+            }
+        } catch (FileNotFoundException e) {
+            <span class="cmt">// 파일이 없을 때 (테스트 환경에서는 무시 가능)</span>
+        }
+    }
+}</pre>
+
+<div class="callout warn"><b>주의:</b> <code class="inline">br.readLine()</code>은 개행 전까지 공백을 포함해 통째로 읽으므로, 숫자를 한 줄에 공백으로 구분해 여러 개 받을 때는 반드시 <code class="inline">StringTokenizer</code> 또는 <code class="inline">split(" ")</code>으로 재분리해야 한다.</div>
+
+<div class="usecase"><b>활용:</b> 입력 n이 10만 개 이상인 문제, 반복 출력이 많은 문제(예: 각 쿼리마다 결과 출력)에서는 반드시 BufferedReader + StringBuilder 조합을 기본값으로 사용한다.</div>
+</article>
+</section>
+<section class="major" id="datastructure">
+<h2><span class="num">02</span> 자료 구조 (Data Structure)</h2>
+
+<article class="topic" id="ds-array">
+<h3>배열<span class="en">Array</span></h3>
+<p>같은 자료형의 원소를 <b>연속된 메모리 공간</b>에 저장하는 가장 기본적인 자료구조. 인덱스로 O(1) 접근이 가능하지만, 크기가 고정되어 있고(Java에서는 생성 시 크기 확정) 중간 삽입/삭제 시 뒤의 원소를 모두 옮겨야 한다.</p>
+<div class="complexity-box">
+<div class="cbox">접근 <b>O(1)</b></div>
+<div class="cbox">탐색 <b>O(n)</b></div>
+<div class="cbox">삽입/삭제(중간) <b>O(n)</b></div>
+<div class="cbox">삽입/삭제(끝) <b>O(1)</b></div>
+</div>
+<pre>int[] arr = new int[10];
+int[][] matrix = new int[5][5];      <span class="cmt">// 2차원 배열</span>
+int[] copy = Arrays.copyOf(arr, arr.length * 2);  <span class="cmt">// 동적 확장은 복사 필요</span>
+Arrays.sort(arr);                     <span class="cmt">// O(n log n), 듀얼 피벗 퀵정렬</span>
+int idx = Arrays.binarySearch(arr, 5); <span class="cmt">// 정렬된 배열에서 O(log n)</span></pre>
+<div class="usecase"><b>활용:</b> 크기가 미리 정해져 있고 랜덤 접근이 빈번한 경우(DP 테이블, 그래프의 인접행렬, 카운팅 배열) 배열이 최선의 선택.</div>
+</article>
+
+<article class="topic" id="ds-list">
+<h3>리스트<span class="en">List (ArrayList)</span></h3>
+<p>Java의 <code class="inline">ArrayList</code>는 내부적으로 배열을 사용하되, 용량이 부족하면 자동으로 <b>1.5배 확장</b>하여 크기 제약 없이 사용할 수 있게 만든 동적 배열이다. <code class="inline">List</code> 인터페이스를 구현하며 제네릭을 지원한다.</p>
+<div class="complexity-box">
+<div class="cbox">접근(get) <b>O(1)</b></div>
+<div class="cbox">끝에 추가 <b>O(1) 상각</b></div>
+<div class="cbox">중간 삽입/삭제 <b>O(n)</b></div>
+</div>
+<pre>List<Integer> list = new ArrayList<>();
+list.add(10); list.add(20);
+list.add(1, 15);           <span class="cmt">// 인덱스 1에 삽입 — 뒤 원소 shift, O(n)</span>
+list.remove(Integer.valueOf(20)); <span class="cmt">// 값으로 제거 (인덱스로 제거하려면 remove(int)와 오버로딩 주의)</span>
+Collections.sort(list);
+list.sort((a, b) -> b - a); <span class="cmt">// 내림차순 정렬</span></pre>
+<div class="callout warn"><b>주의:</b> <code class="inline">list.remove(20)</code>은 인덱스 20을 제거하지만 <code class="inline">list.remove(Integer.valueOf(20))</code>은 값 20을 제거한다 — 오토박싱 오버로딩 함정.</div>
+<div class="usecase"><b>활용:</b> 크기가 가변적이고 요소 순서가 중요한 대부분의 상황(입력 저장, 그래프 인접 리스트의 각 노드 리스트).</div>
+</article>
+
+<article class="topic" id="ds-linkedlist">
+<h3>연결 리스트<span class="en">LinkedList</span></h3>
+<p>각 노드가 데이터와 다음(및 이전) 노드에 대한 참조(포인터)를 가지는 자료구조. 메모리가 비연속적으로 흩어져 있어 인덱스 접근은 느리지만, 노드 자체를 알고 있다면 삽입/삭제가 O(1)이다. Java의 <code class="inline">LinkedList</code>는 이중 연결 리스트(Doubly Linked List)로 구현되어 <code class="inline">Deque</code> 인터페이스도 구현한다.</p>
+<div class="complexity-box">
+<div class="cbox">접근 <b>O(n)</b></div>
+<div class="cbox">앞/뒤 삽입·삭제 <b>O(1)</b></div>
+<div class="cbox">중간 삽입(노드 참조 有) <b>O(1)</b></div>
+</div>
+<h4 class="sub">직접 구현 — 단일 연결 리스트</h4>
+<pre>class Node {
+    int data;
+    Node next;
+    Node(int data) { this.data = data; }
+}
+
+class SinglyLinkedList {
+    Node head;
+
+    void addFirst(int data) {
+        Node newNode = new Node(data);
+        newNode.next = head;
+        head = newNode;
+    }
+
+    void addLast(int data) {
+        Node newNode = new Node(data);
+        if (head == null) { head = newNode; return; }
+        Node cur = head;
+        while (cur.next != null) cur = cur.next;
+        cur.next = newNode;
+    }
+
+    <span class="cmt">// 재귀로 리스트 역순 뒤집기 — 연결 리스트 단골 문제</span>
+    Node reverse(Node node) {
+        if (node == null || node.next == null) return node;
+        Node newHead = reverse(node.next);
+        node.next.next = node;
+        node.next = null;
+        return newHead;
+    }
+}</pre>
+<div class="usecase"><b>활용:</b> 삽입/삭제가 빈번하고 인덱스 접근이 적은 경우(LRU 캐시 구현, 다항식 표현). 코딩테스트보다 CS 개념(포인터 조작) 이해 목적으로 자주 출제된다.</div>
+</article>
+
+<article class="topic" id="ds-map">
+<h3>맵<span class="en">Map (HashMap / TreeMap)</span></h3>
+<p>키(Key)-값(Value) 쌍을 저장하는 자료구조. <code class="inline">HashMap</code>은 해시 함수로 버킷 인덱스를 계산해 평균 O(1) 접근을 제공하고, <code class="inline">TreeMap</code>은 레드-블랙 트리 기반으로 키를 정렬된 상태로 유지하며 O(log n) 접근을 제공한다.</p>
+<div class="complexity-box">
+<div class="cbox">HashMap 조회 <b>평균 O(1)</b></div>
+<div class="cbox">HashMap 최악 <b>O(n)</b></div>
+<div class="cbox">TreeMap 조회 <b>O(log n)</b></div>
+</div>
+<pre>Map<String, Integer> hm = new HashMap<>();
+hm.put("apple", 3);
+hm.merge("apple", 1, Integer::sum);       <span class="cmt">// 존재하면 누적, 없으면 초기값</span>
+hm.getOrDefault("banana", 0);
+hm.computeIfAbsent("cherry", k -> 0);
+
+TreeMap<Integer, String> tm = new TreeMap<>();
+tm.put(5, "five"); tm.put(1, "one");
+tm.firstKey(); tm.lastKey();
+tm.ceilingKey(3);   <span class="cmt">// 3 이상인 가장 작은 키 — O(log n)</span>
+tm.floorKey(3);     <span class="cmt">// 3 이하인 가장 큰 키</span></pre>
+<div class="callout tip"><b>선택 기준:</b> 순서가 필요 없고 최고 속도가 필요하면 HashMap, 정렬 순회·범위 검색(ceiling/floor)이 필요하면 TreeMap.</div>
+<div class="usecase"><b>활용:</b> 빈도수 계산(문자 빈도, 투 포인터와 결합한 부분합), 캐싱/메모이제이션(DP), 그래프의 방문 여부 기록.</div>
+</article>
+
+<article class="topic" id="ds-set">
+<h3>세트<span class="en">Set (HashSet / TreeSet)</span></h3>
+<p>중복을 허용하지 않는 원소들의 집합. 내부적으로 HashMap/TreeMap을 그대로 재사용해 구현되어 있다(값만 저장, 키만 사용). 원소의 존재 여부 확인에 최적화되어 있다.</p>
+<pre>Set<Integer> hs = new HashSet<>();
+hs.add(1); hs.add(2); hs.add(1);   <span class="cmt">// 중복 무시 → size == 2</span>
+hs.contains(2);                     <span class="cmt">// O(1) 평균</span>
+
+TreeSet<Integer> ts = new TreeSet<>(Arrays.asList(5, 1, 3));
+ts.higher(3);  <span class="cmt">// 3보다 큰 값 중 최소 — O(log n)</span>
+ts.lower(3);   <span class="cmt">// 3보다 작은 값 중 최대</span>
+ts.pollFirst(); <span class="cmt">// 최소값 꺼내며 제거</span></pre>
+<div class="usecase"><b>활용:</b> 중복 제거, 방문 처리(BFS/DFS visited), 두 집합의 교집합·합집합·차집합 연산(retainAll/addAll/removeAll).</div>
+</article>
+
+<article class="topic" id="ds-stack">
+<h3>스택<span class="en">Stack (LIFO)</span></h3>
+<p>Last-In-First-Out — 나중에 넣은 원소가 먼저 나오는 자료구조. Java의 <code class="inline">Stack</code> 클래스는 legacy(동기화 오버헤드)이므로, 실전에서는 <code class="inline">Deque</code>(ArrayDeque)를 스택처럼 사용하는 것이 권장된다.</p>
+<div class="complexity-box"><div class="cbox">push/pop/peek 모두 <b>O(1)</b></div></div>
+<pre>Deque<Integer> stack = new ArrayDeque<>();
+stack.push(1); stack.push(2);
+stack.pop();   <span class="cmt">// 2 반환 후 제거</span>
+stack.peek();  <span class="cmt">// 1 (제거하지 않고 확인)</span>
+
+<span class="cmt">// 활용 예: 괄호 유효성 검사</span>
+boolean isValid(String s) {
+    Deque<Character> st = new ArrayDeque<>();
+    Map<Character, Character> pair = Map.of(')', '(', ']', '[', '}', '{');
+    for (char c : s.toCharArray()) {
+        if (c == '(' || c == '[' || c == '{') st.push(c);
+        else {
+            if (st.isEmpty() || st.pop() != pair.get(c)) return false;
+        }
+    }
+    return st.isEmpty();
+}</pre>
+<div class="usecase"><b>활용:</b> 괄호 매칭, 계산기(중위→후위 변환), 함수 호출 스택 시뮬레이션(재귀 → 반복 변환), DFS의 반복문 구현, 모노토닉 스택(다음 큰 원소 찾기).</div>
+</article>
+
+<article class="topic" id="ds-queue">
+<h3>큐<span class="en">Queue (FIFO)</span></h3>
+<p>First-In-First-Out — 먼저 넣은 원소가 먼저 나오는 자료구조. <code class="inline">LinkedList</code> 또는 <code class="inline">ArrayDeque</code>로 구현하며, ArrayDeque가 배열 기반이라 더 빠르다.</p>
+<div class="complexity-box"><div class="cbox">offer/poll/peek 모두 <b>O(1)</b></div></div>
+<pre>Queue<Integer> queue = new ArrayDeque<>();
+queue.offer(1); queue.offer(2);
+queue.poll();  <span class="cmt">// 1 반환 후 제거</span>
+queue.peek();  <span class="cmt">// 2 (확인만)</span>
+
+<span class="cmt">// 우선순위 큐(PriorityQueue) — 힙 기반, O(log n) 삽입/삭제</span>
+PriorityQueue<Integer> pq = new PriorityQueue<>();          <span class="cmt">// 최소 힙 (기본)</span>
+PriorityQueue<Integer> maxPq = new PriorityQueue<>(Collections.reverseOrder()); <span class="cmt">// 최대 힙</span>
+pq.offer(5); pq.offer(1); pq.offer(3);
+pq.poll(); <span class="cmt">// 1 — 항상 최소값 먼저 반환</span></pre>
+<div class="usecase"><b>활용:</b> BFS 탐색(레벨 순회), 다익스트라·프림 알고리즘의 우선순위 큐, 작업 스케줄링, 최근 N개 유지(슬라이딩 윈도우).</div>
+</article>
+
+<article class="topic" id="ds-deque">
+<h3>덱<span class="en">Deque (Double-Ended Queue)</span></h3>
+<p>양쪽 끝에서 모두 삽입/삭제가 O(1)인 자료구조. Java의 <code class="inline">ArrayDeque</code>는 원형 배열(circular array)로 구현되어 Stack과 Queue를 모두 대체할 수 있는 만능 자료구조다.</p>
+<pre>Deque<Integer> dq = new ArrayDeque<>();
+dq.addFirst(1); dq.addLast(2);
+dq.pollFirst(); dq.pollLast();
+dq.offerFirst(3); dq.offerLast(4);
+
+<span class="cmt">// 활용 예: 슬라이딩 윈도우 최댓값 — 단조 감소 덱(Monotonic Deque), O(n)</span>
+int[] slidingWindowMax(int[] nums, int k) {
+    Deque<Integer> dq2 = new ArrayDeque<>(); <span class="cmt">// 인덱스 저장, 값이 감소하는 순서 유지</span>
+    int[] result = new int[nums.length - k + 1];
+    for (int i = 0; i < nums.length; i++) {
+        while (!dq2.isEmpty() && dq2.peekFirst() <= i - k) dq2.pollFirst(); <span class="cmt">// 윈도우 벗어난 인덱스 제거</span>
+        while (!dq2.isEmpty() && nums[dq2.peekLast()] < nums[i]) dq2.pollLast(); <span class="cmt">// 자신보다 작은 값 제거</span>
+        dq2.offerLast(i);
+        if (i >= k - 1) result[i - k + 1] = nums[dq2.peekFirst()];
+    }
+    return result;
+}</pre>
+<div class="usecase"><b>활용:</b> 슬라이딩 윈도우 최대/최소값(단조 덱), 팰린드롬 검사, BFS 0-1 (가중치 0/1 최단경로에서 덱으로 다익스트라 대체).</div>
+</article>
+
+<article class="topic" id="ds-tree">
+<h3>트리<span class="en">Tree</span></h3>
+<p>노드와 간선으로 이루어진 비선형 계층 자료구조. 사이클이 없는 연결 그래프의 특수한 형태(간선 수 = 노드 수 - 1)로 볼 수 있다. 이진 트리, 이진 탐색 트리(BST), 균형 트리(AVL, Red-Black), 힙(Heap) 등 다양한 변형이 있다.</p>
+<h4 class="sub">이진 탐색 트리(BST) 직접 구현</h4>
+<pre>class TreeNode {
+    int val;
+    TreeNode left, right;
+    TreeNode(int val) { this.val = val; }
+}
+
+class BST {
+    TreeNode root;
+
+    void insert(int val) { root = insertRec(root, val); }
+    TreeNode insertRec(TreeNode node, int val) {
+        if (node == null) return new TreeNode(val);
+        if (val < node.val) node.left = insertRec(node.left, val);
+        else if (val > node.val) node.right = insertRec(node.right, val);
+        return node;
+    }
+
+    boolean search(TreeNode node, int val) {
+        if (node == null) return false;
+        if (node.val == val) return true;
+        return val < node.val ? search(node.left, val) : search(node.right, val);
+    }
+
+    <span class="cmt">// 중위 순회 — BST에서는 항상 오름차순 결과</span>
+    void inorder(TreeNode node, List<Integer> result) {
+        if (node == null) return;
+        inorder(node.left, result);
+        result.add(node.val);
+        inorder(node.right, result);
+    }
+}</pre>
+<div class="complexity-box">
+<div class="cbox">균형 BST 탐색/삽입 <b>O(log n)</b></div>
+<div class="cbox">편향 BST 최악 <b>O(n)</b></div>
+</div>
+<div class="callout warn"><b>주의:</b> 정렬된 데이터를 순서대로 삽입하면 BST가 연결 리스트처럼 편향되어 O(n)으로 성능이 저하된다 — 실전에서는 자동 균형을 보장하는 <code class="inline">TreeMap/TreeSet</code>을 사용한다.</div>
+<div class="usecase"><b>활용:</b> 계층 구조 표현(파일 시스템, 조직도), 힙 기반 우선순위 큐, 세그먼트/펜윅 트리(구간 질의), 트라이(문자열 검색), LCA(최소 공통 조상).</div>
+</article>
+</section>
+<section class="major" id="numbertheory">
+<h2><span class="num">03</span> 수학 (Number Theory)</h2>
+
+<article class="topic" id="nt-prime">
+<h3>소수 &amp; 에라토스테네스의 체<span class="en">Prime Number / Sieve of Eratosthenes</span></h3>
+<p>소수는 1과 자기 자신 외의 약수를 갖지 않는 2 이상의 자연수다. 단일 숫자의 소수 판별은 O(√n)로 충분하지만, 특정 범위 내 모든 소수를 구해야 할 때는 <b>에라토스테네스의 체</b>를 사용해 O(n log log n)에 처리한다.</p>
+
+<h4 class="sub">단일 수 소수 판별 — O(√n)</h4>
+<pre>boolean isPrime(int n) {
+    if (n < 2) return false;
+    for (int i = 2; (long) i * i <= n; i++) {   <span class="cmt">// i*i <= n 까지만 검사하면 충분</span>
+        if (n % i == 0) return false;
+    }
+    return true;
+}</pre>
+
+<h4 class="sub">에라토스테네스의 체 — O(n log log n)</h4>
+<pre>boolean[] sieve(int n) {
+    boolean[] isComposite = new boolean[n + 1]; <span class="cmt">// true면 합성수</span>
+    for (int i = 2; (long) i * i <= n; i++) {
+        if (!isComposite[i]) {
+            for (int j = i * i; j <= n; j += i) { <span class="cmt">// i*i부터 시작 — 그 이전 배수는 이미 처리됨</span>
+                isComposite[j] = true;
+            }
+        }
+    }
+    return isComposite; <span class="cmt">// isComposite[i]==false && i>=2 → i는 소수</span>
+}</pre>
+<div class="complexity-box"><div class="cbox">단건 판별 <b>O(√n)</b></div><div class="cbox">범위 전체 <b>O(n log log n)</b></div></div>
+<div class="usecase"><b>활용:</b> 소수 리스트 사전 계산 후 여러 쿼리 처리, 소인수분해(체 계산 시 최소소인수 배열도 함께 구성 가능), 골드바흐 추측류 문제.</div>
+</article>
+
+<article class="topic" id="nt-gcd">
+<h3>최대공약수·최소공배수<span class="en">GCD / LCM — Euclidean Algorithm</span></h3>
+<p><b>유클리드 호제법</b>은 두 수의 최대공약수(GCD)를 구하는 알고리즘으로, "두 수 a, b(a&gt;b)의 GCD는 b와 (a mod b)의 GCD와 같다"는 성질을 반복 적용한다. 최소공배수(LCM)는 GCD를 이용해 <code class="inline">a*b/GCD(a,b)</code>로 즉시 구한다.</p>
+<pre>long gcd(long a, long b) {
+    return b == 0 ? a : gcd(b, a % b);   <span class="cmt">// 재귀 유클리드 호제법 — O(log(min(a,b)))</span>
+}
+
+long lcm(long a, long b) {
+    return a / gcd(a, b) * b;   <span class="cmt">// 오버플로 방지 위해 나눗셈을 먼저 수행</span>
+}
+
+<span class="cmt">// 반복문 버전 (스택 오버플로 방지)</span>
+long gcdIter(long a, long b) {
+    while (b != 0) {
+        long t = b;
+        b = a % b;
+        a = t;
+    }
+    return a;
+}</pre>
+<div class="complexity-box"><div class="cbox">O(log(min(a,b)))</div></div>
+<div class="usecase"><b>활용:</b> 분수 약분, 주기 계산(톱니바퀴 문제), 여러 수의 공배수/공약수 문제, 확장 유클리드 호제법으로 모듈러 역원 계산(RSA 등).</div>
+</article>
+
+<article class="topic" id="nt-geometry">
+<h3>기하학<span class="en">Geometry — Vector, Convex-Hull</span></h3>
+<p>좌표평면 상의 점·선분·다각형 문제를 다루는 분야. 핵심은 두 벡터의 <b>외적(CCW, Counter-ClockWise)</b>으로 세 점의 회전 방향(시계/반시계/일직선)을 판별하는 것이며, 이를 기반으로 볼록 껍질(Convex Hull), 선분 교차 판정 등을 구현한다.</p>
+
+<h4 class="sub">CCW (외적을 이용한 방향 판정)</h4>
+<pre>// 세 점 p1, p2, p3의 방향: 양수=반시계, 음수=시계, 0=일직선
+long ccw(int[] p1, int[] p2, int[] p3) {
+    long v = (long)(p2[0] - p1[0]) * (p3[1] - p1[1])
+           - (long)(p2[1] - p1[1]) * (p3[0] - p1[0]);
+    return v;
+}</pre>
+
+<h4 class="sub">Convex Hull — Graham Scan, O(n log n)</h4>
+<pre>List<int[]> convexHull(int[][] points) {
+    Arrays.sort(points, (a, b) -> a[0] != b[0] ? a[0] - b[0] : a[1] - b[1]); <span class="cmt">// x, y 기준 정렬</span>
+    int n = points.length;
+    int[][] hull = new int[2 * n][];
+    int k = 0;
+
+    <span class="cmt">// 아래쪽 껍질</span>
+    for (int[] p : points) {
+        while (k >= 2 && ccw(hull[k-2], hull[k-1], p) <= 0) k--;
+        hull[k++] = p;
+    }
+    <span class="cmt">// 위쪽 껍질</span>
+    int lower = k + 1;
+    for (int i = n - 2; i >= 0; i--) {
+        int[] p = points[i];
+        while (k >= lower && ccw(hull[k-2], hull[k-1], p) <= 0) k--;
+        hull[k++] = p;
+    }
+    return new ArrayList<>(Arrays.asList(hull).subList(0, k - 1));
+}</pre>
+<div class="complexity-box"><div class="cbox">CCW 판정 <b>O(1)</b></div><div class="cbox">Convex Hull <b>O(n log n)</b></div></div>
+<div class="usecase"><b>활용:</b> 선분 교차 판정(CCW 부호 조합), 다각형 내부 점 판정, 최소 넓이로 모든 점을 감싸는 울타리 문제, GIS/충돌 검출.</div>
+</article>
+</section>
+<section class="major" id="implementation">
+<h2><span class="num">04</span> 구현 (Implementation)</h2>
+
+<article class="topic" id="impl-dfsbfs">
+<h3>DFS-BFS<span class="en">Depth-First Search / Breadth-First Search</span></h3>
+<p>그래프·트리를 탐색하는 두 가지 기본 방법. <b>DFS(깊이 우선 탐색)</b>는 한 방향으로 갈 수 있는 만큼 깊이 들어간 뒤 되돌아오며(재귀 또는 스택), <b>BFS(너비 우선 탐색)</b>는 가까운 노드부터 레벨 단위로 탐색한다(큐 사용). BFS는 <b>가중치 없는 그래프에서 최단 거리</b>를 보장한다는 점이 핵심이다.</p>
+
+<h4 class="sub">DFS — 재귀 구현</h4>
+<pre>void dfs(int node, List<List<Integer>> graph, boolean[] visited) {
+    visited[node] = true;
+    System.out.print(node + " ");
+    for (int next : graph.get(node)) {
+        if (!visited[next]) dfs(next, graph, visited);
+    }
+}</pre>
+
+<h4 class="sub">BFS — 큐 구현 (최단 거리 동시 계산)</h4>
+<pre>int[] bfs(int start, List<List<Integer>> graph, int n) {
+    int[] dist = new int[n];
+    Arrays.fill(dist, -1);
+    dist[start] = 0;
+    Queue<Integer> queue = new ArrayDeque<>();
+    queue.offer(start);
+
+    while (!queue.isEmpty()) {
+        int cur = queue.poll();
+        for (int next : graph.get(cur)) {
+            if (dist[next] == -1) {           <span class="cmt">// 미방문 = 아직 최단거리 미확정</span>
+                dist[next] = dist[cur] + 1;
+                queue.offer(next);
+            }
+        }
+    }
+    return dist;
+}</pre>
+<div class="complexity-box"><div class="cbox">DFS/BFS 모두 <b>O(V+E)</b></div></div>
+<div class="callout tip"><b>선택 기준:</b> 모든 경로를 탐색하거나 사이클을 찾아야 하면 DFS, 최단 거리(가중치 없음)나 레벨별 처리가 필요하면 BFS.</div>
+<div class="usecase"><b>활용:</b> 섬 개수 세기, 미로 최단거리, 연결 요소 찾기, 이분 그래프 판정, 위상 정렬(DFS 기반).</div>
+</article>
+
+<article class="topic" id="impl-brute">
+<h3>브루트 포스<span class="en">Brute Force</span></h3>
+<p>가능한 모든 경우의 수를 전부 탐색해 답을 찾는 방법. 구현이 단순하고 정답을 보장하지만 시간복잡도가 크므로, 입력 크기가 작을 때(N≤20 내외)만 실전에서 사용 가능하다. 문제 설계 시 "일단 완전탐색으로 접근 가능한지" 확인하는 것이 첫 단계다.</p>
+<pre><span class="cmt">// 예: N개 중 최댓값을 만드는 부분집합 찾기 — 2^N 완전탐색</span>
+int bruteForceMaxSubset(int[] arr) {
+    int n = arr.length, best = Integer.MIN_VALUE;
+    for (int mask = 0; mask < (1 << n); mask++) {   <span class="cmt">// 모든 부분집합 = 2^n 가지</span>
+        int sum = 0;
+        for (int i = 0; i < n; i++) {
+            if ((mask & (1 << i)) != 0) sum += arr[i];
+        }
+        <span class="cmt">// 조건 검사 후 최적값 갱신</span>
+        best = Math.max(best, sum);
+    }
+    return best;
+}</pre>
+<div class="complexity-box"><div class="cbox">경우의 수에 비례 — 보통 <b>O(2ⁿ)</b> 또는 <b>O(n!)</b></div></div>
+<div class="usecase"><b>활용:</b> N≤15 부분집합 문제, N≤10 순열 문제, 시뮬레이션 문제의 초기 접근, 최적화 전 정답 검증용 코드.</div>
+</article>
+
+<article class="topic" id="impl-backtrack">
+<h3>백트래킹<span class="en">Backtracking</span></h3>
+<p>완전탐색을 하되, 현재까지의 선택이 답이 될 가능성이 없다고 판단되면 <b>그 즉시 탐색을 중단하고 이전 상태로 되돌아가는(가지치기, Pruning)</b> 방식이다. 트리 형태의 탐색 공간에서 유망하지 않은 가지를 쳐냄으로써 브루트 포스보다 훨씬 빠르게 동작한다.</p>
+<h4 class="sub">Java 코드 예시 — N-Queen</h4>
+<pre>class NQueen {
+    int n, count = 0;
+    int[] col; <span class="cmt">// col[row] = 해당 row에 놓인 queen의 열 위치</span>
+
+    void solve(int n) {
+        this.n = n;
+        col = new int[n];
+        backtrack(0);
+    }
+
+    void backtrack(int row) {
+        if (row == n) { count++; return; }   <span class="cmt">// 종료 조건: 모든 행 배치 완료</span>
+
+        for (int c = 0; c < n; c++) {
+            if (isValid(row, c)) {
+                col[row] = c;      <span class="cmt">// 선택</span>
+                backtrack(row + 1); <span class="cmt">// 탐색</span>
+                <span class="cmt">// col[row]는 다음 반복에서 덮어써지므로 별도 되돌리기 불필요</span>
+            }
+        }
+    }
+
+    boolean isValid(int row, int c) {
+        for (int r = 0; r < row; r++) {
+            <span class="cmt">// 같은 열이거나 대각선이면 유효하지 않음 → 즉시 가지치기</span>
+            if (col[r] == c || Math.abs(col[r] - c) == row - r) return false;
+        }
+        return true;
+    }
+}</pre>
+<div class="complexity-box"><div class="cbox">최악 <b>O(n!)</b> — 가지치기로 실제 탐색량은 대폭 감소</div></div>
+<div class="callout tip"><b>백트래킹의 3요소:</b> ① 선택(Choose) — 후보를 상태에 반영, ② 탐색(Explore) — 다음 단계 재귀 호출, ③ 되돌리기(Un-choose) — 실패 시 상태 복구 후 다음 후보 시도.</div>
+<div class="usecase"><b>활용:</b> N-Queen, 스도쿠, 순열/조합 생성, 부분집합 합 문제, 조합 최적화(TSP 브랜치 앤 바운드).</div>
+</article>
+</section>
+<section class="major" id="algorithm">
+<h2><span class="num">05</span> 알고리즘 (Algorithm)</h2>
+
+<article class="topic" id="alg-slidewindow">
+<h3>슬라이드 윈도우<span class="en">Sliding Window</span></h3>
+<p>고정되거나 가변적인 크기의 구간(윈도우)을 배열 위에서 이동시키며 구간 정보를 O(1)에 갱신하는 기법. 매번 구간 합/조건을 처음부터 다시 계산하지 않고, <b>윈도우가 이동할 때 빠지는 원소를 빼고 들어오는 원소만 더하는 방식</b>으로 O(n²)를 O(n)으로 줄인다.</p>
+<pre><span class="cmt">// 고정 크기 k 윈도우의 최대 합</span>
+int maxSumFixedWindow(int[] arr, int k) {
+    int windowSum = 0;
+    for (int i = 0; i < k; i++) windowSum += arr[i];
+    int maxSum = windowSum;
+    for (int i = k; i < arr.length; i++) {
+        windowSum += arr[i] - arr[i - k];  <span class="cmt">// 들어오는 값 더하고 나가는 값 빼기 — O(1)</span>
+        maxSum = Math.max(maxSum, windowSum);
+    }
+    return maxSum;
+}
+
+<span class="cmt">// 가변 크기 윈도우 — 합이 target 이상이 되는 최소 길이 부분배열</span>
+int minSubArrayLen(int target, int[] arr) {
+    int left = 0, sum = 0, minLen = Integer.MAX_VALUE;
+    for (int right = 0; right < arr.length; right++) {
+        sum += arr[right];
+        while (sum >= target) {           <span class="cmt">// 조건 만족 시 왼쪽을 최대한 좁힘</span>
+            minLen = Math.min(minLen, right - left + 1);
+            sum -= arr[left++];
+        }
+    }
+    return minLen == Integer.MAX_VALUE ? 0 : minLen;
+}</pre>
+<div class="complexity-box"><div class="cbox">O(n) — 각 원소가 최대 한 번씩만 들어오고 나감</div></div>
+<div class="usecase"><b>활용:</b> 최대/최소 부분배열 합, 특정 조건을 만족하는 최소/최대 길이 구간, 문자열 내 특정 패턴을 포함하는 최소 윈도우.</div>
+</article>
+
+<article class="topic" id="alg-binarysearch">
+<h3>이분 탐색<span class="en">Binary Search</span></h3>
+<p><b>정렬된 배열</b>에서 탐색 범위를 절반씩 줄여가며 목표 값을 찾는 알고리즘. 단순 값 탐색뿐 아니라, "조건을 만족하는 최소/최대값"을 찾는 <b>파라메트릭 서치(Parametric Search)</b>로도 널리 활용된다.</p>
+<pre><span class="cmt">// 기본 이분 탐색</span>
+int binarySearch(int[] arr, int target) {
+    int lo = 0, hi = arr.length - 1;
+    while (lo <= hi) {
+        int mid = lo + (hi - lo) / 2;   <span class="cmt">// (lo+hi)/2는 오버플로 위험 — 이렇게 계산</span>
+        if (arr[mid] == target) return mid;
+        else if (arr[mid] < target) lo = mid + 1;
+        else hi = mid - 1;
+    }
+    return -1;
+}
+
+<span class="cmt">// 파라메트릭 서치: 절단기로 자른 나무 길이의 합이 target 이상이 되는 최대 높이 H 찾기</span>
+long parametricSearch(int[] trees, long target) {
+    long lo = 0, hi = Arrays.stream(trees).max().getAsInt();
+    long answer = 0;
+    while (lo <= hi) {
+        long mid = lo + (hi - lo) / 2;
+        long sum = 0;
+        for (int t : trees) if (t > mid) sum += t - mid;
+
+        if (sum >= target) {       <span class="cmt">// 조건 만족 → 더 큰 높이도 가능한지 탐색</span>
+            answer = mid;
+            lo = mid + 1;
+        } else {
+            hi = mid - 1;
+        }
+    }
+    return answer;
+}</pre>
+<div class="complexity-box"><div class="cbox">O(log n)</div><div class="cbox">파라메트릭 서치 <b>O(log(범위) × 검증비용)</b></div></div>
+<div class="callout tip"><b>적용 신호:</b> "정답이 단조성(monotonic)을 갖는가?" — 어떤 값 X가 조건을 만족하면 X보다 크거나 작은 모든 값도 만족/불만족한다면 파라메트릭 서치를 적용할 수 있다.</div>
+<div class="usecase"><b>활용:</b> Java 내장 <code class="inline">Arrays.binarySearch, Collections.binarySearch</code>, 최적 값 탐색(랜선 자르기, 공유기 설치, 배달 시간).</div>
+</article>
+
+<article class="topic" id="alg-twopointer">
+<h3>투 포인터<span class="en">Two Pointer</span></h3>
+<p>두 개의 인덱스(포인터)를 배열의 양 끝 또는 같은 방향으로 움직이며 조건을 만족하는 구간/쌍을 O(n)에 찾는 기법. <b>정렬된 배열</b>에서 특히 강력하다.</p>
+<pre><span class="cmt">// 정렬된 배열에서 합이 target인 두 수 찾기 — O(n)</span>
+int[] twoSumSorted(int[] arr, int target) {
+    int left = 0, right = arr.length - 1;
+    while (left < right) {
+        int sum = arr[left] + arr[right];
+        if (sum == target) return new int[]{left, right};
+        else if (sum < target) left++;   <span class="cmt">// 합이 작으면 왼쪽을 오른쪽으로 이동해 합 증가</span>
+        else right--;                     <span class="cmt">// 합이 크면 오른쪽을 왼쪽으로 이동해 합 감소</span>
+    }
+    return new int[]{-1, -1};
+}</pre>
+<div class="complexity-box"><div class="cbox">O(n) (정렬 필요 시 O(n log n) 추가)</div></div>
+<div class="usecase"><b>활용:</b> 정렬 배열에서 쌍/삼중 합 찾기(3Sum), 팰린드롬 검사, 두 정렬 리스트 병합, 슬라이딩 윈도우와 결합한 부분 배열 문제.</div>
+</article>
+
+<article class="topic" id="alg-greedy">
+<h3>탐욕 알고리즘<span class="en">Greedy Algorithm</span></h3>
+<p>매 순간 <b>현재 상황에서 가장 좋아 보이는 선택</b>을 반복해 전체 최적해를 구하려는 방법. 항상 최적해를 보장하지는 않으며, 문제가 <b>탐욕적 선택 속성(Greedy Choice Property)</b>과 <b>최적 부분구조(Optimal Substructure)</b>를 만족할 때만 유효하다 — 적용 전 반드시 수학적 근거(교환 논증 등)로 정당성을 확인해야 한다.</p>
+<pre><span class="cmt">// 회의실 배정 — 종료시간 기준 정렬 후 탐욕 선택, 정당성: 가장 먼저 끝나는 회의를 선택하는 것이 항상 최적</span>
+int maxMeetings(int[][] meetings) {
+    Arrays.sort(meetings, (a, b) -> a[1] - b[1]);  <span class="cmt">// 종료시간 오름차순 정렬</span>
+    int count = 0, lastEnd = 0;
+    for (int[] m : meetings) {
+        if (m[0] >= lastEnd) {   <span class="cmt">// 이전 회의가 끝난 후 시작 가능하면 선택</span>
+            count++;
+            lastEnd = m[1];
+        }
+    }
+    return count;
+}
+
+<span class="cmt">// 거스름돈 — 동전 단위가 배수 관계일 때만 탐욕이 최적 (아닐 경우 DP 필요)</span>
+int minCoins(int[] coins, int amount) {
+    Arrays.sort(coins);
+    int count = 0;
+    for (int i = coins.length - 1; i >= 0 && amount > 0; i--) {
+        count += amount / coins[i];
+        amount %= coins[i];
+    }
+    return amount == 0 ? count : -1;
+}</pre>
+<div class="callout warn"><b>주의:</b> 동전 단위가 {1, 3, 4}처럼 배수 관계가 아니면 탐욕이 최적해를 보장하지 못한다(6원을 4+1+1이 아닌 3+3으로 만들어야 최소 개수). 이런 경우 DP로 전환해야 한다.</div>
+<div class="usecase"><b>활용:</b> 활동 선택 문제, 최소 신장 트리(Kruskal/Prim), 허프만 코딩, 다익스트라 최단경로.</div>
+</article>
+<article class="topic" id="alg-recursion">
+<h3>재귀 함수 작성 방법<span class="en">Writing Recursive Function</span></h3>
+<p>함수가 자기 자신을 호출하는 기법. 반드시 <b>① 종료 조건(Base Case)</b>과 <b>② 문제를 더 작은 단위로 줄이는 점화 관계(Recursive Case)</b> 두 가지를 정의해야 무한 재귀를 피할 수 있다. 내부적으로 함수 호출 스택을 사용하므로 깊이가 깊으면 <code class="inline">StackOverflowError</code>가 발생할 수 있다(Java 기본 스택 깊이는 대략 1만 회 내외).</p>
+<pre><span class="cmt">// 팩토리얼 — 가장 기본적인 재귀 구조</span>
+long factorial(int n) {
+    if (n <= 1) return 1;              <span class="cmt">// ① 종료 조건</span>
+    return n * factorial(n - 1);        <span class="cmt">// ② 더 작은 문제로 축소</span>
+}
+
+<span class="cmt">// 피보나치 — 메모이제이션 없이는 O(2^n), 있으면 O(n)</span>
+Map<Integer, Long> memo = new HashMap<>();
+long fibonacci(int n) {
+    if (n <= 1) return n;
+    if (memo.containsKey(n)) return memo.get(n);  <span class="cmt">// 이미 계산한 값 재사용 (top-down DP)</span>
+    long result = fibonacci(n - 1) + fibonacci(n - 2);
+    memo.put(n, result);
+    return result;
+}</pre>
+<div class="callout tip"><b>재귀 설계 3단계:</b> ① 가장 작은 경우(n=0, n=1)를 손으로 풀어 종료조건을 정한다. ② "이 문제가 더 작은 동일한 문제로 어떻게 줄어드는가"를 점화식으로 세운다. ③ 중복 계산이 생기면 메모이제이션을 추가한다.</div>
+<div class="usecase"><b>활용:</b> 트리/그래프 순회, 분할 정복, DP의 top-down 구현, 백트래킹.</div>
+</article>
+
+<article class="topic" id="alg-sorting">
+<h3>정렬<span class="en">Sorting</span></h3>
+<p>원소들을 특정 순서(오름차순/내림차순)로 재배열하는 알고리즘. Java의 <code class="inline">Arrays.sort()</code>는 원시타입에는 듀얼 피벗 퀵정렬(O(n log n) 평균), 객체타입에는 팀소트(TimSort, 안정 정렬)를 사용한다.</p>
+<h4 class="sub">병합 정렬 — 분할 정복 기반, O(n log n) 항상 보장</h4>
+<pre>void mergeSort(int[] arr, int left, int right) {
+    if (left >= right) return;
+    int mid = (left + right) / 2;
+    mergeSort(arr, left, mid);
+    mergeSort(arr, mid + 1, right);
+    merge(arr, left, mid, right);
+}
+
+void merge(int[] arr, int left, int mid, int right) {
+    int[] temp = new int[right - left + 1];
+    int i = left, j = mid + 1, k = 0;
+    while (i <= mid && j <= right) {
+        temp[k++] = (arr[i] <= arr[j]) ? arr[i++] : arr[j++];  <span class="cmt">// <= 사용 시 안정 정렬 유지</span>
+    }
+    while (i <= mid) temp[k++] = arr[i++];
+    while (j <= right) temp[k++] = arr[j++];
+    System.arraycopy(temp, 0, arr, left, temp.length);
+}</pre>
+<h4 class="sub">퀵 정렬 — 평균 O(n log n), 최악 O(n²)</h4>
+<pre>void quickSort(int[] arr, int lo, int hi) {
+    if (lo >= hi) return;
+    int pivotIdx = partition(arr, lo, hi);
+    quickSort(arr, lo, pivotIdx - 1);
+    quickSort(arr, pivotIdx + 1, hi);
+}
+
+int partition(int[] arr, int lo, int hi) {
+    int pivot = arr[hi];
+    int i = lo - 1;
+    for (int j = lo; j < hi; j++) {
+        if (arr[j] < pivot) {
+            i++;
+            int t = arr[i]; arr[i] = arr[j]; arr[j] = t;
+        }
+    }
+    int t = arr[i + 1]; arr[i + 1] = arr[hi]; arr[hi] = t;
+    return i + 1;
+}</pre>
+<table>
+<tr><th>알고리즘</th><th>평균</th><th>최악</th><th>안정성</th><th>공간</th></tr>
+<tr><td>버블/선택/삽입 정렬</td><td>O(n²)</td><td>O(n²)</td><td>삽입만 안정</td><td>O(1)</td></tr>
+<tr><td>병합 정렬</td><td>O(n log n)</td><td>O(n log n)</td><td>안정</td><td>O(n)</td></tr>
+<tr><td>퀵 정렬</td><td>O(n log n)</td><td>O(n²)</td><td>불안정</td><td>O(log n)</td></tr>
+<tr><td>힙 정렬</td><td>O(n log n)</td><td>O(n log n)</td><td>불안정</td><td>O(1)</td></tr>
+</table>
+<div class="usecase"><b>활용:</b> 대부분 문제에서는 <code class="inline">Arrays.sort()</code>로 충분하나, 직접 구현 능력은 분할정복 개념 검증 및 특수 정렬(카운팅 정렬 등) 응용에 필요.</div>
+</article>
+
+<article class="topic" id="alg-divideconquer">
+<h3>분할 정복<span class="en">Divide and Conquer</span></h3>
+<p>문제를 <b>① 분할(Divide)</b> — 더 작은 동일 유형의 부분 문제로 나누고, <b>② 정복(Conquer)</b> — 각 부분 문제를 재귀적으로 해결한 뒤, <b>③ 결합(Combine)</b> — 부분 해를 합쳐 전체 해를 구하는 전략. 병합정렬, 퀵정렬, 이분탐색, 거듭제곱 빠른 계산 등이 대표적이다.</p>
+<pre><span class="cmt">// 분할 정복을 이용한 빠른 거듭제곱 — O(log n), 일반 반복곱은 O(n)</span>
+long power(long base, long exp, long mod) {
+    if (exp == 0) return 1;
+    long half = power(base, exp / 2, mod);
+    long result = (half * half) % mod;
+    if (exp % 2 == 1) result = (result * base) % mod;  <span class="cmt">// 지수가 홀수면 base 한 번 더 곱함</span>
+    return result;
+}
+
+<span class="cmt">// 최대/최소 동시 탐색 — 분할정복으로 비교 횟수 절감</span>
+int[] findMinMax(int[] arr, int lo, int hi) {
+    if (lo == hi) return new int[]{arr[lo], arr[lo]};
+    int mid = (lo + hi) / 2;
+    int[] left = findMinMax(arr, lo, mid);
+    int[] right = findMinMax(arr, mid + 1, hi);
+    return new int[]{Math.min(left[0], right[0]), Math.max(left[1], right[1])};
+}</pre>
+<div class="usecase"><b>활용:</b> 거듭제곱/행렬 거듭제곱(피보나치 O(log n) 계산), 최근접 점의 쌍(Closest Pair), 큰 수의 곱셈(Karatsuba).</div>
+</article>
+
+<article class="topic" id="alg-string">
+<h3>문자열 검색 알고리즘 — KMP<span class="en">Knuth-Morris-Pratt</span></h3>
+<p>패턴 매칭 시 일치하지 않는 지점에서 <b>이미 비교했던 정보를 버리지 않고</b> 다음 비교 시작 위치를 건너뛰어, 단순 매칭(O(nm))을 O(n+m)으로 줄이는 알고리즘. 핵심은 패턴 자기 자신 내부의 <b>접두사=접미사(prefix=suffix)</b> 최대 길이를 미리 계산해두는 <b>실패 함수(failure function, pi 배열)</b>다.</p>
+<pre><span class="cmt">// 실패 함수(pi 배열) 계산 — pattern[0..i]에서 접두사=접미사인 최대 길이</span>
+int[] getFailure(String pattern) {
+    int m = pattern.length();
+    int[] pi = new int[m];
+    int j = 0;
+    for (int i = 1; i < m; i++) {
+        while (j > 0 && pattern.charAt(i) != pattern.charAt(j)) {
+            j = pi[j - 1];       <span class="cmt">// 불일치 시 이전 접두사 길이로 되돌아감 (핵심)</span>
+        }
+        if (pattern.charAt(i) == pattern.charAt(j)) {
+            pi[i] = ++j;
+        }
+    }
+    return pi;
+}
+
+<span class="cmt">// KMP 매칭 — O(n + m)</span>
+List<Integer> kmpSearch(String text, String pattern) {
+    List<Integer> result = new ArrayList<>();
+    int[] pi = getFailure(pattern);
+    int j = 0;
+    for (int i = 0; i < text.length(); i++) {
+        while (j > 0 && text.charAt(i) != pattern.charAt(j)) {
+            j = pi[j - 1];
+        }
+        if (text.charAt(i) == pattern.charAt(j)) {
+            if (j == pattern.length() - 1) {
+                result.add(i - j);   <span class="cmt">// 매칭 성공 위치 기록</span>
+                j = pi[j];
+            } else j++;
+        }
+    }
+    return result;
+}</pre>
+<div class="complexity-box"><div class="cbox">전처리 O(m)</div><div class="cbox">탐색 O(n)</div><div class="cbox">전체 <b>O(n+m)</b></div></div>
+<div class="usecase"><b>활용:</b> 긴 텍스트에서 패턴 반복 탐색, DNA 서열 매칭, 문자열 주기성 판별(pi 배열의 성질 이용).</div>
+</article>
+
+<article class="topic" id="alg-trie">
+<h3>트라이<span class="en">Trie (Prefix Tree)</span></h3>
+<p>문자열 집합을 저장하는 트리 자료구조로, 루트에서 특정 노드까지의 경로가 하나의 문자열(접두사)을 나타낸다. 공통 접두사를 공유하는 노드를 재사용해 <b>문자열 길이에 비례하는 O(L)</b> 시간에 삽입/검색이 가능하다.</p>
+<pre>class TrieNode {
+    Map<Character, TrieNode> children = new HashMap<>();
+    boolean isEnd = false;
+}
+
+class Trie {
+    TrieNode root = new TrieNode();
+
+    void insert(String word) {
+        TrieNode node = root;
+        for (char c : word.toCharArray()) {
+            node = node.children.computeIfAbsent(c, k -> new TrieNode());
+        }
+        node.isEnd = true;
+    }
+
+    boolean search(String word) {
+        TrieNode node = find(word);
+        return node != null && node.isEnd;
+    }
+
+    boolean startsWith(String prefix) {
+        return find(prefix) != null;
+    }
+
+    private TrieNode find(String s) {
+        TrieNode node = root;
+        for (char c : s.toCharArray()) {
+            node = node.children.get(c);
+            if (node == null) return null;
+        }
+        return node;
+    }
+}</pre>
+<div class="complexity-box"><div class="cbox">삽입/검색 <b>O(L)</b> (L=문자열 길이)</div><div class="cbox">공간 <b>O(전체 문자 수 × 알파벳 크기)</b></div></div>
+<div class="usecase"><b>활용:</b> 자동완성, 사전 검색, IP 라우팅(최장 접두사 매칭), 문자열 집합에서 특정 접두사를 가진 단어 개수 세기.</div>
+</article>
+
+<article class="topic" id="alg-unionfind">
+<h3>유니온-파인드<span class="en">Union-Find (Disjoint Set Union)</span></h3>
+<p>서로소 집합(disjoint set)들을 관리하며, <b>두 원소가 같은 집합에 속하는지(Find)</b>와 <b>두 집합을 합치는(Union)</b> 연산을 빠르게 처리하는 자료구조. <b>경로 압축(Path Compression)</b>과 <b>랭크에 의한 합치기(Union by Rank)</b>를 함께 적용하면 사실상 상수 시간(O(α(n)), 아커만 역함수)에 가까워진다.</p>
+<pre>class UnionFind {
+    int[] parent, rank;
+
+    UnionFind(int n) {
+        parent = new int[n];
+        rank = new int[n];
+        for (int i = 0; i < n; i++) parent[i] = i;   <span class="cmt">// 초기에는 각자가 자기 자신의 대표</span>
+    }
+
+    int find(int x) {
+        if (parent[x] != x) {
+            parent[x] = find(parent[x]);   <span class="cmt">// 경로 압축: 탐색하며 지나온 노드를 루트에 직접 연결</span>
+        }
+        return parent[x];
+    }
+
+    void union(int x, int y) {
+        int rootX = find(x), rootY = find(y);
+        if (rootX == rootY) return;         <span class="cmt">// 이미 같은 집합 — 사이클 발생 지점</span>
+
+        <span class="cmt">// 랭크(트리 높이)가 낮은 쪽을 높은 쪽 밑에 붙여 트리가 편향되지 않게 함</span>
+        if (rank[rootX] < rank[rootY]) parent[rootX] = rootY;
+        else if (rank[rootX] > rank[rootY]) parent[rootY] = rootX;
+        else { parent[rootY] = rootX; rank[rootX]++; }
+    }
+
+    boolean isConnected(int x, int y) { return find(x) == find(y); }
+}</pre>
+<div class="complexity-box"><div class="cbox">경로압축+랭크 적용 시 <b>사실상 O(1)</b> (엄밀히 O(α(n)))</div></div>
+<div class="usecase"><b>활용:</b> 크루스칼 MST(사이클 판정), 네트워크 연결성 확인, 친구 관계 그룹핑, 이미지의 연결 요소 찾기.</div>
+</article>
+</section>
+<section class="major" id="combination">
+<h2><span class="num">06</span> 조합-순열 (Combination-Permutation)</h2>
+
+<article class="topic" id="cp-nextperm">
+<h3>NextPerm / PrevPerm<span class="en">Next Permutation / Previous Permutation</span></h3>
+<p>현재 순열을 사전순 기준으로 <b>바로 다음(또는 이전) 순열</b>로 바꾸는 알고리즘. 모든 순열을 저장하지 않고도 O(n)에 in-place로 다음 순열을 생성할 수 있어, 순열을 사전순으로 하나씩 순회할 때 매우 효율적이다.</p>
+<pre><span class="cmt">// 다음 순열 — Java Collections에는 없어 직접 구현 (C++의 next_permutation과 동일 로직)</span>
+boolean nextPermutation(int[] arr) {
+    int n = arr.length;
+    int i = n - 2;
+    <span class="cmt">// 1) 뒤에서부터 증가가 꺾이는 지점 i를 찾는다 (arr[i] < arr[i+1])</span>
+    while (i >= 0 && arr[i] >= arr[i + 1]) i--;
+    if (i < 0) { reverse(arr, 0, n - 1); return false; } <span class="cmt">// 이미 마지막 순열 → 첫 순열로 순환</span>
+
+    <span class="cmt">// 2) i보다 큰 값들 중 가장 작은 값을 뒤에서 찾아 swap</span>
+    int j = n - 1;
+    while (arr[j] <= arr[i]) j--;
+    swap(arr, i, j);
+
+    <span class="cmt">// 3) i 이후 구간을 오름차순(가장 작은 배열)으로 뒤집는다</span>
+    reverse(arr, i + 1, n - 1);
+    return true;
+}
+
+void reverse(int[] arr, int lo, int hi) {
+    while (lo < hi) swap(arr, lo++, hi--);
+}
+void swap(int[] arr, int i, int j) { int t = arr[i]; arr[i] = arr[j]; arr[j] = t; }</pre>
+<div class="complexity-box"><div class="cbox">O(n) per call</div></div>
+<div class="usecase"><b>활용:</b> 사전순 K번째 순열 찾기, 모든 순열을 메모리 효율적으로 순회, 순열 관련 완전탐색 문제.</div>
+</article>
+
+<article class="topic" id="cp-subset">
+<h3>부분집합<span class="en">Subset / PowerSet, BitSubset</span></h3>
+<p>N개 원소로 이루어진 집합은 총 2ᴺ개의 부분집합(공집합, 전체집합 포함)을 가진다. 각 원소를 "포함/미포함" 두 가지 상태로 볼 수 있으므로, <b>0부터 2ᴺ-1까지의 정수를 비트마스크로 사용</b>하면 모든 부분집합을 표현할 수 있다.</p>
+<pre>List<List<Integer>> allSubsets(int[] arr) {
+    int n = arr.length;
+    List<List<Integer>> result = new ArrayList<>();
+    for (int mask = 0; mask < (1 << n); mask++) {   <span class="cmt">// mask의 각 비트가 해당 원소의 포함 여부</span>
+        List<Integer> subset = new ArrayList<>();
+        for (int i = 0; i < n; i++) {
+            if ((mask & (1 << i)) != 0) subset.add(arr[i]);
+        }
+        result.add(subset);
+    }
+    return result;
+}
+
+<span class="cmt">// 재귀(백트래킹)로 부분집합 생성 — 트리 순회 관점에서 이해</span>
+void backtrackSubset(int[] arr, int idx, List<Integer> cur, List<List<Integer>> result) {
+    if (idx == arr.length) { result.add(new ArrayList<>(cur)); return; }
+    backtrackSubset(arr, idx + 1, cur, result);        <span class="cmt">// 현재 원소 미포함</span>
+    cur.add(arr[idx]);
+    backtrackSubset(arr, idx + 1, cur, result);        <span class="cmt">// 현재 원소 포함</span>
+    cur.remove(cur.size() - 1);
+}</pre>
+<div class="complexity-box"><div class="cbox">O(2ⁿ × n)</div></div>
+<div class="usecase"><b>활용:</b> 부분집합 합 문제, 비트마스크 DP(외판원 문제), 최적 조합 완전탐색(N≤20).</div>
+</article>
+
+<article class="topic" id="cp-combination">
+<h3>조합<span class="en">Combination</span></h3>
+<p>N개 중 순서 없이 R개를 뽑는 경우의 수(nCr). 백트래킹으로 "시작 인덱스 이후"만 재귀 탐색하도록 제한하면 순서가 자연스럽게 배제되어 중복 없이 생성된다.</p>
+<pre>void combination(int[] arr, int r, int start, List<Integer> cur, List<List<Integer>> result) {
+    if (cur.size() == r) { result.add(new ArrayList<>(cur)); return; }
+    for (int i = start; i < arr.length; i++) {   <span class="cmt">// start부터 시작 → 이전 원소를 다시 뽑지 않음(순서 무관 보장)</span>
+        cur.add(arr[i]);
+        combination(arr, r, i + 1, cur, result);
+        cur.remove(cur.size() - 1);
+    }
+}
+
+<span class="cmt">// nCr 값 자체가 필요할 때 — 파스칼의 삼각형 (동적계획법)</span>
+long[][] pascalTriangle(int n) {
+    long[][] C = new long[n + 1][n + 1];
+    for (int i = 0; i <= n; i++) {
+        C[i][0] = 1;
+        for (int j = 1; j <= i; j++) {
+            C[i][j] = C[i - 1][j - 1] + C[i - 1][j];   <span class="cmt">// nCr = (n-1)C(r-1) + (n-1)Cr</span>
+        }
+    }
+    return C;
+}</pre>
+<div class="complexity-box"><div class="cbox">조합 생성 <b>O(nCr × r)</b></div><div class="cbox">nCr 값 계산(DP) <b>O(n²)</b></div></div>
+<div class="usecase"><b>활용:</b> 로또 번호 조합, 팀 구성 경우의 수, DP 점화식에서 조합수 활용(카탈랑 수 등).</div>
+</article>
+
+<article class="topic" id="cp-combrep">
+<h3>중복 조합<span class="en">Combination with Repetition, BitPerm</span></h3>
+<p>N개 중 순서 없이, <b>같은 원소를 여러 번 선택 가능</b>하게 R개를 뽑는 경우의 수(nHr = (n+r-1)Cr). 백트래킹 시 다음 재귀 호출을 <code class="inline">i</code>(다음 인덱스가 아닌 자기 자신부터 시작)로 넘겨 같은 원소를 다시 선택할 수 있게 한다.</p>
+<pre>void combinationWithRepetition(int[] arr, int r, int start, List<Integer> cur, List<List<Integer>> result) {
+    if (cur.size() == r) { result.add(new ArrayList<>(cur)); return; }
+    for (int i = start; i < arr.length; i++) {
+        cur.add(arr[i]);
+        combinationWithRepetition(arr, r, i, cur, result);  <span class="cmt">// i (i+1 아님) — 같은 원소 재선택 허용</span>
+        cur.remove(cur.size() - 1);
+    }
+}</pre>
+<div class="usecase"><b>활용:</b> 음료 N종에서 R개 고르기(중복 허용), 자연수 분할 문제, 다중집합(multiset) 관련 완전탐색.</div>
+</article>
+
+<article class="topic" id="cp-permutation">
+<h3>순열<span class="en">Permutation</span></h3>
+<p>N개 중 순서를 고려하여 R개를 나열하는 경우의 수(nPr = n!/(n-r)!). 방문 배열(visited)로 이미 사용한 원소를 제외하며 재귀적으로 생성한다.</p>
+<pre>void permutation(int[] arr, int r, boolean[] visited, List<Integer> cur, List<List<Integer>> result) {
+    if (cur.size() == r) { result.add(new ArrayList<>(cur)); return; }
+    for (int i = 0; i < arr.length; i++) {
+        if (visited[i]) continue;          <span class="cmt">// 순서를 구분하므로 시작 인덱스 제한 없이 전체를 돌되 방문 여부만 체크</span>
+        visited[i] = true;
+        cur.add(arr[i]);
+        permutation(arr, r, visited, cur, result);
+        cur.remove(cur.size() - 1);
+        visited[i] = false;                <span class="cmt">// 백트래킹: 다른 경로 탐색 위해 되돌림</span>
+    }
+}</pre>
+<div class="complexity-box"><div class="cbox">O(nPr × r)</div></div>
+<div class="usecase"><b>활용:</b> 순서가 의미 있는 경우의 수(줄 세우기, 경로 방문 순서), 외판원 문제(TSP) 완전탐색 기반, 다음 순열과 결합한 사전순 탐색.</div>
+</article>
+
+<article class="topic" id="cp-permrep">
+<h3>중복 순열<span class="en">Permutation with Repetition</span></h3>
+<p>N개 중 순서를 고려하며 <b>중복을 허용</b>해 R개를 나열하는 경우의 수(n^r). 방문 배열 없이 매번 전체 원소를 다시 순회하면 자연스럽게 중복이 허용된다.</p>
+<pre>void permutationWithRepetition(int[] arr, int r, List<Integer> cur, List<List<Integer>> result) {
+    if (cur.size() == r) { result.add(new ArrayList<>(cur)); return; }
+    for (int i = 0; i < arr.length; i++) {
+        cur.add(arr[i]);
+        permutationWithRepetition(arr, r, cur, result);   <span class="cmt">// visited 체크 없음 → 같은 원소 재사용 가능</span>
+        cur.remove(cur.size() - 1);
+    }
+}</pre>
+<div class="complexity-box"><div class="cbox">O(nʳ × r)</div></div>
+<div class="usecase"><b>활용:</b> 비밀번호 전수 조사, 주사위를 R번 굴렸을 때 나올 수 있는 모든 경우, 문자열 생성 문제.</div>
+</article>
+</section>
+<section class="major" id="graph">
+<h2><span class="num">07</span> 그래프 (Graph)</h2>
+
+<article class="topic" id="gr-repr">
+<h3>그래프 표현 방법<span class="en">Graph Representation — adjM, adjL, userNode</span></h3>
+<p>그래프는 크게 <b>인접 행렬(Adjacency Matrix)</b>과 <b>인접 리스트(Adjacency List)</b> 두 가지로 표현한다. 정점 수 대비 간선 수가 많은 밀집 그래프면 행렬이, 간선이 적은 희소 그래프면 리스트가 유리하다. 사용자 정의 노드 클래스(userNode)로 그래프를 표현하면 각 노드에 추가 속성을 담기 용이하다.</p>
+
+<h4 class="sub">인접 행렬 (Adjacency Matrix)</h4>
+<pre>int n = 5;
+int[][] adjM = new int[n][n];       <span class="cmt">// adjM[i][j] = i→j 간선의 가중치 (0 또는 INF는 간선 없음)</span>
+adjM[0][1] = 3;
+adjM[1][2] = 5;
+<span class="cmt">// 간선 존재 확인: O(1) — adjM[i][j] != 0
+   모든 인접 정점 순회: O(V) — 항상 V번 확인해야 함</span></pre>
+
+<h4 class="sub">인접 리스트 (Adjacency List)</h4>
+<pre>List<List<int[]>> adjL = new ArrayList<>();  <span class="cmt">// adjL.get(i) = i에서 갈 수 있는 [정점, 가중치] 목록</span>
+for (int i = 0; i < n; i++) adjL.add(new ArrayList<>());
+adjL.get(0).add(new int[]{1, 3});   <span class="cmt">// 0 → 1, 가중치 3</span>
+adjL.get(1).add(new int[]{2, 5});
+<span class="cmt">// 간선 존재 확인: O(간선 수) — 최악 O(V)
+   모든 인접 정점 순회: O(실제 연결된 정점 수)만 — 희소 그래프에서 효율적</span></pre>
+
+<h4 class="sub">사용자 정의 노드 (userNode)</h4>
+<pre>class UserNode {
+    int id;
+    List<UserNode> neighbors = new ArrayList<>();
+    int weight;             <span class="cmt">// 노드 자체에 추가 속성 부여 가능</span>
+    boolean visited;
+    UserNode(int id) { this.id = id; }
+}</pre>
+<table>
+<tr><th>표현 방법</th><th>공간</th><th>간선 확인</th><th>적합한 경우</th></tr>
+<tr><td>인접 행렬</td><td>O(V²)</td><td>O(1)</td><td>밀집 그래프, V가 작음(≤1000)</td></tr>
+<tr><td>인접 리스트</td><td>O(V+E)</td><td>O(degree)</td><td>희소 그래프, 대부분의 코딩테스트</td></tr>
+</table>
+<div class="usecase"><b>활용:</b> 대부분의 실전 문제(V가 크고 E가 상대적으로 적음)에서는 인접 리스트가 표준. 플로이드-워셜처럼 모든 쌍의 관계를 다뤄야 할 때만 인접 행렬을 사용.</div>
+</article>
+
+<article class="topic" id="gr-mst">
+<h3>최소신장트리<span class="en">Minimum Spanning Tree — Kruskal / Prim</span></h3>
+<p>그래프의 모든 정점을 <b>사이클 없이, 최소 비용으로 연결</b>하는 부분 그래프(트리)를 찾는 문제. <b>크루스칼</b>은 간선을 가중치 순으로 정렬해 사이클을 만들지 않는 간선만 유니온-파인드로 선택하고(간선 중심), <b>프림</b>은 하나의 정점에서 시작해 우선순위 큐로 매번 가장 싼 인접 간선을 확장한다(정점 중심).</p>
+
+<h4 class="sub">크루스칼 (Kruskal) — 간선 정렬 + Union-Find, O(E log E)</h4>
+<pre>int kruskalMST(int n, int[][] edges) {  <span class="cmt">// edges[i] = {u, v, weight}</span>
+    Arrays.sort(edges, (a, b) -> a[2] - b[2]);   <span class="cmt">// 가중치 오름차순 정렬</span>
+    UnionFind uf = new UnionFind(n);
+    int totalCost = 0, edgeCount = 0;
+
+    for (int[] e : edges) {
+        int u = e[0], v = e[1], w = e[2];
+        if (!uf.isConnected(u, v)) {     <span class="cmt">// 사이클을 만들지 않는 간선만 채택</span>
+            uf.union(u, v);
+            totalCost += w;
+            edgeCount++;
+            if (edgeCount == n - 1) break;   <span class="cmt">// 트리 완성 (정점 n개면 간선 n-1개)</span>
+        }
+    }
+    return totalCost;
+}</pre>
+
+<h4 class="sub">프림 (Prim) — 우선순위 큐, O(E log V)</h4>
+<pre>int primMST(int n, List<List<int[]>> adjL, int start) {
+    boolean[] visited = new boolean[n];
+    PriorityQueue<int[]> pq = new PriorityQueue<>((a, b) -> a[1] - b[1]); <span class="cmt">// [정점, 가중치] 최소힙</span>
+    pq.offer(new int[]{start, 0});
+    int totalCost = 0;
+
+    while (!pq.isEmpty()) {
+        int[] cur = pq.poll();
+        int node = cur[0], cost = cur[1];
+        if (visited[node]) continue;      <span class="cmt">// 이미 트리에 포함된 정점은 스킵</span>
+        visited[node] = true;
+        totalCost += cost;
+
+        for (int[] next : adjL.get(node)) {
+            if (!visited[next[0]]) pq.offer(next);  <span class="cmt">// 인접한 미방문 정점을 후보로 등록</span>
+        }
+    }
+    return totalCost;
+}</pre>
+<div class="complexity-box"><div class="cbox">Kruskal <b>O(E log E)</b></div><div class="cbox">Prim <b>O(E log V)</b></div></div>
+<div class="callout tip"><b>선택 기준:</b> 간선이 적은 희소 그래프면 크루스칼, 정점 수 대비 간선이 매우 많은 밀집 그래프면 프림이 유리한 경향이 있다.</div>
+<div class="usecase"><b>활용:</b> 도로/통신망 최소 비용 연결, 클러스터링(MST 간선을 끊어 그룹 형성).</div>
+</article>
+<article class="topic" id="gr-shortest">
+<h3>최단경로<span class="en">Shortest Path — Dijkstra / Bellman-Ford / Floyd-Warshall</span></h3>
+<p>세 알고리즘 모두 최단경로를 구하지만 적용 조건이 다르다. <b>다익스트라</b>는 음수 가중치가 없을 때 한 정점에서 모든 정점까지의 최단거리를, <b>벨만-포드</b>는 음수 가중치가 있어도(음수 사이클만 없으면) 처리 가능하며 음수 사이클 탐지도 가능하다. <b>플로이드-워셜</b>은 모든 정점 쌍 간의 최단거리를 한 번에 구한다.</p>
+
+<h4 class="sub">다익스트라 — 우선순위 큐, O((V+E) log V)</h4>
+<pre>int[] dijkstra(int n, List<List<int[]>> adjL, int start) {
+    int[] dist = new int[n];
+    Arrays.fill(dist, Integer.MAX_VALUE);
+    dist[start] = 0;
+    PriorityQueue<int[]> pq = new PriorityQueue<>((a, b) -> a[1] - b[1]);
+    pq.offer(new int[]{start, 0});
+
+    while (!pq.isEmpty()) {
+        int[] cur = pq.poll();
+        int node = cur[0], d = cur[1];
+        if (d > dist[node]) continue;    <span class="cmt">// 이미 더 짧은 경로로 갱신된 적 있으면 스킵 (지연 삭제)</span>
+
+        for (int[] next : adjL.get(node)) {
+            int nd = d + next[1];
+            if (nd < dist[next[0]]) {    <span class="cmt">// 완화(Relaxation): 더 짧은 경로 발견 시 갱신</span>
+                dist[next[0]] = nd;
+                pq.offer(new int[]{next[0], nd});
+            }
+        }
+    }
+    return dist;
+}</pre>
+
+<h4 class="sub">벨만-포드 — 모든 간선을 V-1번 완화, O(VE)</h4>
+<pre>int[] bellmanFord(int n, int[][] edges, int start) {  <span class="cmt">// edges[i] = {u, v, w}</span>
+    int[] dist = new int[n];
+    Arrays.fill(dist, Integer.MAX_VALUE);
+    dist[start] = 0;
+
+    for (int i = 0; i < n - 1; i++) {          <span class="cmt">// 최단경로는 최대 V-1개 간선으로 구성됨</span>
+        for (int[] e : edges) {
+            if (dist[e[0]] != Integer.MAX_VALUE && dist[e[0]] + e[2] < dist[e[1]]) {
+                dist[e[1]] = dist[e[0]] + e[2];
+            }
+        }
+    }
+
+    <span class="cmt">// V번째 순회에서도 갱신이 일어나면 음수 사이클 존재</span>
+    for (int[] e : edges) {
+        if (dist[e[0]] != Integer.MAX_VALUE && dist[e[0]] + e[2] < dist[e[1]]) {
+            return null;   <span class="cmt">// 음수 사이클 탐지</span>
+        }
+    }
+    return dist;
+}</pre>
+
+<h4 class="sub">플로이드-워셜 — 모든 쌍 최단경로, O(V³)</h4>
+<pre>int[][] floydWarshall(int n, int[][] adjM) {  <span class="cmt">// adjM: 초기 인접행렬 (없으면 INF)</span>
+    int[][] dist = adjM.clone();
+    for (int k = 0; k < n; k++) {          <span class="cmt">// 경유지 k를 하나씩 고려</span>
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                if (dist[i][k] + dist[k][j] < dist[i][j]) {
+                    dist[i][j] = dist[i][k] + dist[k][j];  <span class="cmt">// i→k→j가 i→j보다 짧으면 갱신</span>
+                }
+            }
+        }
+    }
+    return dist;
+}</pre>
+<table>
+<tr><th>알고리즘</th><th>시간복잡도</th><th>음수 가중치</th><th>용도</th></tr>
+<tr><td>다익스트라</td><td>O((V+E)log V)</td><td>불가</td><td>단일 출발점 최단경로</td></tr>
+<tr><td>벨만-포드</td><td>O(VE)</td><td>가능(음수사이클 탐지)</td><td>단일 출발점, 음수 간선 존재 시</td></tr>
+<tr><td>플로이드-워셜</td><td>O(V³)</td><td>가능(음수사이클 없어야)</td><td>모든 쌍 최단경로, V≤400 내외</td></tr>
+</table>
+<div class="usecase"><b>활용:</b> 내비게이션 최단경로, 네트워크 라우팅, 환율 차익거래 탐지(벨만-포드 음수사이클), 도시 간 전체 최단거리 테이블(플로이드-워셜).</div>
+</article>
+
+<article class="topic" id="gr-bipartite">
+<h3>Bipartite (이분 그래프)<span class="en">2-Coloring</span></h3>
+<p>그래프의 정점을 두 그룹으로 나누어 <b>같은 그룹 내에는 간선이 존재하지 않도록</b> 나눌 수 있는지 판별하는 문제. BFS/DFS로 인접한 정점에 서로 다른 색을 번갈아 칠하다가, 이미 칠해진 인접 정점이 같은 색이면 이분 그래프가 아니다.</p>
+<pre>boolean isBipartite(int n, List<List<Integer>> adjL) {
+    int[] color = new int[n];
+    Arrays.fill(color, -1);
+
+    for (int i = 0; i < n; i++) {
+        if (color[i] != -1) continue;
+        color[i] = 0;
+        Queue<Integer> queue = new ArrayDeque<>();
+        queue.offer(i);
+
+        while (!queue.isEmpty()) {
+            int cur = queue.poll();
+            for (int next : adjL.get(cur)) {
+                if (color[next] == -1) {
+                    color[next] = 1 - color[cur];   <span class="cmt">// 인접 정점은 반대 색으로 칠함</span>
+                    queue.offer(next);
+                } else if (color[next] == color[cur]) {
+                    return false;   <span class="cmt">// 인접한데 같은 색 → 이분 그래프 아님</span>
+                }
+            }
+        }
+    }
+    return true;
+}</pre>
+<div class="complexity-box"><div class="cbox">O(V+E)</div></div>
+<div class="usecase"><b>활용:</b> 이분 매칭(작업-일꾼 배정), 홀수 사이클 존재 여부 판별, 그래프 색칠 문제의 특수 케이스.</div>
+</article>
+
+<article class="topic" id="gr-articulation">
+<h3>단절점<span class="en">Articulation Points (Cut Vertices)</span></h3>
+<p>그래프에서 <b>제거하면 그래프가 두 개 이상의 연결 요소로 분리되는 정점</b>. DFS 방문 순서(discovery time, <code class="inline">disc</code>)와 DFS 트리에서 역방향 간선을 통해 조상으로 갈 수 있는 최소 발견 시각(<code class="inline">low</code>)을 비교하는 Tarjan의 알고리즘으로 O(V+E)에 찾는다.</p>
+<pre>class ArticulationPoints {
+    int[] disc, low;
+    boolean[] visited, isArticulation;
+    int timer = 0;
+    List<List<Integer>> adjL;
+
+    void findArticulationPoints(int n, List<List<Integer>> adjL) {
+        this.adjL = adjL;
+        disc = new int[n]; low = new int[n];
+        visited = new boolean[n]; isArticulation = new boolean[n];
+        for (int i = 0; i < n; i++) {
+            if (!visited[i]) dfs(i, -1, i == 0 ? 0 : -1);  <span class="cmt">// 루트는 별도 처리</span>
+        }
+    }
+
+    void dfs(int u, int parent, int isRoot) {
+        visited[u] = true;
+        disc[u] = low[u] = timer++;
+        int children = 0;
+
+        for (int v : adjL.get(u)) {
+            if (v == parent) continue;
+            if (visited[v]) {
+                low[u] = Math.min(low[u], disc[v]);   <span class="cmt">// 역방향 간선 — 조상에 접근 가능</span>
+            } else {
+                children++;
+                dfs(v, u, -1);
+                low[u] = Math.min(low[u], low[v]);
+                <span class="cmt">// 루트가 아니면서, 자식이 u를 거치지 않고는 조상으로 못 가면 u는 단절점</span>
+                if (isRoot != 0 && low[v] >= disc[u]) isArticulation[u] = true;
+            }
+        }
+        <span class="cmt">// 루트는 자식이 2개 이상일 때만 단절점</span>
+        if (isRoot == 0 && children >= 2) isArticulation[u] = true;
+    }
+}</pre>
+<div class="complexity-box"><div class="cbox">O(V+E)</div></div>
+<div class="usecase"><b>활용:</b> 네트워크의 SPOF(단일 장애점) 탐지, 도로망에서 끊기면 마을이 고립되는 지점 찾기.</div>
+</article>
+<article class="topic" id="gr-topo">
+<h3>위상 정렬<span class="en">Topological Sort</span></h3>
+<p>방향 비순환 그래프(DAG)에서 <b>모든 간선 u→v에 대해 u가 v보다 먼저 오도록</b> 정점을 일렬로 나열하는 것. 진입차수(in-degree)가 0인 정점부터 큐에 넣고 하나씩 제거하며 인접 정점의 진입차수를 낮추는 <b>칸의 알고리즘(Kahn's Algorithm)</b>이 대표적이다.</p>
+<pre>List<Integer> topologicalSort(int n, List<List<Integer>> adjL) {
+    int[] inDegree = new int[n];
+    for (List<Integer> neighbors : adjL) {
+        for (int v : neighbors) inDegree[v]++;   <span class="cmt">// 각 정점의 진입차수 계산</span>
+    }
+
+    Queue<Integer> queue = new ArrayDeque<>();
+    for (int i = 0; i < n; i++) {
+        if (inDegree[i] == 0) queue.offer(i);    <span class="cmt">// 진입차수 0 = 선행 조건 없음 → 먼저 처리 가능</span>
+    }
+
+    List<Integer> result = new ArrayList<>();
+    while (!queue.isEmpty()) {
+        int cur = queue.poll();
+        result.add(cur);
+        for (int next : adjL.get(cur)) {
+            if (--inDegree[next] == 0) queue.offer(next);  <span class="cmt">// 선행 정점 모두 처리되면 큐에 추가</span>
+        }
+    }
+
+    <span class="cmt">// 결과 크기가 n보다 작으면 사이클 존재 → 위상 정렬 불가</span>
+    return result.size() == n ? result : new ArrayList<>();
+}</pre>
+<div class="complexity-box"><div class="cbox">O(V+E)</div></div>
+<div class="usecase"><b>활용:</b> 선수과목 이수 순서, 빌드 의존성 처리(Makefile), 작업 스케줄링, DAG 위에서의 DP(가장 긴 경로 등).</div>
+</article>
+
+<article class="topic" id="gr-lca">
+<h3>최소 공통 조상<span class="en">Lowest Common Ancestor</span></h3>
+<p>트리에서 두 노드의 <b>가장 가까운 공통 조상</b>을 찾는 문제. 매 쿼리마다 O(depth)로 찾으면 느리므로, <b>희소 테이블(Sparse Table)</b>로 각 노드의 2ᵏ번째 조상을 미리 계산해두면 쿼리당 O(log N)에 처리할 수 있다.</p>
+<pre>class LCA {
+    int LOG;
+    int[][] parent;   <span class="cmt">// parent[k][v] = v의 2^k번째 조상</span>
+    int[] depth;
+
+    void build(int n, List<List<Integer>> adjL, int root) {
+        LOG = (int) (Math.log(n) / Math.log(2)) + 1;
+        parent = new int[LOG][n];
+        depth = new int[n];
+        boolean[] visited = new boolean[n];
+
+        <span class="cmt">// 1) BFS로 depth와 직속 부모(parent[0]) 계산</span>
+        Queue<Integer> queue = new ArrayDeque<>();
+        queue.offer(root); visited[root] = true; parent[0][root] = root;
+        while (!queue.isEmpty()) {
+            int cur = queue.poll();
+            for (int next : adjL.get(cur)) {
+                if (!visited[next]) {
+                    visited[next] = true;
+                    depth[next] = depth[cur] + 1;
+                    parent[0][next] = cur;
+                    queue.offer(next);
+                }
+            }
+        }
+
+        <span class="cmt">// 2) 점프 테이블 구성 — 2^k번째 조상 = (2^(k-1)번째 조상)의 2^(k-1)번째 조상</span>
+        for (int k = 1; k < LOG; k++) {
+            for (int v = 0; v < n; v++) {
+                parent[k][v] = parent[k - 1][parent[k - 1][v]];
+            }
+        }
+    }
+
+    int lca(int u, int v) {
+        if (depth[u] < depth[v]) { int t = u; u = v; v = t; }
+        int diff = depth[u] - depth[v];
+        for (int k = 0; k < LOG; k++) {                 <span class="cmt">// 깊이를 먼저 맞춘다</span>
+            if (((diff >> k) & 1) == 1) u = parent[k][u];
+        }
+        if (u == v) return u;
+        for (int k = LOG - 1; k >= 0; k--) {             <span class="cmt">// 큰 점프부터 시도하며 공통조상 직전까지 접근</span>
+            if (parent[k][u] != parent[k][v]) { u = parent[k][u]; v = parent[k][v]; }
+        }
+        return parent[0][u];
+    }
+}</pre>
+<div class="complexity-box"><div class="cbox">전처리 <b>O(N log N)</b></div><div class="cbox">쿼리당 <b>O(log N)</b></div></div>
+<div class="usecase"><b>활용:</b> 트리에서 두 노드 간 거리 계산(depth[u]+depth[v]-2×depth[lca]), 조직도 상 공통 상급자 찾기, 트리 경로 쿼리.</div>
+</article>
+
+<article class="topic" id="gr-segfenwick">
+<h3>세그먼트 트리 / 펜윅 트리<span class="en">Segment Tree / Fenwick Tree (BIT)</span></h3>
+<p>배열의 <b>구간 합/최솟값/최댓값 질의</b>와 <b>특정 원소 갱신</b>을 모두 O(log n)에 처리하는 자료구조. 세그먼트 트리는 완전 이진 트리로 임의 구간 연산에 범용적이고, 펜윅 트리(Binary Indexed Tree)는 비트 연산만으로 구현되어 구간 합에 특화되어 있으며 구현이 더 간결하다.</p>
+
+<h4 class="sub">펜윅 트리 (구간 합 특화) — O(log n)</h4>
+<pre>class Fenwick {
+    long[] tree;
+    int n;
+
+    Fenwick(int n) { this.n = n; tree = new long[n + 1]; }
+
+    void update(int i, long delta) {           <span class="cmt">// i번째 값에 delta만큼 더하기</span>
+        for (; i <= n; i += i & (-i)) {         <span class="cmt">// i & (-i) = 최하위 비트 — 다음 담당 구간으로 이동</span>
+            tree[i] += delta;
+        }
+    }
+
+    long prefixSum(int i) {                      <span class="cmt">// 1~i 구간 합</span>
+        long sum = 0;
+        for (; i > 0; i -= i & (-i)) {
+            sum += tree[i];
+        }
+        return sum;
+    }
+
+    long rangeSum(int l, int r) {                 <span class="cmt">// l~r 구간 합 = prefixSum(r) - prefixSum(l-1)</span>
+        return prefixSum(r) - prefixSum(l - 1);
+    }
+}</pre>
+
+<h4 class="sub">세그먼트 트리 (범용 구간 질의) — O(log n)</h4>
+<pre>class SegmentTree {
+    long[] tree;
+    int n;
+
+    SegmentTree(int[] arr) {
+        n = arr.length;
+        tree = new long[4 * n];
+        build(arr, 1, 0, n - 1);
+    }
+
+    void build(int[] arr, int node, int start, int end) {
+        if (start == end) { tree[node] = arr[start]; return; }
+        int mid = (start + end) / 2;
+        build(arr, node * 2, start, mid);
+        build(arr, node * 2 + 1, mid + 1, end);
+        tree[node] = tree[node * 2] + tree[node * 2 + 1];   <span class="cmt">// 합 세그먼트 트리 예시 (최소/최대도 동일 구조)</span>
+    }
+
+    void update(int node, int start, int end, int idx, int val) {
+        if (start == end) { tree[node] = val; return; }
+        int mid = (start + end) / 2;
+        if (idx <= mid) update(node * 2, start, mid, idx, val);
+        else update(node * 2 + 1, mid + 1, end, idx, val);
+        tree[node] = tree[node * 2] + tree[node * 2 + 1];
+    }
+
+    long query(int node, int start, int end, int l, int r) {
+        if (r < start || end < l) return 0;           <span class="cmt">// 범위 밖 — 영향 없음</span>
+        if (l <= start && end <= r) return tree[node]; <span class="cmt">// 완전 포함 — 바로 반환</span>
+        int mid = (start + end) / 2;
+        return query(node * 2, start, mid, l, r) + query(node * 2 + 1, mid + 1, end, l, r);
+    }
+}</pre>
+<table>
+<tr><th></th><th>구간 합</th><th>구간 최솟값/최댓값</th><th>구현 난이도</th></tr>
+<tr><td>펜윅 트리</td><td>매우 간결</td><td>불가(합 전용 구조)</td><td>쉬움</td></tr>
+<tr><td>세그먼트 트리</td><td>가능</td><td>가능(비교 연산만 바꾸면 됨)</td><td>중간</td></tr>
+</table>
+<div class="usecase"><b>활용:</b> 구간 합 갱신 쿼리가 반복되는 문제, RMQ(Range Minimum/Maximum Query), 재고 변동 누적 관리, 좌표압축과 결합한 역순 쌍 세기.</div>
+</article>
+</section>
+<section class="major" id="dp">
+<h2><span class="num">08</span> 동적 계획법 (Dynamic Programming)</h2>
+
+<article class="topic" id="dp-basic">
+<h3>점화식 &amp; 관계식 유도<span class="en">Top-down Memoization / Bottom-up Tabulation</span></h3>
+<p>DP는 <b>중복되는 부분 문제(Overlapping Subproblems)</b>와 <b>최적 부분구조(Optimal Substructure)</b>를 가진 문제를, 작은 문제의 답을 저장해두고 재사용함으로써 지수 시간을 다항 시간으로 줄이는 기법이다. 구현 방식은 두 가지다 — <b>Top-down(메모이제이션)</b>은 재귀 호출을 그대로 쓰되 계산 결과를 캐싱하고, <b>Bottom-up(테이블화)</b>은 작은 인덱스부터 배열을 채워나간다.</p>
+
+<h4 class="sub">점화식 유도 3단계</h4>
+<ol>
+<li><b>상태 정의:</b> "dp[i]가 무엇을 의미하는가"를 명확히 한다 (예: dp[i] = i번째까지 고려했을 때의 최적값).</li>
+<li><b>점화식 도출:</b> dp[i]를 더 작은 dp[j] (j&lt;i)들의 관계로 표현한다.</li>
+<li><b>초기값(Base Case) 설정:</b> 더 이상 쪼갤 수 없는 최소 단위의 답을 명시한다.</li>
+</ol>
+
+<h4 class="sub">Java 코드 예시 — 계단 오르기 (Top-down vs Bottom-up)</h4>
+<pre><span class="cmt">// 점화식: dp[i] = dp[i-1] + dp[i-2]  (i번째 계단에 도달하는 방법 수 = 한 칸 전 + 두 칸 전)</span>
+
+<span class="cmt">// Top-down (메모이제이션)</span>
+long[] memo;
+long climbStairsTopDown(int n) {
+    memo = new long[n + 1];
+    Arrays.fill(memo, -1);
+    return solve(n);
+}
+long solve(int n) {
+    if (n <= 1) return 1;                 <span class="cmt">// Base Case</span>
+    if (memo[n] != -1) return memo[n];    <span class="cmt">// 이미 계산됨 → 재사용</span>
+    return memo[n] = solve(n - 1) + solve(n - 2);
+}
+
+<span class="cmt">// Bottom-up (테이블화) — 재귀 호출 스택 오버헤드 없음, 보통 더 빠름</span>
+long climbStairsBottomUp(int n) {
+    long[] dp = new long[n + 1];
+    dp[0] = 1;
+    if (n >= 1) dp[1] = 1;
+    for (int i = 2; i <= n; i++) {
+        dp[i] = dp[i - 1] + dp[i - 2];
+    }
+    return dp[n];
+}</pre>
+<div class="callout tip"><b>선택 기준:</b> 점화식을 떠올리기 쉬운 초기 단계에는 Top-down이 직관적이고(재귀 그대로 캐싱만 추가), 최적화·공간 절약(1차원 배열을 변수 2~3개로 축소)이 필요하면 Bottom-up으로 전환한다.</div>
+<div class="usecase"><b>활용:</b> 배낭 문제(Knapsack), 최장 공통 부분수열(LCS), 편집 거리, 동전 교환 문제, 타일링 문제.</div>
+</article>
+
+<article class="topic" id="dp-lis">
+<h3>가장 긴 증가하는 부분 수열<span class="en">Longest Increasing Subsequence (LIS)</span></h3>
+<p>주어진 수열에서 <b>순서를 유지하며 증가하는 가장 긴 부분 수열</b>의 길이를 구하는 문제. 기본 DP는 O(n²)이며, <b>이분 탐색을 결합</b>하면 O(n log n)으로 개선된다.</p>
+
+<h4 class="sub">기본 DP — O(n²)</h4>
+<pre><span class="cmt">// dp[i] = arr[i]를 마지막 원소로 하는 LIS의 길이</span>
+int lisDP(int[] arr) {
+    int n = arr.length;
+    int[] dp = new int[n];
+    Arrays.fill(dp, 1);            <span class="cmt">// 자기 자신만으로도 길이 1</span>
+    int maxLen = 1;
+    for (int i = 1; i < n; i++) {
+        for (int j = 0; j < i; j++) {
+            if (arr[j] < arr[i]) {
+                dp[i] = Math.max(dp[i], dp[j] + 1);   <span class="cmt">// arr[j] 뒤에 arr[i]를 이어붙일 수 있으면 갱신</span>
+            }
+        }
+        maxLen = Math.max(maxLen, dp[i]);
+    }
+    return maxLen;
+}</pre>
+
+<h4 class="sub">이분 탐색 결합 — O(n log n)</h4>
+<pre><span class="cmt">// tails[k] = 길이 k+1인 증가 부분수열 중 "끝값이 가장 작은" 값 (실제 수열이 아님에 주의)</span>
+int lisBinarySearch(int[] arr) {
+    List<Integer> tails = new ArrayList<>();
+    for (int num : arr) {
+        int lo = 0, hi = tails.size();
+        while (lo < hi) {                 <span class="cmt">// num이 들어갈 위치를 이분탐색 (lower_bound)</span>
+            int mid = (lo + hi) / 2;
+            if (tails.get(mid) < num) lo = mid + 1;
+            else hi = mid;
+        }
+        if (lo == tails.size()) tails.add(num);   <span class="cmt">// 모든 값보다 크면 새로 추가 → 길이 1 증가</span>
+        else tails.set(lo, num);                   <span class="cmt">// 아니면 해당 위치 값을 더 작은 num으로 교체 (미래 확장 가능성 ↑)</span>
+    }
+    return tails.size();
+}</pre>
+<div class="complexity-box"><div class="cbox">기본 DP <b>O(n²)</b></div><div class="cbox">이분탐색 결합 <b>O(n log n)</b></div></div>
+<div class="callout warn"><b>주의:</b> <code class="inline">tails</code> 배열은 실제 LIS 수열이 아니라 "길이별 최소 끝값"을 담을 뿐이다. 실제 수열 복원이 필요하면 별도로 각 원소가 갱신될 때의 인덱스를 추적해야 한다.</div>
+<div class="usecase"><b>활용:</b> 박스 쌓기(2차원으로 확장), 최장 감소 부분수열(배열을 뒤집어 LIS 적용), 편집 거리와 결합한 응용 문제.</div>
+</article>
+
+<article class="topic" id="dp-prefixsum">
+<h3>누적합<span class="en">Prefix Sum</span></h3>
+<p>배열의 <b>구간 합을 반복적으로 질의</b>해야 할 때, 매번 O(n)으로 더하지 않고 <code class="inline">prefix[i] = arr[0]+...+arr[i-1]</code>을 미리 계산해두면 임의 구간 합을 <b>O(1)</b>에 구할 수 있다. DP의 가장 단순하면서도 실전에서 가장 많이 쓰이는 형태 중 하나다.</p>
+<pre><span class="cmt">// 1차원 누적합</span>
+int[] buildPrefixSum(int[] arr) {
+    int n = arr.length;
+    int[] prefix = new int[n + 1];        <span class="cmt">// prefix[i] = arr[0..i-1]의 합, prefix[0] = 0</span>
+    for (int i = 0; i < n; i++) {
+        prefix[i + 1] = prefix[i] + arr[i];
+    }
+    return prefix;
+}
+int rangeSum(int[] prefix, int l, int r) {  <span class="cmt">// [l, r] 구간 합 (0-indexed, inclusive) — O(1)</span>
+    return prefix[r + 1] - prefix[l];
+}
+
+<span class="cmt">// 2차원 누적합 — 부분 직사각형 합을 O(1)에 구함</span>
+int[][] build2DPrefixSum(int[][] mat) {
+    int n = mat.length, m = mat[0].length;
+    int[][] prefix = new int[n + 1][m + 1];
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < m; j++) {
+            <span class="cmt">// 포함-배제 원리: 위쪽+왼쪽-왼위(중복 제거)+현재값</span>
+            prefix[i + 1][j + 1] = prefix[i][j + 1] + prefix[i + 1][j] - prefix[i][j] + mat[i][j];
+        }
+    }
+    return prefix;
+}
+int rectSum(int[][] prefix, int r1, int c1, int r2, int c2) {  <span class="cmt">// (r1,c1)~(r2,c2) 직사각형 합 — O(1)</span>
+    return prefix[r2 + 1][c2 + 1] - prefix[r1][c2 + 1] - prefix[r2 + 1][c1] + prefix[r1][c1];
+}</pre>
+<div class="complexity-box"><div class="cbox">전처리 <b>O(n)</b> (2차원 O(nm))</div><div class="cbox">쿼리당 <b>O(1)</b></div></div>
+<div class="usecase"><b>활용:</b> 다수의 구간 합 쿼리, 2차원 히트맵/이미지의 부분합, 차분 배열(Difference Array)과 결합한 구간 갱신 문제.</div>
+</article>
+</section>
+</main>
+</div>
+
+<button class="top-btn" id="topBtn" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<script>
+// 사이드바 스크롤스파이 — 현재 보이는 섹션에 맞춰 사이드바 링크 하이라이트
+const sections = document.querySelectorAll('article.topic, section.major');
+const navLinks = document.querySelectorAll('nav.sidebar a');
+
+function onScroll() {
+  let currentId = '';
+  document.querySelectorAll('article.topic').forEach(sec => {
+    const rect = sec.getBoundingClientRect();
+    if (rect.top <= 140) currentId = sec.id;
+  });
+  navLinks.forEach(link => {
+    link.classList.toggle('active', link.getAttribute('href') === '#' + currentId);
+  });
+
+  const topBtn = document.getElementById('topBtn');
+  topBtn.style.display = window.scrollY > 400 ? 'block' : 'none';
+}
+window.addEventListener('scroll', onScroll);
+onScroll();
+</script>
+</body>
+</html>

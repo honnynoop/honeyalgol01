@@ -1,0 +1,1453 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>마방진으로 배우는 객체지향 — Java vs Python 완전 학습서</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Noto+Sans+KR:wght@300;400;700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --py: #2563eb; --py2: #1d4ed8; --py-bg: rgba(37,99,235,0.07); --py-border: #bfdbfe;
+  --java: #d97706; --java2: #b45309; --java-bg: rgba(217,119,6,0.07); --java-border: #fde68a;
+  --bg: #ffffff; --surface: #f8fafc; --surface2: #f1f5f9; --border: #e2e8f0;
+  --text: #0f172a; --muted: #64748b; --muted2: #94a3b8;
+  --accent: #7c3aed; --green: #16a34a; --red: #dc2626; --orange: #ea580c; --teal: #0891b2;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:var(--bg); color:var(--text); font-family:'Noto Sans KR',sans-serif; min-height:100vh; }
+
+.hero { padding:52px 24px 36px; text-align:center; border-bottom:1px solid var(--border); background:linear-gradient(to bottom,#f8fafc,#ffffff); }
+.hero-badge { display:inline-block; font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:3px; color:var(--accent); border:1px solid #ddd6fe; background:#faf5ff; padding:4px 14px; border-radius:20px; margin-bottom:18px; text-transform:uppercase; }
+.hero h1 { font-size:clamp(1.6rem,4vw,2.7rem); font-weight:900; line-height:1.15; margin-bottom:10px; }
+.hero h1 .py { color:var(--py); } .hero h1 .java { color:var(--java); }
+.hero p { color:var(--muted); font-size:13.5px; font-weight:300; max-width:760px; margin:0 auto; line-height:1.6; }
+
+.tab-nav { display:flex; flex-wrap:wrap; gap:4px; padding:14px 20px; background:var(--surface); border-bottom:1px solid var(--border); position:sticky; top:0; z-index:100; }
+.tab-btn { font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.5px; padding:6px 13px; border:1px solid var(--border); background:var(--bg); color:var(--muted); cursor:pointer; border-radius:4px; transition:all .18s; white-space:nowrap; }
+.tab-btn:hover { border-color:var(--py); color:var(--py); background:#eff6ff; }
+.tab-btn.active { background:var(--py); border-color:var(--py); color:#fff; }
+
+.main { max-width:1360px; margin:0 auto; padding:0 20px 70px; }
+.algo-section { display:none; animation:fadeIn .25s ease; padding-top:28px; }
+.algo-section.active { display:block; }
+@keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+
+.sec-head { display:flex; align-items:flex-start; gap:14px; margin-bottom:20px; padding-bottom:16px; border-bottom:2px solid var(--border); }
+.sec-icon { width:44px; height:44px; border-radius:10px; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:20px; background:var(--surface2); border:1px solid var(--border); }
+.sec-head h2 { font-size:21px; font-weight:800; }
+.sec-head p { font-size:12px; color:var(--muted); margin-top:3px; line-height:1.6; }
+
+.stage-badges { display:flex; gap:6px; margin-top:8px; flex-wrap:wrap; }
+.sbadge { font-family:'JetBrains Mono',monospace; font-size:10px; padding:3px 10px; border-radius:20px; border:1px solid; white-space:nowrap; }
+.sbadge.new { color:#16a34a; border-color:#bbf7d0; background:#f0fdf4; }
+.sbadge.pattern { color:#7c3aed; border-color:#ddd6fe; background:#faf5ff; }
+.sbadge.file { color:#0891b2; border-color:#bae6fd; background:#f0f9ff; }
+
+.dirtree { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:14px 18px; font-family:'JetBrains Mono',monospace; font-size:12px; line-height:1.9; margin-bottom:18px; color:var(--text); }
+.dirtree .d { color:var(--accent); font-weight:700; }
+.dirtree .f { color:var(--muted); }
+.dirtree .fnew { color:var(--green); font-weight:700; }
+
+.split-card { display:grid; grid-template-columns:1fr 1fr; gap:2px; border:1px solid var(--border); border-radius:10px; overflow:hidden; margin-bottom:20px; background:var(--border); }
+.split-side { background:var(--bg); padding:20px; }
+.split-side.py-side { border-top:3px solid var(--py); }
+.split-side.java-side { border-top:3px solid var(--java); }
+.lang-label { font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; text-transform:uppercase; margin-bottom:8px; display:flex; align-items:center; gap:7px; }
+.lang-label.py { color:var(--py); } .lang-label.java { color:var(--java); }
+.lang-dot { width:7px; height:7px; border-radius:50%; background:currentColor; }
+.ds-title { font-size:15px; font-weight:700; margin-bottom:2px; }
+.ds-sub { font-size:11px; color:var(--muted); margin-bottom:12px; }
+
+pre { background:var(--surface); border:1px solid var(--border); border-radius:7px; padding:14px; font-family:'JetBrains Mono',monospace; font-size:11px; line-height:1.72; overflow-x:auto; tab-size:4; }
+.kw { color:#7c3aed; font-weight:600; } .st { color:#16a34a; } .cm { color:#94a3b8; font-style:italic; }
+.num { color:#ea580c; } .fn { color:#2563eb; } .ty { color:#0891b2; } .op { color:#64748b; } .an { color:#dc2626; }
+
+.ctbl { width:100%; border-collapse:collapse; margin-bottom:20px; font-size:12.5px; }
+.ctbl th { padding:9px 13px; text-align:left; font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:1px; text-transform:uppercase; border-bottom:2px solid var(--border); color:var(--muted); }
+.ctbl th.py { color:var(--py); border-bottom-color:var(--py); }
+.ctbl th.java { color:var(--java); border-bottom-color:var(--java); }
+.ctbl th.acc { color:var(--accent); border-bottom-color:#ddd6fe; }
+.ctbl td { padding:8px 13px; border-bottom:1px solid var(--border); vertical-align:top; line-height:1.55; }
+.ctbl td:first-child { color:var(--text); font-weight:700; font-size:11.5px; white-space:nowrap; }
+.ctbl tr:hover td { background:#fafafa; }
+
+.viz { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:20px; margin-bottom:20px; }
+.viz-title { font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--accent); margin-bottom:14px; }
+.graph-wrap { overflow-x:auto; display:flex; justify-content:center; }
+svg text { font-family:'JetBrains Mono',monospace; }
+
+.tag-row { display:flex; flex-wrap:wrap; gap:5px; margin-top:10px; }
+.tag { font-size:10px; font-family:'JetBrains Mono',monospace; padding:2px 9px; border-radius:3px; border:1px solid; letter-spacing:.3px; }
+.tag.py { color:#1d4ed8; border-color:#bfdbfe; background:rgba(37,99,235,0.05); }
+.tag.java { color:#b45309; border-color:#fde68a; background:rgba(217,119,6,0.05); }
+.tag.acc { color:#7c3aed; border-color:#ddd6fe; background:rgba(124,58,237,0.05); }
+
+::-webkit-scrollbar{width:5px;height:5px} ::-webkit-scrollbar-track{background:var(--bg)} ::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:3px}
+
+.ov-table { width:100%; border-collapse:collapse; font-size:12.5px; }
+.ov-table th { padding:9px 13px; background:var(--surface2); font-weight:700; font-size:10.5px; text-align:left; border:1px solid var(--border); }
+.ov-table td { padding:8px 13px; border:1px solid var(--border); vertical-align:middle; line-height:1.55; }
+.ov-table tr:nth-child(even) td { background:var(--surface); }
+.badge { display:inline-block; font-family:'JetBrains Mono',monospace; font-size:10px; padding:1px 8px; border-radius:3px; }
+.badge.g { background:#dcfce7; color:#15803d; } .badge.y { background:#fef9c3; color:#a16207; }
+.badge.b { background:#dbeafe; color:#1d4ed8; } .badge.p { background:#f3e8ff; color:#7e22ce; }
+.badge.o { background:#ffedd5; color:#c2410c; }
+
+.note { border-radius:8px; padding:13px 15px; font-size:12px; line-height:1.65; margin:14px 0; border:1px solid var(--java-border); background:var(--java-bg); color:#7c4a03; }
+.note.py { border-color:var(--py-border); background:var(--py-bg); color:#1e3a8a; }
+.note.acc { border-color:#ddd6fe; background:#faf5ff; color:#5b21b6; }
+.note b { display:block; margin-bottom:4px; font-size:12.5px; }
+
+.step-strip { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:22px; }
+.step-chip { flex:1; min-width:130px; border:1px solid var(--border); border-radius:8px; padding:10px 12px; background:var(--bg); text-align:center; }
+.step-chip .sc-id { font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--accent); font-weight:700; }
+.step-chip .sc-t { font-size:11.5px; font-weight:700; margin-top:3px; }
+.step-chip.now { border-color:var(--accent); background:#faf5ff; }
+
+/* UML */
+.uml-box rect.hdr { fill:var(--surface2); stroke:var(--border); }
+.uml-box text.cname { font-weight:700; }
+.uml-legend { display:flex; flex-wrap:wrap; gap:14px; font-size:10.5px; color:var(--muted); margin-top:10px; font-family:'JetBrains Mono',monospace; }
+.uml-legend span.sw { display:inline-block; width:22px; height:0; border-top:2px solid; vertical-align:middle; margin-right:5px; }
+
+@media(max-width:768px){ .split-card{grid-template-columns:1fr} }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-badge">Magic Square OOP Case Study</div>
+  <h1><span class="java">Java</span> <span style="color:var(--muted);font-weight:300;">→</span> <span class="py">Python</span> 마방진 리팩터링으로 배우는 객체지향</h1>
+  <p>s115 ~ s120 여섯 단계에 걸쳐 하나의 마방진(魔方陣) 프로그램이 어떻게 "중복 코드 덩어리"에서 "상속 → 다형성 → 추상화 → 싱글턴/팩토리 패턴"을 갖춘 설계로 진화하는지, 각 디렉토리별 변화를 Java 원본과 Python 변환 코드, UML 클래스 다이어그램으로 완전히 분석합니다.</p>
+</div>
+
+<div class="tab-nav">
+  <button class="tab-btn active" onclick="showTab('overview',this)">전체 개요</button>
+  <button class="tab-btn" onclick="showTab('s115',this)">s115 · 단일 클래스</button>
+  <button class="tab-btn" onclick="showTab('s116',this)">s116 · 독립 클래스</button>
+  <button class="tab-btn" onclick="showTab('s117',this)">s117 · 의존 관계</button>
+  <button class="tab-btn" onclick="showTab('s118',this)">s118 · 상속·다형성</button>
+  <button class="tab-btn" onclick="showTab('s119',this)">s119 · 인터페이스·추상화</button>
+  <button class="tab-btn" onclick="showTab('s120',this)">s120 · 싱글턴·팩토리</button>
+  <button class="tab-btn" onclick="showTab('summary',this)">패턴·UML 총정리</button>
+</div>
+
+<div class="main">
+
+<!-- ============ OVERVIEW ============ -->
+<div class="algo-section active" id="tab-overview">
+  <div class="sec-head">
+    <div class="sec-icon">🗺️</div>
+    <div>
+      <h2>전체 진화 로드맵</h2>
+      <p>같은 "마방진 만들기" 문제를 6단계에 걸쳐 리팩터링하며 객체지향 4대 특성과 디자인 패턴을 하나씩 도입합니다.</p>
+    </div>
+  </div>
+
+  <div class="step-strip">
+    <div class="step-chip"><div class="sc-id">s115</div><div class="sc-t">홀수 마방진<br>단일 클래스</div></div>
+    <div class="step-chip"><div class="sc-id">s116</div><div class="sc-t">4배수 마방진<br>독립 클래스</div></div>
+    <div class="step-chip"><div class="sc-id">s117</div><div class="sc-t">6n+2 마방진<br>클래스 간 의존</div></div>
+    <div class="step-chip"><div class="sc-id">s118</div><div class="sc-t">상속 도입<br>다형성</div></div>
+    <div class="step-chip"><div class="sc-id">s119</div><div class="sc-t">인터페이스<br>추상화</div></div>
+    <div class="step-chip"><div class="sc-id">s120</div><div class="sc-t">싱글턴·팩토리<br>커스텀 예외</div></div>
+  </div>
+
+  <table class="ov-table" style="margin-bottom:24px;">
+    <thead>
+      <tr><th>단계</th><th>핵심 목표</th><th>새로 등장한 클래스/파일</th><th>도입된 객체지향 문법</th><th>디자인 패턴</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><b>s115</b></td><td>홀수(odd) 마방진 알고리즘 구현</td><td>OddMagicSquare, Main</td><td>클래스, 필드, 생성자 오버로딩(this(3))</td><td><span class="badge b">없음</span></td></tr>
+      <tr><td><b>s116</b></td><td>4의 배수 마방진 알고리즘 구현</td><td>FourMagicSquare, Main</td><td>Odd와 동일 구조를 "복사-붙여넣기"로 재구현 → 중복 문제 노출</td><td><span class="badge b">없음</span></td></tr>
+      <tr><td><b>s117</b></td><td>6n+2 마방진까지 3종류 완성</td><td>SixMagicSquare</td><td>클래스 간 의존(생성 의존) — Six가 내부에서 Odd를 생성해 사용</td><td><span class="badge y">Dependency (사용 관계)</span></td></tr>
+      <tr><td><b>s118</b></td><td>중복 제거 — 공통 로직을 부모로 추출</td><td>MagicSquare(부모), MagicPrint</td><td>상속(extends), super(), protected, 메서드 오버라이딩(@Override), 업캐스팅 다형성</td><td><span class="badge g">Polymorphism</span></td></tr>
+      <tr><td><b>s119</b></td><td>구현을 강제하는 "규약" 도입</td><td>IMagicSquare(인터페이스)</td><td>interface, implements, abstract class, 다중 추상화 계층</td><td><span class="badge p">Program to Interface</span></td></tr>
+      <tr><td><b>s120</b></td><td>객체 생성 책임 분리 + 예외 처리 고도화</td><td>FactoryMagic, MagicException</td><td>커스텀 예외(extends Exception), try-with-resources(AutoCloseable)</td><td><span class="badge p">Singleton + Factory Method</span></td></tr>
+    </tbody>
+  </table>
+
+  <div class="viz">
+    <div class="viz-title">// 왜 이런 순서로 리팩터링 하는가 — 문제→해결 흐름</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+      <div>
+        <div class="lang-label java" style="margin-bottom:10px;"><span class="lang-dot"></span>드러나는 문제</div>
+        <div style="display:flex;flex-direction:column;gap:8px;font-size:12px;line-height:1.7;">
+          <div style="background:var(--java-bg);border:1px solid var(--java-border);border-radius:6px;padding:10px 12px;">
+            <b>s115→s116:</b> OddMagicSquare와 FourMagicSquare가 print(), isMagic(), sumRow() 등 <u>완전히 동일한 코드</u>를 각자 갖고 있음
+          </div>
+          <div style="background:var(--java-bg);border:1px solid var(--java-border);border-radius:6px;padding:10px 12px;">
+            <b>s117:</b> SixMagicSquare까지 추가되며 중복이 3배로 늘어남. 유지보수 시 3곳을 동시에 고쳐야 함
+          </div>
+          <div style="background:var(--java-bg);border:1px solid var(--java-border);border-radius:6px;padding:10px 12px;">
+            <b>s118 이후:</b> SquareMain이 세 클래스를 각각 다른 타입으로 다뤄야 해서 if-else 분기와 개별 처리 코드가 늘어남
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="lang-label py" style="margin-bottom:10px;"><span class="lang-dot"></span>적용한 해결책</div>
+        <div style="display:flex;flex-direction:column;gap:8px;font-size:12px;line-height:1.7;">
+          <div style="background:var(--py-bg);border:1px solid var(--py-border);border-radius:6px;padding:10px 12px;">
+            <b>s118:</b> 공통 필드·메서드를 <code>MagicSquare</code> 부모 클래스로 추출 → <b>상속</b>으로 중복 제거
+          </div>
+          <div style="background:var(--py-bg);border:1px solid var(--py-border);border-radius:6px;padding:10px 12px;">
+            <b>s118:</b> <code>MagicPrint.print(MagicSquare magic)</code> 하나로 3종류 모두 출력 → <b>다형성</b>으로 분기 제거
+          </div>
+          <div style="background:var(--py-bg);border:1px solid var(--py-border);border-radius:6px;padding:10px 12px;">
+            <b>s119:</b> <code>IMagicSquare</code> 인터페이스로 "무엇을 해야 하는가"만 규약화 → <b>추상화</b>
+          </div>
+          <div style="background:var(--py-bg);border:1px solid var(--py-border);border-radius:6px;padding:10px 12px;">
+            <b>s120:</b> 객체 생성 로직을 <code>FactoryMagic</code>에 위임 → <b>싱글턴 + 팩토리 메서드 패턴</b>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <table class="ctbl">
+    <thead><tr><th>OOP 4대 특성</th><th class="acc">등장 단계</th><th>이 프로젝트에서의 구현</th></tr></thead>
+    <tbody>
+      <tr><td>캡슐화 (Encapsulation)</td><td>s115 ~</td><td>magic, n 필드를 private/protected로 감추고 getMagic()으로만 노출</td></tr>
+      <tr><td>상속 (Inheritance)</td><td>s118</td><td>OddMagicSquare, FourMagicSquare, SixMagicSquare가 MagicSquare를 extends</td></tr>
+      <tr><td>다형성 (Polymorphism)</td><td>s118 ~</td><td>MagicSquare(부모) 타입 변수·매개변수로 세 자식 객체를 동일하게 다룸</td></tr>
+      <tr><td>추상화 (Abstraction)</td><td>s119 ~</td><td>IMagicSquare 인터페이스 + abstract class MagicSquare로 구현을 강제</td></tr>
+    </tbody>
+  </table>
+
+  <div class="note acc"><b>학습서 읽는 법</b>각 탭은 실제 업로드된 s115~s120 디렉토리 하나에 대응합니다. 탭 안에서 ① 디렉토리 구조 ② Java 핵심 소스 ③ 사용 문법 표 ④ UML 클래스 다이어그램 ⑤ Python 대응 구현 순서로 확인하세요.</div>
+</div>
+
+<!-- ============ s115 ============ -->
+<div class="algo-section" id="tab-s115">
+  <div class="sec-head">
+    <div class="sec-icon">1️⃣</div>
+    <div>
+      <h2>s115 — 홀수 마방진, 첫 번째 클래스</h2>
+      <p>가장 단순한 형태: 필드 캡슐화 + 생성자 오버로딩만 사용하는 독립된 클래스 하나.</p>
+      <div class="stage-badges">
+        <span class="sbadge file">패키지 kr.co.infopub.chapter.s115</span>
+        <span class="sbadge new">신규: OddMagicSquare, OddMagicSquareMain</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="dirtree">
+<span class="d">s115/</span>
+├── <span class="f">OddMagicSquare.java</span> <span class="cm">// 마방진 데이터 + 알고리즘</span>
+└── <span class="f">OddMagicSquareMain.java</span> <span class="cm">// 실행 진입점(main)</span>
+  </div>
+
+  <div class="split-card">
+    <div class="split-side java-side">
+      <div class="lang-label java"><span class="lang-dot"></span>Java — OddMagicSquare.java</div>
+      <div class="ds-title">필드 캡슐화 + 생성자 오버로딩</div>
+      <div class="ds-sub">2차원 배열(magic)을 private로 감추고 getMagic()으로만 공개</div>
+      <pre><span class="kw">public class</span> OddMagicSquare {
+    <span class="kw">private int</span>[][] magic;  <span class="cm">// 2차원 배열 선언 — private로 은닉</span>
+    <span class="kw">private int</span> n;           <span class="cm">// 마방진 크기 n x n</span>
+
+    <span class="kw">public int</span>[][] getMagic() {   <span class="cm">// getter — 읽기 전용 공개</span>
+        <span class="kw">return</span> magic;
+    }
+    <span class="kw">public</span> OddMagicSquare(<span class="ty">int</span> n) {   <span class="cm">// 생성자 ①</span>
+        magic = <span class="kw">new int</span>[n][n];     <span class="cm">// 2차원 배열 생성+초기화(0으로 자동 채움)</span>
+        <span class="kw">this</span>.n = n;
+    }
+    <span class="kw">public</span> OddMagicSquare() {        <span class="cm">// 생성자 ② — 오버로딩</span>
+        <span class="kw">this</span>(<span class="num">3</span>);    <span class="cm">// this(n) → 생성자①을 재사용(생성자 위임)</span>
+    }
+    <span class="kw">public void</span> make() {   <span class="cm">// 시계 방향 대각선 채우기 알고리즘</span>
+        <span class="ty">int</span> x = <span class="num">0</span>, y = n / <span class="num">2</span>;
+        <span class="kw">for</span> (<span class="ty">int</span> i = <span class="num">1</span>; i &lt;= n*n; i++) {
+            <span class="ty">int</span> temX = x, temY = y;
+            magic[x][y] = i;
+            <span class="kw">if</span> (x-<span class="num">1</span> &lt; <span class="num">0</span>) x = n-<span class="num">1</span>; <span class="kw">else</span> x--;   <span class="cm">// 위로 이동(벽이면 순환)</span>
+            <span class="kw">if</span> (y-<span class="num">1</span> &lt; <span class="num">0</span>) y = n-<span class="num">1</span>; <span class="kw">else</span> y--;   <span class="cm">// 왼쪽 이동(벽이면 순환)</span>
+            <span class="kw">if</span> (magic[x][y] != <span class="num">0</span>) { x = temX+<span class="num">1</span>; y = temY; }  <span class="cm">// 이미 채워짐 → 아래로</span>
+        }
+    }
+    <span class="kw">public void</span> print() { <span class="cm">/* n x n 행렬 + isMagic() 결과 출력 */</span> }
+    <span class="kw">private int</span> sumRow(<span class="ty">int</span> row) { <span class="cm">/* row행 합계 */ return</span> <span class="num">0</span>; }
+    <span class="kw">private int</span> sumCol(<span class="ty">int</span> col) { <span class="cm">/* col열 합계 */ return</span> <span class="num">0</span>; }
+    <span class="kw">private int</span> sumDia() { <span class="cm">/* 역대각선 합 */ return</span> <span class="num">0</span>; }
+    <span class="kw">private int</span> sumReverseDia() { <span class="cm">/* 대각선 합 */ return</span> <span class="num">0</span>; }
+    <span class="kw">private boolean</span> isMagic() { <span class="cm">/* 모든 행·열·대각선 합이 같은지 검증 */ return</span> <span class="kw">true</span>; }
+}</pre>
+      <div class="tag-row"><span class="tag java">private 필드</span><span class="tag java">getter</span><span class="tag java">생성자 오버로딩</span><span class="tag java">this(n)</span></div>
+    </div>
+    <div class="split-side java-side" style="border-top-color:var(--muted2);">
+      <div class="lang-label" style="color:var(--muted);"><span class="lang-dot"></span>Java — OddMagicSquareMain.java</div>
+      <div class="ds-title">실행 진입점</div>
+      <div class="ds-sub">Scanner로 홀수를 입력받아 객체 생성 → make() → print()</div>
+      <pre><span class="kw">public class</span> OddMagicSquareMain {
+    <span class="kw">public static void</span> main(String[] args) {
+        Scanner scann = <span class="kw">new</span> Scanner(System.in);
+        System.out.<span class="fn">println</span>(<span class="st">"홀수 정수를 입력하세요."</span>);
+        <span class="ty">int</span> n = scann.<span class="fn">nextInt</span>();
+        OddMagicSquare odd = <span class="kw">new</span> OddMagicSquare(n);  <span class="cm">// 객체 생성</span>
+        odd.<span class="fn">make</span>();
+        odd.<span class="fn">print</span>();
+    }
+}</pre>
+    </div>
+  </div>
+
+  <table class="ctbl">
+    <thead><tr><th>문법 요소</th><th class="java">Java 표현</th><th>설명</th></tr></thead>
+    <tbody>
+      <tr><td>클래스</td><td>public class OddMagicSquare { }</td><td>마방진 데이터와 알고리즘을 하나로 묶은 설계도</td></tr>
+      <tr><td>필드(캡슐화)</td><td>private int[][] magic; private int n;</td><td>외부에서 직접 수정 불가 — 데이터 보호</td></tr>
+      <tr><td>getter</td><td>public int[][] getMagic()</td><td>읽기 전용으로만 내부 데이터 공개</td></tr>
+      <tr><td>생성자 오버로딩</td><td>OddMagicSquare(int n) / OddMagicSquare()</td><td>매개변수 개수가 다른 생성자를 여러 개 정의</td></tr>
+      <tr><td>생성자 위임</td><td>this(3);</td><td>다른 생성자를 호출해 중복 초기화 코드를 줄임</td></tr>
+      <tr><td>2차원 배열</td><td>magic = new int[n][n];</td><td>n x n 크기, int는 자동으로 0 초기화</td></tr>
+    </tbody>
+  </table>
+
+  <div class="viz">
+    <div class="viz-title">// UML — s115 클래스 다이어그램</div>
+    <div class="graph-wrap">
+      <svg width="420" height="230" viewBox="0 0 420 230" class="uml-box">
+        <rect x="90" y="20" width="240" height="185" rx="4" fill="#fff" stroke="#d97706" stroke-width="1.5"/>
+        <rect x="90" y="20" width="240" height="30" rx="4" fill="#fef3e2" stroke="#d97706" stroke-width="1.5"/>
+        <text x="210" y="40" text-anchor="middle" class="cname" font-size="13" fill="#b45309">OddMagicSquare</text>
+        <line x1="90" y1="50" x2="330" y2="50" stroke="#d97706"/>
+        <text x="98" y="66" font-size="10.5" fill="#0f172a">- magic : int[][]</text>
+        <text x="98" y="80" font-size="10.5" fill="#0f172a">- n : int</text>
+        <line x1="90" y1="90" x2="330" y2="90" stroke="#d97706"/>
+        <text x="98" y="105" font-size="10.5" fill="#0f172a">+ OddMagicSquare(n:int)</text>
+        <text x="98" y="119" font-size="10.5" fill="#0f172a">+ OddMagicSquare()</text>
+        <text x="98" y="133" font-size="10.5" fill="#0f172a">+ getMagic() : int[][]</text>
+        <text x="98" y="147" font-size="10.5" fill="#0f172a">+ make() : void</text>
+        <text x="98" y="161" font-size="10.5" fill="#0f172a">+ print() : void</text>
+        <text x="98" y="175" font-size="10.5" fill="#64748b">- sumRow/sumCol/sumDia..</text>
+        <text x="98" y="189" font-size="10.5" fill="#64748b">- isMagic() : boolean</text>
+      </svg>
+    </div>
+    <div class="uml-legend">클래스 하나만 존재 — 관계선 없음. -(private) / +(public) 표기는 UML 접근제어자 표기법입니다.</div>
+  </div>
+
+  <div class="split-card">
+    <div class="split-side py-side">
+      <div class="lang-label py"><span class="lang-dot"></span>Python — odd_magic_square.py</div>
+      <div class="ds-title">클래스 + __init__ + 기본값 인자</div>
+      <div class="ds-sub">Java의 생성자 오버로딩은 Python에서 기본값 매개변수로 대체</div>
+      <pre><span class="kw">class</span> OddMagicSquare:
+    <span class="cm"># Java의 OddMagicSquare(int n) / OddMagicSquare() 두 생성자를
+    # 기본값 매개변수 하나로 통합 (오버로딩이 없는 Python의 관용법)</span>
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, n=<span class="num">3</span>):
+        self._magic = [[<span class="num">0</span>] * n <span class="kw">for</span> _ <span class="kw">in</span> <span class="fn">range</span>(n)]  <span class="cm"># 2차원 리스트</span>
+        self._n = n                                    <span class="cm"># _ 접두사 = "private" 컨벤션</span>
+
+    <span class="kw">@property</span>
+    <span class="kw">def</span> <span class="fn">magic</span>(self):        <span class="cm"># getMagic() 대응 — @property로 getter화</span>
+        <span class="kw">return</span> self._magic
+
+    <span class="kw">def</span> <span class="fn">make</span>(self):
+        x, y = <span class="num">0</span>, self._n // <span class="num">2</span>
+        <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="num">1</span>, self._n * self._n + <span class="num">1</span>):
+            tem_x, tem_y = x, y
+            self._magic[x][y] = i
+            x = self._n - <span class="num">1</span> <span class="kw">if</span> x - <span class="num">1</span> &lt; <span class="num">0</span> <span class="kw">else</span> x - <span class="num">1</span>
+            y = self._n - <span class="num">1</span> <span class="kw">if</span> y - <span class="num">1</span> &lt; <span class="num">0</span> <span class="kw">else</span> y - <span class="num">1</span>
+            <span class="kw">if</span> self._magic[x][y] != <span class="num">0</span>:
+                x, y = tem_x + <span class="num">1</span>, tem_y
+
+    <span class="kw">def</span> <span class="fn">print</span>(self):
+        <span class="fn">print</span>()
+        <span class="fn">print</span>(f<span class="st">"{self._n} is magic : {self._is_magic()}"</span>)
+        <span class="kw">for</span> row <span class="kw">in</span> self._magic:
+            <span class="fn">print</span>(<span class="st">"\t"</span>.join(<span class="fn">map</span>(<span class="ty">str</span>, row)))
+
+    <span class="kw">def</span> <span class="fn">_sum_row</span>(self, row):  <span class="kw">return</span> <span class="fn">sum</span>(self._magic[row])
+    <span class="kw">def</span> <span class="fn">_sum_col</span>(self, col):  <span class="kw">return</span> <span class="fn">sum</span>(r[col] <span class="kw">for</span> r <span class="kw">in</span> self._magic)
+    <span class="kw">def</span> <span class="fn">_sum_dia</span>(self):       <span class="kw">return</span> <span class="fn">sum</span>(self._magic[i][self._n-<span class="num">1</span>-i] <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(self._n))
+    <span class="kw">def</span> <span class="fn">_sum_rdia</span>(self):      <span class="kw">return</span> <span class="fn">sum</span>(self._magic[i][i] <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(self._n))
+
+    <span class="kw">def</span> <span class="fn">_is_magic</span>(self):
+        totals = [self._sum_row(i) <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(self._n)]
+        totals += [self._sum_col(i) <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(self._n)]
+        totals += [self._sum_rdia(), self._sum_dia()]
+        <span class="kw">return</span> <span class="fn">len</span>(<span class="fn">set</span>(totals)) == <span class="num">1</span> <span class="kw">and</span> totals[<span class="num">0</span>] != <span class="num">0</span>
+
+
+<span class="kw">if</span> __name__ == <span class="st">"__main__"</span>:
+    n = <span class="fn">int</span>(<span class="fn">input</span>(<span class="st">"홀수 정수를 입력하세요.\n"</span>))
+    odd = OddMagicSquare(n)
+    odd.make()
+    odd.print()</pre>
+      <div class="tag-row"><span class="tag py">_ 밑줄 컨벤션</span><span class="tag py">@property</span><span class="tag py">기본값 인자로 오버로딩 대체</span></div>
+    </div>
+    <div class="split-side py-side" style="border-top-color:var(--muted2);">
+      <div class="lang-label" style="color:var(--muted);"><span class="lang-dot"></span>Python ↔ Java 문법 대응</div>
+      <table class="ctbl" style="margin:0;">
+        <thead><tr><th>Java</th><th class="py">Python</th></tr></thead>
+        <tbody>
+          <tr><td>생성자 오버로딩 2개</td><td>기본값 매개변수 def __init__(self, n=3)</td></tr>
+          <tr><td>private 필드</td><td>_magic (관례, 강제 아님)</td></tr>
+          <tr><td>getter 메서드</td><td>@property 데코레이터</td></tr>
+          <tr><td>new int[n][n]</td><td>[[0]*n for _ in range(n)]</td></tr>
+          <tr><td>정적 타입(int[][])</td><td>타입 명시 없음(동적 타이핑)</td></tr>
+        </tbody>
+      </table>
+      <div class="note py" style="margin-top:14px;"><b>포인트</b>Python엔 생성자 오버로딩이 없으므로, "인자를 안 주면 3으로" 라는 Java의 두 번째 생성자 의도를 기본값 매개변수 하나로 압축합니다. 이것이 두 언어의 가장 전형적인 차이입니다.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ s116 ============ -->
+<div class="algo-section" id="tab-s116">
+  <div class="sec-head">
+    <div class="sec-icon">2️⃣</div>
+    <div>
+      <h2>s116 — 4의 배수 마방진, 두 번째 독립 클래스</h2>
+      <p>s115와 똑같은 골격(필드·getter·print·isMagic·sumRow...)을 새 클래스에 그대로 복제 — <b>코드 중복 문제가 시작되는 지점</b>입니다.</p>
+      <div class="stage-badges">
+        <span class="sbadge file">패키지 kr.co.infopub.chapter.s116</span>
+        <span class="sbadge new">신규: FourMagicSquare, FourMagicSquareMain</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="dirtree">
+<span class="d">s116/</span>
+├── <span class="f">FourMagicSquare.java</span> <span class="cm">// LUX 방식 4배수 마방진 알고리즘</span>
+└── <span class="f">FourMagicSquareMain.java</span>
+  </div>
+
+  <div class="split-card">
+    <div class="split-side java-side">
+      <div class="lang-label java"><span class="lang-dot"></span>Java — FourMagicSquare.java (알고리즘부만)</div>
+      <div class="ds-title">makeA() + makeR() 조합 알고리즘</div>
+      <div class="ds-sub">필드·getMagic()·print()·sumRow 등은 s115와 100% 동일 코드 (중복!)</div>
+      <pre><span class="kw">public class</span> FourMagicSquare {
+    <span class="kw">private int</span>[][] magic;
+    <span class="kw">private int</span> n;
+    <span class="cm">// ↓↓↓ getMagic(), print(), sumRow(), sumCol(), sumDia(),
+    //     sumReverseDia(), isMagic() — s115와 글자 하나 안 틀리고 동일 ↓↓↓</span>
+
+    <span class="kw">public</span> FourMagicSquare(<span class="ty">int</span> n) { magic = <span class="kw">new int</span>[n][n]; <span class="kw">this</span>.n = n; }
+    <span class="kw">public</span> FourMagicSquare() { <span class="kw">this</span>(<span class="num">4</span>); }   <span class="cm">// 기본 크기만 3→4로 다름</span>
+
+    <span class="kw">public void</span> make() {
+        <span class="fn">makeA</span>();   <span class="cm">// ① 1~n²을 순서대로 채움</span>
+        <span class="fn">makeR</span>();   <span class="cm">// ② 대칭 영역 값을 n²+1-값 으로 뒤집음(LUX 패턴)</span>
+    }
+    <span class="kw">private void</span> makeA() {
+        <span class="kw">for</span> (<span class="ty">int</span> i = <span class="num">0</span>; i &lt; n*n; i++) magic[i/n][i%n] = i+<span class="num">1</span>;
+    }
+    <span class="kw">private void</span> makeR() {
+        <span class="kw">for</span> (<span class="ty">int</span> i = <span class="num">0</span>; i &lt; n; i++)
+            <span class="kw">for</span> (<span class="ty">int</span> j = <span class="num">0</span>; j &lt; n; j++) {
+                <span class="kw">boolean</span> edgeRow = (i &lt; n/<span class="num">4</span>) || (i &gt;= n/<span class="num">4</span>*<span class="num">3</span>);
+                <span class="kw">boolean</span> midCol  = (j &gt;= n/<span class="num">4</span> &amp;&amp; j &lt; n/<span class="num">4</span>*<span class="num">3</span>);
+                <span class="kw">boolean</span> edgeCol = (j &lt; n/<span class="num">4</span>) || (j &gt;= n/<span class="num">4</span>*<span class="num">3</span>);
+                <span class="kw">if</span> ((edgeRow &amp;&amp; midCol) || (!edgeRow &amp;&amp; edgeCol))
+                    magic[i][j] = n*n - (i*n + j);
+            }
+    }
+}</pre>
+      <div class="tag-row"><span class="tag java">코드 중복</span><span class="tag java">makeA/makeR 분리 메서드</span></div>
+    </div>
+    <div class="split-side java-side" style="border-top-color:var(--red);">
+      <div class="lang-label" style="color:var(--red);"><span class="lang-dot"></span>중복이 왜 문제인가</div>
+      <div class="ds-title">DRY(Don't Repeat Yourself) 원칙 위반</div>
+      <div class="ds-sub">isMagic()의 버그를 고치려면 s115, s116 두 파일을 모두 고쳐야 함</div>
+      <div class="note" style="margin-top:6px;">
+        <b>s115 vs s116 동일 코드 비율</b>
+        전체 코드의 약 70%(필드 선언, getMagic, print, sumRow, sumCol, sumDia, sumReverseDia, isMagic)가 두 클래스에서 완전히 동일합니다. 오직 <code>make()</code> 알고리즘 내부와 기본 생성자의 크기(3 vs 4)만 다릅니다.
+      </div>
+      <div class="note" style="margin-top:10px;">
+        <b>s118에서의 해결 예고</b>
+        이 중복된 70%를 <code>MagicSquare</code>라는 부모 클래스로 뽑아내고, 서로 다른 <code>make()</code>만 자식 클래스에 남기는 것이 다음 단계(s118)의 핵심 리팩터링입니다.
+      </div>
+    </div>
+  </div>
+
+  <table class="ctbl">
+    <thead><tr><th>비교 항목</th><th class="java">s115 (Odd)</th><th class="java">s116 (Four)</th></tr></thead>
+    <tbody>
+      <tr><td>필드</td><td>magic, n</td><td>magic, n (동일)</td></tr>
+      <tr><td>기본 생성자</td><td>this(3)</td><td>this(4)</td></tr>
+      <tr><td>make() 알고리즘</td><td>나선형 이동(회전 배치법)</td><td>1~n² 순서 배치 후 대칭 반전(LUX법)</td></tr>
+      <tr><td>print / isMagic / sum*</td><td>동일 코드</td><td>동일 코드 (복사됨)</td></tr>
+    </tbody>
+  </table>
+
+  <div class="viz">
+    <div class="viz-title">// UML — s116 클래스 다이어그램 (s115와 관계 없음, 독립)</div>
+    <div class="graph-wrap">
+      <svg width="700" height="230" viewBox="0 0 700 230">
+        <rect x="30" y="30" width="220" height="160" rx="4" fill="#fff" stroke="#94a3b8" stroke-width="1.2" stroke-dasharray="3"/>
+        <rect x="30" y="30" width="220" height="28" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.2" stroke-dasharray="3"/>
+        <text x="140" y="49" text-anchor="middle" font-size="12" font-weight="700" fill="#64748b">OddMagicSquare (s115)</text>
+        <text x="40" y="72" font-size="10" fill="#64748b">- magic, n</text>
+        <text x="40" y="88" font-size="10" fill="#64748b">+ make() / print() ...</text>
+        <text x="140" y="115" text-anchor="middle" font-size="9.5" fill="#cbd5e1">(참고용 — 이전 단계)</text>
+
+        <rect x="450" y="30" width="220" height="160" rx="4" fill="#fff" stroke="#d97706" stroke-width="1.5"/>
+        <rect x="450" y="30" width="220" height="28" fill="#fef3e2" stroke="#d97706" stroke-width="1.5"/>
+        <text x="560" y="49" text-anchor="middle" font-size="12" font-weight="700" fill="#b45309">FourMagicSquare (s116)</text>
+        <text x="460" y="72" font-size="10" fill="#0f172a">- magic : int[][]</text>
+        <text x="460" y="86" font-size="10" fill="#0f172a">- n : int</text>
+        <text x="460" y="104" font-size="10" fill="#0f172a">+ make() / print()</text>
+        <text x="460" y="118" font-size="10" fill="#0f172a">- makeA() / makeR()</text>
+        <text x="460" y="132" font-size="10" fill="#0f172a">- sumRow/sumCol/isMagic..</text>
+
+        <text x="350" y="105" text-anchor="middle" font-size="20" fill="#dc2626">≈</text>
+        <text x="350" y="128" text-anchor="middle" font-size="9.5" fill="#dc2626">70% 코드 중복</text>
+        <line x1="255" y1="105" x2="445" y2="105" stroke="#fca5a5" stroke-width="1.5" stroke-dasharray="4"/>
+      </svg>
+    </div>
+    <div class="uml-legend">두 클래스는 코드 상 관계(상속·연관)가 전혀 없는 완전히 독립된 클래스입니다 — 그래서 중복이 생깁니다.</div>
+  </div>
+
+  <div class="split-card">
+    <div class="split-side py-side">
+      <div class="lang-label py"><span class="lang-dot"></span>Python — four_magic_square.py</div>
+      <div class="ds-title">동일한 중복 문제를 Python에서도 그대로 재현</div>
+      <pre><span class="kw">class</span> FourMagicSquare:
+    <span class="cm"># _magic, _n, print, _sum_row.. 등은 OddMagicSquare와 완전히 동일 코드 (중복)</span>
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, n=<span class="num">4</span>):                    <span class="cm"># 기본값만 4로 다름</span>
+        self._magic = [[<span class="num">0</span>] * n <span class="kw">for</span> _ <span class="kw">in</span> <span class="fn">range</span>(n)]
+        self._n = n
+
+    <span class="kw">@property</span>
+    <span class="kw">def</span> <span class="fn">magic</span>(self):
+        <span class="kw">return</span> self._magic
+
+    <span class="kw">def</span> <span class="fn">make</span>(self):
+        self._make_a()
+        self._make_r()
+
+    <span class="kw">def</span> <span class="fn">_make_a</span>(self):
+        <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(self._n * self._n):
+            self._magic[i // self._n][i % self._n] = i + <span class="num">1</span>
+
+    <span class="kw">def</span> <span class="fn">_make_r</span>(self):
+        n = self._n
+        <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(n):
+            <span class="kw">for</span> j <span class="kw">in</span> <span class="fn">range</span>(n):
+                edge_row = i &lt; n//<span class="num">4</span> <span class="kw">or</span> i &gt;= n//<span class="num">4</span>*<span class="num">3</span>
+                mid_col  = n//<span class="num">4</span> &lt;= j &lt; n//<span class="num">4</span>*<span class="num">3</span>
+                edge_col = j &lt; n//<span class="num">4</span> <span class="kw">or</span> j &gt;= n//<span class="num">4</span>*<span class="num">3</span>
+                <span class="kw">if</span> (edge_row <span class="kw">and</span> mid_col) <span class="kw">or</span> (<span class="kw">not</span> edge_row <span class="kw">and</span> edge_col):
+                    self._magic[i][j] = n*n - (i*n + j)
+
+    <span class="cm"># print(), _sum_row(), _sum_col(), _sum_dia(), _sum_rdia(), _is_magic()
+    # → OddMagicSquare와 100% 동일 (생략, 그대로 복사됨)</span></pre>
+      <div class="tag-row"><span class="tag py">동일한 중복 문제 재현</span></div>
+    </div>
+    <div class="split-side py-side" style="border-top-color:var(--accent);">
+      <div class="lang-label" style="color:var(--accent);"><span class="lang-dot"></span>왜 일부러 중복을 보여주는가</div>
+      <div class="note acc">
+        <b>의도된 "나쁜 설계" 예시</b>
+        s115·s116은 상속 없이 짠 코드가 얼마나 많이 겹치는지 보여주기 위한 <u>비교 대조군</u>입니다. Python도 Java와 마찬가지로 상속 없이 짜면 동일하게 중복이 발생합니다 — 이는 언어 문제가 아니라 <b>설계</b> 문제라는 것을 보여줍니다.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ s117 ============ -->
+<div class="algo-section" id="tab-s117">
+  <div class="sec-head">
+    <div class="sec-icon">3️⃣</div>
+    <div>
+      <h2>s117 — 세 번째 클래스, 그리고 첫 클래스 간 관계(의존)</h2>
+      <p>Odd/Four에 SixMagicSquare(4n+2 마방진, LUX법)가 추가됩니다. Six는 내부적으로 <b>OddMagicSquare 객체를 직접 생성해서 사용</b> — 클래스끼리 처음으로 관계를 맺는 지점입니다.</p>
+      <div class="stage-badges">
+        <span class="sbadge file">패키지 kr.co.infopub.chapter.s117</span>
+        <span class="sbadge new">신규: SixMagicSquare</span>
+        <span class="sbadge pattern">관계: 의존(Dependency)</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="dirtree">
+<span class="d">s117/</span>
+├── <span class="f">OddMagicSquare.java</span>
+├── <span class="f">FourMagicSquare.java</span>
+├── <span class="fnew">SixMagicSquare.java</span>      <span class="cm">// NEW — 내부에서 OddMagicSquare 사용</span>
+├── <span class="f">SixMagicSquareMain.java</span>
+└── <span class="f">SixMagicSquareMain2.java</span>
+  </div>
+
+  <div class="split-card">
+    <div class="split-side java-side">
+      <div class="lang-label java"><span class="lang-dot"></span>Java — SixMagicSquare.java (핵심부)</div>
+      <div class="ds-title">LUX 방식 5단계 조합 + 내부 3마방진 의존</div>
+      <div class="ds-sub">makeA→makeB→makeCD→makeMulti→makeOdd 순서로 4분면을 채운 뒤 3마방진을 더함</div>
+      <pre><span class="kw">public class</span> SixMagicSquare {
+    <span class="kw">private int</span>[][] magic;
+    <span class="kw">private int</span> n;
+    <span class="cm">// (생성자, getMagic, print, sumRow.. 는 이전과 동일 — 여전히 중복)</span>
+
+    <span class="kw">public void</span> make() {
+        <span class="fn">makeA</span>(); <span class="fn">makeB</span>(); <span class="fn">makeCD</span>(); <span class="fn">makeMulti</span>(); <span class="fn">makeOdd</span>();
+    }
+    <span class="kw">private void</span> makeOdd() {
+        <span class="cm">// ★ 클래스 간 의존(사용 관계) — Six는 Odd가 있어야 완성된다</span>
+        <span class="cm">// "6 마방진은 3 마방진을 필요로 한다" — 생성 의존(creates & uses)</span>
+        OddMagicSquare odd = <span class="kw">new</span> OddMagicSquare(n/<span class="num">2</span>);  <span class="cm">// 지역변수로 임시 생성</span>
+        odd.<span class="fn">make</span>();                              <span class="cm">// 3마방진을 완성시키고</span>
+        <span class="ty">int</span>[][] mm = odd.<span class="fn">getMagic</span>();               <span class="cm">// 결과만 꺼내 쓴다 (필드로 저장 X)</span>
+        <span class="kw">for</span> (<span class="ty">int</span> i = <span class="num">0</span>; i &lt; n/<span class="num">2</span>; i++)
+            <span class="kw">for</span> (<span class="ty">int</span> j = <span class="num">0</span>; j &lt; n/<span class="num">2</span>; j++) {
+                magic[i][j]           += mm[i][j];  <span class="cm">// 4분면 각각에 동일하게 가산</span>
+                magic[i][j+n/<span class="num">2</span>]      += mm[i][j];
+                magic[i+n/<span class="num">2</span>][j]      += mm[i][j];
+                magic[i+n/<span class="num">2</span>][j+n/<span class="num">2</span>] += mm[i][j];
+            }
+    }
+}</pre>
+      <div class="tag-row"><span class="tag java">new OddMagicSquare()</span><span class="tag java">지역변수 사용, 필드 아님</span><span class="tag java">Dependency</span></div>
+    </div>
+    <div class="split-side java-side" style="border-top-color:var(--muted2);">
+      <div class="lang-label" style="color:var(--muted);"><span class="lang-dot"></span>의존(Dependency) vs 상속(Inheritance)</div>
+      <div class="ds-title">이 시점엔 아직 "상속"이 아니다</div>
+      <div class="ds-sub">"Six is a kind of Odd"가 아니라 "Six uses (needs) an Odd" 관계</div>
+      <table class="ctbl" style="margin:0;">
+        <thead><tr><th>구분</th><th>의존(Dependency, s117)</th><th>상속(Inheritance, s118)</th></tr></thead>
+        <tbody>
+          <tr><td>의미</td><td>"필요할 때 잠깐 사용한다" (uses-a)</td><td>"~의 한 종류이다" (is-a)</td></tr>
+          <tr><td>Java 표현</td><td>메서드 안 지역변수로 new</td><td>class X extends Y</td></tr>
+          <tr><td>생명주기</td><td>메서드 실행 끝나면 사라짐</td><td>객체 자체가 부모 특성을 내장</td></tr>
+          <tr><td>이 코드</td><td>SixMagicSquare → OddMagicSquare</td><td>(s118에서 등장)</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="viz">
+    <div class="viz-title">// UML — s117 클래스 다이어그램 (의존 관계 등장)</div>
+    <div class="graph-wrap">
+      <svg width="720" height="230" viewBox="0 0 720 230">
+        <rect x="20" y="30" width="180" height="90" rx="4" fill="#fff" stroke="#94a3b8" stroke-width="1.2"/>
+        <rect x="20" y="30" width="180" height="26" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.2"/>
+        <text x="110" y="48" text-anchor="middle" font-size="11.5" font-weight="700" fill="#475569">FourMagicSquare</text>
+        <text x="30" y="70" font-size="9.5" fill="#64748b">- magic, n</text>
+        <text x="30" y="86" font-size="9.5" fill="#64748b">+ make()/print()</text>
+
+        <rect x="270" y="30" width="180" height="90" rx="4" fill="#fff" stroke="#2563eb" stroke-width="1.5"/>
+        <rect x="270" y="30" width="180" height="26" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+        <text x="360" y="48" text-anchor="middle" font-size="11.5" font-weight="700" fill="#1d4ed8">OddMagicSquare</text>
+        <text x="280" y="70" font-size="9.5" fill="#0f172a">- magic, n</text>
+        <text x="280" y="86" font-size="9.5" fill="#0f172a">+ make()/getMagic()</text>
+
+        <rect x="270" y="150" width="220" height="70" rx="4" fill="#fff" stroke="#d97706" stroke-width="1.5"/>
+        <rect x="270" y="150" width="220" height="26" fill="#fef3e2" stroke="#d97706" stroke-width="1.5"/>
+        <text x="380" y="168" text-anchor="middle" font-size="11.5" font-weight="700" fill="#b45309">SixMagicSquare</text>
+        <text x="280" y="190" font-size="9.5" fill="#0f172a">- magic, n</text>
+        <text x="280" y="204" font-size="9.5" fill="#0f172a">+ make() → makeOdd() 안에서 사용</text>
+
+        <line x1="380" y1="150" x2="365" y2="120" stroke="#94a3b8" stroke-width="1.3" stroke-dasharray="4" marker-end="url(#arrOpen)"/>
+        <text x="480" y="138" font-size="9.5" fill="#64748b">&lt;&lt;use&gt;&gt; 생성 의존</text>
+
+        <defs>
+          <marker id="arrOpen" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+            <path d="M0,0 L8,3 L0,6" fill="none" stroke="#94a3b8" stroke-width="1"/>
+          </marker>
+        </defs>
+      </svg>
+    </div>
+    <div class="uml-legend"><span class="sw" style="border-color:#94a3b8;border-style:dashed;"></span>점선 화살표 = 의존(Dependency, &lt;&lt;use&gt;&gt;) — "필요할 때만 생성해서 쓰는" 가장 약한 결합 관계입니다.</div>
+  </div>
+
+  <div class="split-card">
+    <div class="split-side py-side">
+      <div class="lang-label py"><span class="lang-dot"></span>Python — six_magic_square.py</div>
+      <div class="ds-title">동일한 의존 관계를 Python으로</div>
+      <pre><span class="kw">from</span> odd_magic_square <span class="kw">import</span> OddMagicSquare
+
+<span class="kw">class</span> SixMagicSquare:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, n=<span class="num">6</span>):
+        self._magic = [[<span class="num">0</span>] * n <span class="kw">for</span> _ <span class="kw">in</span> <span class="fn">range</span>(n)]
+        self._n = n
+
+    <span class="kw">def</span> <span class="fn">make</span>(self):
+        self._make_a(); self._make_b(); self._make_cd()
+        self._make_multi(); self._make_odd()
+
+    <span class="kw">def</span> <span class="fn">_make_odd</span>(self):
+        <span class="cm"># ★ 의존 관계: 지역변수로 OddMagicSquare를 생성해 값만 빌려온다</span>
+        n = self._n
+        odd = OddMagicSquare(n // <span class="num">2</span>)   <span class="cm"># 클래스를 필드로 저장하지 않고 그때그때 사용</span>
+        odd.make()
+        mm = odd.magic                <span class="cm"># @property로 노출된 결과만 사용</span>
+        <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(n // <span class="num">2</span>):
+            <span class="kw">for</span> j <span class="kw">in</span> <span class="fn">range</span>(n // <span class="num">2</span>):
+                self._magic[i][j]                 += mm[i][j]
+                self._magic[i][j + n//<span class="num">2</span>]         += mm[i][j]
+                self._magic[i + n//<span class="num">2</span>][j]         += mm[i][j]
+                self._magic[i + n//<span class="num">2</span>][j + n//<span class="num">2</span>] += mm[i][j]
+    <span class="cm"># _make_a, _make_b, _make_cd, _make_multi, print, _sum_*, _is_magic
+    # → 동일 패턴으로 구현 (지면상 생략)</span></pre>
+      <div class="tag-row"><span class="tag py">import로 모듈 분리</span><span class="tag py">지역변수 의존</span></div>
+    </div>
+    <div class="split-side py-side" style="border-top-color:var(--muted2);">
+      <div class="lang-label" style="color:var(--muted);"><span class="lang-dot"></span>Java ↔ Python 모듈 구조 차이</div>
+      <table class="ctbl" style="margin:0;">
+        <thead><tr><th>Java</th><th class="py">Python</th></tr></thead>
+        <tbody>
+          <tr><td>package kr.co.infopub.chapter.s117;</td><td>디렉토리 = 패키지, 파일별 import</td></tr>
+          <tr><td>같은 패키지면 import 불필요</td><td>from odd_magic_square import OddMagicSquare 필요</td></tr>
+          <tr><td>new OddMagicSquare(n/2)</td><td>OddMagicSquare(n // 2)  — new 키워드 없음</td></tr>
+        </tbody>
+      </table>
+      <div class="note py" style="margin-top:12px;"><b>포인트</b> Java는 같은 패키지 안 클래스는 import 없이 바로 참조 가능하지만, Python은 파일(모듈) 단위로 항상 명시적 import가 필요합니다.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ s118 ============ -->
+<div class="algo-section" id="tab-s118">
+  <div class="sec-head">
+    <div class="sec-icon">🌳</div>
+    <div>
+      <h2>s118 — 상속으로 중복 제거, 다형성으로 분기 제거</h2>
+      <p>MagicSquare 부모 클래스가 등장해 공통 필드·메서드를 흡수합니다. Odd/Four/Six는 이제 <code>extends MagicSquare</code>로 상속받고 make()만 <b>오버라이딩</b>합니다. MagicPrint는 부모 타입 하나로 세 자식을 모두 처리하는 <b>다형성</b>을 보여줍니다.</p>
+      <div class="stage-badges">
+        <span class="sbadge file">패키지 kr.co.infopub.chapter.s118</span>
+        <span class="sbadge new">신규: MagicSquare(부모), MagicPrint</span>
+        <span class="sbadge pattern">문법: 상속·오버라이딩·업캐스팅 다형성</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="dirtree">
+<span class="d">s118/</span>
+├── <span class="fnew">MagicSquare.java</span>       <span class="cm">// NEW — 공통 부모 클래스 (protected 필드)</span>
+├── <span class="f">OddMagicSquare.java</span>   <span class="cm">// extends MagicSquare로 변경</span>
+├── <span class="f">FourMagicSquare.java</span>  <span class="cm">// extends MagicSquare로 변경</span>
+├── <span class="f">SixMagicSquare.java</span>   <span class="cm">// extends MagicSquare로 변경</span>
+├── <span class="fnew">MagicPrint.java</span>        <span class="cm">// NEW — 다형성 활용 유틸 클래스</span>
+└── <span class="f">SquareMain.java</span>       <span class="cm">// 다형성으로 분기 단순화</span>
+  </div>
+
+  <div class="split-card">
+    <div class="split-side java-side">
+      <div class="lang-label java"><span class="lang-dot"></span>Java — MagicSquare.java (부모)</div>
+      <div class="ds-title">공통 로직을 모두 흡수한 부모 클래스</div>
+      <div class="ds-sub">protected — "자식에게는 public처럼, 남에게는 private처럼"</div>
+      <pre><span class="kw">public class</span> MagicSquare {
+    <span class="kw">protected int</span>[][] magic;  <span class="cm">// protected → 자식 클래스에서 직접 접근 가능</span>
+    <span class="kw">protected int</span> n;
+
+    <span class="kw">public int</span>[][] getMagic() { <span class="kw">return</span> magic; }
+
+    <span class="kw">public</span> MagicSquare(<span class="ty">int</span> n) {   <span class="cm">// 기본 생성자는 의도적으로 제거</span>
+        magic = <span class="kw">new int</span>[n][n];
+        <span class="kw">this</span>.n = n;
+    }
+    <span class="kw">public void</span> make() { }        <span class="cm">// 빈 구현 — 자식이 반드시 재정의(오버라이딩)해야 의미 있음</span>
+
+    <span class="kw">public void</span> print() {         <span class="cm">// 자식이 물려받아 그대로 사용(재사용)</span>
+        System.out.<span class="fn">println</span>();
+        System.out.<span class="fn">println</span>(n + <span class="st">" is magic : "</span> + <span class="fn">isMagic</span>());
+        <span class="kw">for</span> (<span class="ty">int</span> i = <span class="num">0</span>; i &lt; n; i++) {
+            <span class="kw">for</span> (<span class="ty">int</span> j = <span class="num">0</span>; j &lt; n; j++) System.out.<span class="fn">print</span>(magic[i][j] + <span class="st">"\t"</span>);
+            System.out.<span class="fn">println</span>();
+        }
+    }
+    <span class="kw">protected boolean</span> isMagic() { <span class="cm">/* ...동일 로직... */ return</span> <span class="kw">true</span>; }
+    <span class="kw">private int</span> sumRow(<span class="ty">int</span> row) { <span class="cm">/* ... */ return</span> <span class="num">0</span>; }
+    <span class="kw">private int</span> sumCol(<span class="ty">int</span> col) { <span class="cm">/* ... */ return</span> <span class="num">0</span>; }
+}</pre>
+    </div>
+    <div class="split-side java-side" style="border-top-color:var(--muted2);">
+      <div class="lang-label" style="color:var(--muted);"><span class="lang-dot"></span>Java — OddMagicSquare.java (자식)</div>
+      <div class="ds-title">extends + super() + @Override</div>
+      <div class="ds-sub">필드는 사라지고 make() 알고리즘만 남음 — 극적으로 짧아짐</div>
+      <pre><span class="kw">public class</span> OddMagicSquare <span class="kw">extends</span> MagicSquare {  <span class="cm">// 상속</span>
+    <span class="kw">public</span> OddMagicSquare(<span class="ty">int</span> n) {
+        <span class="kw">super</span>(n);          <span class="cm">// 부모 생성자 MagicSquare(n) 호출 — 반드시 첫 줄</span>
+    }
+    <span class="kw">public</span> OddMagicSquare() {
+        <span class="kw">this</span>(<span class="num">3</span>);        <span class="cm">// 생성자 오버로딩은 그대로 유지</span>
+    }
+    <span class="kw">@Override</span>                 <span class="cm">// 컴파일러에게 "재정의 의도"를 명시(생략 가능하나 권장)</span>
+    <span class="kw">public void</span> make() {
+        <span class="ty">int</span> x = <span class="num">0</span>, y = n / <span class="num">2</span>;    <span class="cm">// n은 protected라 자식에서 바로 접근</span>
+        magic[x][y] = <span class="num">1</span>;          <span class="cm">// magic도 protected라 바로 접근</span>
+        <span class="cm">// ... 이하 알고리즘은 s115~s117과 동일 ...</span>
+    }
+    <span class="cm">// print(), isMagic(), sumRow() 등은 단 한 줄도 작성하지 않는다 — 상속으로 재사용!</span>
+}</pre>
+    </div>
+  </div>
+
+  <div class="split-card">
+    <div class="split-side java-side">
+      <div class="lang-label java"><span class="lang-dot"></span>Java — MagicPrint.java</div>
+      <div class="ds-title">부모 타입 매개변수 → 다형성의 핵심</div>
+      <div class="ds-sub">Odd/Four/Six 무엇이 와도 이 메서드 하나로 처리</div>
+      <pre><span class="kw">public class</span> MagicPrint {
+    <span class="kw">public static void</span> print(MagicSquare magic) {  <span class="cm">// 매개변수 타입이 부모(MagicSquare)</span>
+        magic.<span class="fn">make</span>();   <span class="cm">// 실제로는 실제 객체(Odd/Four/Six)의 오버라이딩된 make()가 호출됨</span>
+        magic.<span class="fn">print</span>();  <span class="cm">// = "동적 바인딩" (런타임에 실제 타입 메서드를 찾음)</span>
+    }
+}</pre>
+      <div class="tag-row"><span class="tag acc">동적 바인딩</span><span class="tag acc">런타임 다형성</span></div>
+    </div>
+    <div class="split-side java-side" style="border-top-color:var(--muted2);">
+      <div class="lang-label" style="color:var(--muted);"><span class="lang-dot"></span>Java — SquareMain.java</div>
+      <div class="ds-title">업캐스팅 — 부모 타입 변수에 자식 객체 대입</div>
+      <pre><span class="kw">public class</span> SquareMain {
+  <span class="kw">public static void</span> main(String[] args) {
+    <span class="ty">int</span> n = scann.<span class="fn">nextInt</span>();
+    MagicSquare magic = <span class="kw">null</span>;           <span class="cm">// 부모 타입으로 선언</span>
+    <span class="kw">if</span> (n&gt;<span class="num">2</span> &amp;&amp; n%<span class="num">2</span>==<span class="num">1</span>) {
+        magic = <span class="kw">new</span> OddMagicSquare(n);   <span class="cm">// 다형성 — 부모타입 변수 = 자식 객체</span>
+    } <span class="kw">else if</span> (n&gt;<span class="num">2</span> &amp;&amp; n%<span class="num">4</span>==<span class="num">0</span>) {
+        magic = <span class="kw">new</span> FourMagicSquare(n);
+    } <span class="kw">else if</span> (n&gt;<span class="num">2</span> &amp;&amp; n%<span class="num">4</span>==<span class="num">2</span>) {
+        magic = <span class="kw">new</span> SixMagicSquare(n);
+    } <span class="kw">else</span> { System.out.<span class="fn">println</span>(<span class="st">"만들수 없는 마방진입니다."</span>); <span class="kw">return</span>; }
+
+    MagicPrint.<span class="fn">print</span>(magic);  <span class="cm">// 세 클래스 모두 같은 코드로 출력 처리</span>
+  }
+}</pre>
+    </div>
+  </div>
+
+  <table class="ctbl">
+    <thead><tr><th>문법 요소</th><th class="java">Java 키워드/표현</th><th>의미</th></tr></thead>
+    <tbody>
+      <tr><td>상속</td><td>class OddMagicSquare extends MagicSquare</td><td>부모의 필드·메서드를 물려받음</td></tr>
+      <tr><td>부모 생성자 호출</td><td>super(n);</td><td>자식 생성자 첫 줄에서 반드시 부모 초기화</td></tr>
+      <tr><td>접근제어자</td><td>protected</td><td>자식에게는 공개, 외부에는 비공개</td></tr>
+      <tr><td>오버라이딩</td><td>@Override public void make()</td><td>부모 메서드를 자식이 재정의</td></tr>
+      <tr><td>업캐스팅</td><td>MagicSquare magic = new OddMagicSquare(n);</td><td>자식 객체를 부모 타입 변수에 대입</td></tr>
+      <tr><td>다형성(동적 바인딩)</td><td>magic.make() → 실제 객체의 make() 실행</td><td>컴파일 타입(부모)이 아닌 실행 타입(자식) 메서드 호출</td></tr>
+    </tbody>
+  </table>
+
+  <div class="viz">
+    <div class="viz-title">// UML — s118 클래스 다이어그램 (상속 + 다형성)</div>
+    <div class="graph-wrap">
+      <svg width="760" height="330" viewBox="0 0 760 330">
+        <!-- Parent -->
+        <rect x="290" y="16" width="200" height="86" rx="4" fill="#fff" stroke="#0f172a" stroke-width="1.5"/>
+        <rect x="290" y="16" width="200" height="26" fill="#f1f5f9" stroke="#0f172a" stroke-width="1.5"/>
+        <text x="390" y="34" text-anchor="middle" font-size="12" font-weight="700">MagicSquare</text>
+        <text x="298" y="58" font-size="9.5"># magic, n</text>
+        <text x="298" y="72" font-size="9.5">+ make() {} / print()</text>
+        <text x="298" y="86" font-size="9.5"># isMagic()</text>
+
+        <!-- children -->
+        <rect x="60" y="160" width="170" height="66" rx="4" fill="#fff" stroke="#d97706" stroke-width="1.5"/>
+        <rect x="60" y="160" width="170" height="24" fill="#fef3e2" stroke="#d97706" stroke-width="1.5"/>
+        <text x="145" y="176" text-anchor="middle" font-size="11" font-weight="700" fill="#b45309">OddMagicSquare</text>
+        <text x="68" y="200" font-size="9.5">+ make() [override]</text>
+
+        <rect x="295" y="160" width="170" height="66" rx="4" fill="#fff" stroke="#d97706" stroke-width="1.5"/>
+        <rect x="295" y="160" width="170" height="24" fill="#fef3e2" stroke="#d97706" stroke-width="1.5"/>
+        <text x="380" y="176" text-anchor="middle" font-size="11" font-weight="700" fill="#b45309">FourMagicSquare</text>
+        <text x="303" y="200" font-size="9.5">+ make() [override]</text>
+
+        <rect x="530" y="160" width="180" height="66" rx="4" fill="#fff" stroke="#d97706" stroke-width="1.5"/>
+        <rect x="530" y="160" width="180" height="24" fill="#fef3e2" stroke="#d97706" stroke-width="1.5"/>
+        <text x="620" y="176" text-anchor="middle" font-size="11" font-weight="700" fill="#b45309">SixMagicSquare</text>
+        <text x="538" y="200" font-size="9.5">+ make() [override]</text>
+
+        <!-- inheritance arrows (hollow triangle) -->
+        <line x1="145" y1="160" x2="360" y2="102" stroke="#0f172a" stroke-width="1.3"/>
+        <polygon points="360,102 348,96 348,108" fill="#fff" stroke="#0f172a" stroke-width="1.3"/>
+        <line x1="380" y1="160" x2="385" y2="102" stroke="#0f172a" stroke-width="1.3"/>
+        <polygon points="385,102 379,92 391,92" fill="#fff" stroke="#0f172a" stroke-width="1.3"/>
+        <line x1="620" y1="160" x2="420" y2="102" stroke="#0f172a" stroke-width="1.3"/>
+        <polygon points="420,102 411,98 415,109" fill="#fff" stroke="#0f172a" stroke-width="1.3"/>
+
+        <!-- MagicPrint depends on MagicSquare -->
+        <rect x="290" y="260" width="200" height="50" rx="4" fill="#fff" stroke="#7c3aed" stroke-width="1.5"/>
+        <text x="390" y="280" text-anchor="middle" font-size="11" font-weight="700" fill="#7c3aed">MagicPrint</text>
+        <text x="298" y="298" font-size="9" fill="#0f172a">+ print(MagicSquare) static</text>
+        <line x1="390" y1="260" x2="390" y2="104" stroke="#a78bfa" stroke-width="1.3" stroke-dasharray="4" marker-end="url(#arr2)"/>
+        <text x="435" y="230" font-size="9" fill="#a78bfa">&lt;&lt;dependency&gt;&gt; 매개변수 다형성</text>
+
+        <!-- Six -> Odd dependency retained -->
+        <line x1="600" y1="160" x2="230" y2="185" stroke="#94a3b8" stroke-width="1.1" stroke-dasharray="4" marker-end="url(#arr2)"/>
+        <text x="420" y="150" font-size="8.5" fill="#94a3b8">&lt;&lt;use&gt;&gt; (s117과 동일)</text>
+
+        <defs><marker id="arr2" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="none" stroke="#94a3b8" stroke-width="1"/></marker></defs>
+      </svg>
+    </div>
+    <div class="uml-legend">
+      <span><span class="sw" style="border-color:#0f172a;"></span>실선 + 속이 빈 삼각형 = 상속(Inheritance/Generalization)</span>
+      <span><span class="sw" style="border-color:#a78bfa;border-style:dashed;"></span>점선 화살표 = 의존(Dependency)</span>
+    </div>
+  </div>
+
+  <div class="split-card">
+    <div class="split-side py-side">
+      <div class="lang-label py"><span class="lang-dot"></span>Python — magic_square.py (부모)</div>
+      <div class="ds-title">클래스 상속의 기본형</div>
+      <div class="ds-sub">Python은 접근제어자가 없어 protected를 _(밑줄) 하나로 표현하는 관례를 사용</div>
+      <pre><span class="kw">class</span> MagicSquare:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, n):
+        self._magic = [[<span class="num">0</span>] * n <span class="kw">for</span> _ <span class="kw">in</span> <span class="fn">range</span>(n)]  <span class="cm"># _ 하나 = "protected" 관례</span>
+        self._n = n
+
+    <span class="kw">@property</span>
+    <span class="kw">def</span> <span class="fn">magic</span>(self):
+        <span class="kw">return</span> self._magic
+
+    <span class="kw">def</span> <span class="fn">make</span>(self):          <span class="cm"># 빈 메서드 — 자식이 반드시 재정의할 것을 기대</span>
+        <span class="kw">pass</span>
+
+    <span class="kw">def</span> <span class="fn">print</span>(self):         <span class="cm"># 자식이 상속받아 그대로 사용</span>
+        <span class="fn">print</span>()
+        <span class="fn">print</span>(f<span class="st">"{self._n} is magic : {self._is_magic()}"</span>)
+        <span class="kw">for</span> row <span class="kw">in</span> self._magic:
+            <span class="fn">print</span>(<span class="st">"\t"</span>.join(<span class="fn">map</span>(<span class="ty">str</span>, row)))
+
+    <span class="kw">def</span> <span class="fn">_is_magic</span>(self): <span class="cm"># ... 동일 로직 ...</span>
+        <span class="kw">pass</span></pre>
+    </div>
+    <div class="split-side py-side" style="border-top-color:var(--muted2);">
+      <div class="lang-label" style="color:var(--muted);"><span class="lang-dot"></span>Python — odd_magic_square.py (자식)</div>
+      <div class="ds-title">클래스(부모) + super().__init__()</div>
+      <pre><span class="kw">from</span> magic_square <span class="kw">import</span> MagicSquare
+
+<span class="kw">class</span> OddMagicSquare(MagicSquare):   <span class="cm"># 괄호 안에 부모 클래스 — 상속</span>
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, n=<span class="num">3</span>):
+        <span class="fn">super</span>().<span class="fn">__init__</span>(n)      <span class="cm"># 부모 생성자 호출 (Java의 super(n) 대응)</span>
+
+    <span class="kw">def</span> <span class="fn">make</span>(self):            <span class="cm"># 오버라이딩 — 표시 문법 없이 동일 이름 재정의</span>
+        x, y = <span class="num">0</span>, self._n // <span class="num">2</span>
+        self._magic[x][y] = <span class="num">1</span>
+        <span class="cm"># ... 이하 알고리즘은 이전과 동일 ...</span>
+    <span class="cm"># print(), _is_magic() 등은 단 한 줄도 작성하지 않는다 — 상속으로 재사용!</span>
+
+
+<span class="kw">class</span> MagicPrint:
+    <span class="kw">@staticmethod</span>
+    <span class="kw">def</span> <span class="fn">print_magic</span>(magic):   <span class="cm"># 타입 명시 없이도 다형성 동작(덕 타이핑)</span>
+        magic.make()      <span class="cm"># magic이 Odd/Four/Six 무엇이든 그 객체의 make()가 호출됨</span>
+        magic.print()
+
+
+<span class="cm"># SquareMain 대응</span>
+n = <span class="fn">int</span>(<span class="fn">input</span>(<span class="st">"3이상의 정수 마방진을 입력하세요.\n"</span>))
+magic = <span class="kw">None</span>
+<span class="kw">if</span> n &gt; <span class="num">2</span> <span class="kw">and</span> n % <span class="num">2</span> == <span class="num">1</span>:
+    magic = OddMagicSquare(n)      <span class="cm"># 변수 타입 선언이 없다 — 다형성이 문법상 더 자연스러움</span>
+<span class="kw">elif</span> n &gt; <span class="num">2</span> <span class="kw">and</span> n % <span class="num">4</span> == <span class="num">0</span>:
+    magic = FourMagicSquare(n)
+<span class="kw">elif</span> n &gt; <span class="num">2</span> <span class="kw">and</span> n % <span class="num">4</span> == <span class="num">2</span>:
+    magic = SixMagicSquare(n)
+<span class="kw">else</span>:
+    <span class="fn">print</span>(<span class="st">"만들수 없는 마방진입니다."</span>)
+    <span class="fn">exit</span>()
+MagicPrint.print_magic(magic)</pre>
+    </div>
+  </div>
+
+  <table class="ctbl">
+    <thead><tr><th>개념</th><th class="java">Java</th><th class="py">Python</th></tr></thead>
+    <tbody>
+      <tr><td>상속 문법</td><td>class Child extends Parent</td><td>class Child(Parent):</td></tr>
+      <tr><td>부모 생성자 호출</td><td>super(n); (첫 줄 강제)</td><td>super().__init__(n) (위치 자유)</td></tr>
+      <tr><td>protected에 해당하는 것</td><td>protected 키워드 (컴파일러가 검사)</td><td>_ 밑줄 하나 (관례일 뿐, 검사 없음)</td></tr>
+      <tr><td>다형성 실현 방식</td><td>정적 타입(MagicSquare) 변수 + 동적 바인딩</td><td>타입 선언 자체가 없는 덕 타이핑</td></tr>
+      <tr><td>오버라이딩 표시</td><td>@Override (선택이지만 관례상 필수)</td><td>표시 문법 없음</td></tr>
+    </tbody>
+  </table>
+
+  <div class="note acc"><b>이 단계가 왜 핵심인가</b> s115~s117에서 세 번 반복되던 print/isMagic/sumRow 코드가 s118부터는 <b>단 한 곳(MagicSquare)</b>에만 존재합니다. 그리고 SquareMain·MagicPrint는 "OddMagicSquare인지 FourMagicSquare인지"를 몰라도 되는 코드가 됩니다 — 이것이 상속과 다형성이 함께 만들어내는 실질적 이득입니다.</div>
+</div>
+
+<!-- ============ s119 ============ -->
+<div class="algo-section" id="tab-s119">
+  <div class="sec-head">
+    <div class="sec-icon">🧩</div>
+    <div>
+      <h2>s119 — 인터페이스로 "규약"을 강제하는 추상화</h2>
+      <p>MagicSquare가 <code>abstract class</code>로 바뀌고, 그보다 상위에 <code>IMagicSquare</code> 인터페이스가 생깁니다. "무엇을 할 수 있는가(계약)"와 "어떻게 하는가(구현)"를 완전히 분리하는 추상화 단계입니다.</p>
+      <div class="stage-badges">
+        <span class="sbadge file">패키지 kr.co.infopub.chapter.s119</span>
+        <span class="sbadge new">신규: IMagicSquare(interface)</span>
+        <span class="sbadge pattern">원칙: Program to an Interface</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="dirtree">
+<span class="d">s119/</span>
+├── <span class="fnew">IMagicSquare.java</span>     <span class="cm">// NEW — 인터페이스 (규약만 정의)</span>
+├── <span class="f">MagicSquare.java</span>   <span class="cm">// abstract class로 변경, implements IMagicSquare</span>
+├── <span class="f">OddMagicSquare.java</span>
+├── <span class="f">FourMagicSquare.java</span>
+├── <span class="f">SixMagicSquare.java</span>
+├── <span class="f">MagicPrint.java</span>    <span class="cm">// 매개변수 타입이 IMagicSquare로 격상</span>
+└── <span class="f">SquareMain.java</span>   <span class="cm">// 변수 타입이 IMagicSquare로 격상</span>
+  </div>
+
+  <div class="split-card">
+    <div class="split-side java-side">
+      <div class="lang-label java"><span class="lang-dot"></span>Java — IMagicSquare.java</div>
+      <div class="ds-title">interface — 100% 미구현 메서드의 집합</div>
+      <div class="ds-sub">모든 메서드는 자동으로 public abstract</div>
+      <pre><span class="cm">// 100% 구현 안된 메서드를 갖는 클래스 → 인터페이스(추상 클래스의 순수형)</span>
+<span class="kw">public interface</span> IMagicSquare {
+    <span class="kw">void</span> make();     <span class="cm">// 자동으로 public abstract void make(); 로 취급됨</span>
+    <span class="kw">void</span> print();    <span class="cm">// 구현부(중괄호) 자체가 없음 — 세미콜론으로 끝남</span>
+}</pre>
+    </div>
+    <div class="split-side java-side" style="border-top-color:var(--muted2);">
+      <div class="lang-label" style="color:var(--muted);"><span class="lang-dot"></span>Java — MagicSquare.java</div>
+      <div class="ds-title">abstract class + implements</div>
+      <div class="ds-sub">일부만 구현하고 make()는 자식에게 완전히 위임</div>
+      <pre><span class="kw">public abstract class</span> MagicSquare <span class="kw">implements</span> IMagicSquare {
+    <span class="kw">protected int</span>[][] magic;
+    <span class="kw">protected int</span> n;
+    <span class="cm">// make()를 구현하지 않았다 → MagicSquare는 여전히 추상 클래스
+    // (인터페이스의 메서드 중 하나라도 구현 안 하면 abstract 필수)</span>
+
+    <span class="kw">public</span> MagicSquare(<span class="ty">int</span> n) { magic = <span class="kw">new int</span>[n][n]; <span class="kw">this</span>.n = n; }
+
+    <span class="kw">public void</span> print() { <span class="cm">/* IMagicSquare의 print()는 여기서 구현 완료 */</span> }
+    <span class="kw">private boolean</span> isMagic() { <span class="cm">/* ... */ return</span> <span class="kw">true</span>; }
+}
+<span class="cm">// new MagicSquare(5);  → 컴파일 에러! 추상 클래스는 인스턴스화 불가</span></pre>
+    </div>
+  </div>
+
+  <table class="ctbl">
+    <thead><tr><th>abstract가 되는 3가지 케이스 (원본 주석)</th><th>설명</th></tr></thead>
+    <tbody>
+      <tr><td>인터페이스를 구현했지만 메서드를 구현 안 함</td><td>implements IMagicSquare 후 make() 본문을 안 씀 → 강제로 abstract</td></tr>
+      <tr><td>public void make(){ } 처럼 빈 몸통만 둠</td><td>s118 방식 — "상속을 강요"하지만 문법상 추상은 아님</td></tr>
+      <tr><td>public abstract void make(); 로 명시</td><td>Java abstract 키워드를 직접 사용 — 이 클래스도 abstract 필수</td></tr>
+    </tbody>
+  </table>
+
+  <div class="viz">
+    <div class="viz-title">// UML — s119 클래스 다이어그램 (인터페이스 실현 + 상속)</div>
+    <div class="graph-wrap">
+      <svg width="740" height="330" viewBox="0 0 740 330">
+        <rect x="290" y="16" width="200" height="66" rx="4" fill="#fdf4ff" stroke="#7c3aed" stroke-width="1.5" stroke-dasharray="0"/>
+        <text x="390" y="34" text-anchor="middle" font-size="10" fill="#7c3aed">&lt;&lt;interface&gt;&gt;</text>
+        <text x="390" y="50" text-anchor="middle" font-size="12" font-weight="700" font-style="italic" fill="#5b21b6">IMagicSquare</text>
+        <text x="298" y="70" font-size="9.5" fill="#5b21b6">+ make() / + print()</text>
+
+        <rect x="280" y="120" width="220" height="62" rx="4" fill="#fff" stroke="#0f172a" stroke-width="1.5"/>
+        <text x="390" y="138" text-anchor="middle" font-size="10" fill="#64748b" font-style="italic">&lt;&lt;abstract&gt;&gt;</text>
+        <text x="390" y="154" text-anchor="middle" font-size="12" font-weight="700" font-style="italic">MagicSquare</text>
+        <text x="288" y="172" font-size="9.5"># magic, n / + print() 구현</text>
+
+        <!-- realization dashed hollow triangle -->
+        <line x1="390" y1="120" x2="390" y2="84" stroke="#7c3aed" stroke-width="1.3" stroke-dasharray="4"/>
+        <polygon points="390,84 383,94 397,94" fill="#fff" stroke="#7c3aed" stroke-width="1.3"/>
+
+        <rect x="60" y="240" width="170" height="60" rx="4" fill="#fff" stroke="#d97706" stroke-width="1.5"/>
+        <text x="145" y="258" text-anchor="middle" font-size="11" font-weight="700" fill="#b45309">OddMagicSquare</text>
+        <text x="68" y="278" font-size="9">+ make() 구현</text>
+
+        <rect x="295" y="240" width="170" height="60" rx="4" fill="#fff" stroke="#d97706" stroke-width="1.5"/>
+        <text x="380" y="258" text-anchor="middle" font-size="11" font-weight="700" fill="#b45309">FourMagicSquare</text>
+        <text x="303" y="278" font-size="9">+ make() 구현</text>
+
+        <rect x="530" y="240" width="180" height="60" rx="4" fill="#fff" stroke="#d97706" stroke-width="1.5"/>
+        <text x="620" y="258" text-anchor="middle" font-size="11" font-weight="700" fill="#b45309">SixMagicSquare</text>
+        <text x="538" y="278" font-size="9">+ make() 구현</text>
+
+        <line x1="145" y1="240" x2="360" y2="184" stroke="#0f172a" stroke-width="1.3"/>
+        <polygon points="360,184 348,178 348,190" fill="#fff" stroke="#0f172a" stroke-width="1.3"/>
+        <line x1="380" y1="240" x2="385" y2="184" stroke="#0f172a" stroke-width="1.3"/>
+        <polygon points="385,184 379,174 391,174" fill="#fff" stroke="#0f172a" stroke-width="1.3"/>
+        <line x1="620" y1="240" x2="420" y2="184" stroke="#0f172a" stroke-width="1.3"/>
+        <polygon points="420,184 411,180 415,191" fill="#fff" stroke="#0f172a" stroke-width="1.3"/>
+      </svg>
+    </div>
+    <div class="uml-legend">
+      <span><span class="sw" style="border-color:#7c3aed;border-style:dashed;"></span>점선 + 속이 빈 삼각형 = 실현(Realization) — 인터페이스 구현</span>
+      <span><span class="sw" style="border-color:#0f172a;"></span>실선 + 속이 빈 삼각형 = 상속(Generalization)</span>
+    </div>
+  </div>
+
+  <div class="split-card">
+    <div class="split-side py-side">
+      <div class="lang-label py"><span class="lang-dot"></span>Python — imagic_square.py</div>
+      <div class="ds-title">abc.ABC + @abstractmethod로 인터페이스 흉내</div>
+      <div class="ds-sub">Python엔 interface 키워드가 없어 ABC로 동일 효과를 냄</div>
+      <pre><span class="kw">from</span> abc <span class="kw">import</span> ABC, abstractmethod
+
+<span class="kw">class</span> IMagicSquare(ABC):        <span class="cm"># ABC를 상속하면 "추상 클래스"가 됨</span>
+    <span class="kw">@abstractmethod</span>
+    <span class="kw">def</span> <span class="fn">make</span>(self): ...      <span class="cm"># 구현부 없음 — 자식이 반드시 구현해야 함</span>
+
+    <span class="kw">@abstractmethod</span>
+    <span class="kw">def</span> <span class="fn">print</span>(self): ...
+
+
+<span class="kw">class</span> MagicSquare(IMagicSquare):  <span class="cm"># IMagicSquare를 상속(=구현)</span>
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, n):
+        self._magic = [[<span class="num">0</span>] * n <span class="kw">for</span> _ <span class="kw">in</span> <span class="fn">range</span>(n)]
+        self._n = n
+    <span class="cm"># make()를 구현하지 않았다 → MagicSquare도 여전히 추상 클래스
+    # (IMagicSquare.print()만 구현하고 make()는 자식에게 위임)</span>
+
+    <span class="kw">def</span> <span class="fn">print</span>(self):        <span class="cm"># 인터페이스 규약 중 하나를 구현</span>
+        <span class="fn">print</span>()
+        <span class="fn">print</span>(f<span class="st">"{self._n} is magic : {self._is_magic()}"</span>)
+        <span class="kw">for</span> row <span class="kw">in</span> self._magic:
+            <span class="fn">print</span>(<span class="st">"\t"</span>.join(<span class="fn">map</span>(<span class="ty">str</span>, row)))
+
+    <span class="kw">def</span> <span class="fn">_is_magic</span>(self): ...
+
+<span class="cm"># MagicSquare(5)  → TypeError: Can't instantiate abstract class
+#                    (make가 구현되지 않았으므로 인스턴스화 불가)</span></pre>
+      <div class="tag-row"><span class="tag py">ABC</span><span class="tag py">@abstractmethod</span></div>
+    </div>
+    <div class="split-side py-side" style="border-top-color:var(--muted2);">
+      <div class="lang-label" style="color:var(--muted);"><span class="lang-dot"></span>Java ↔ Python 추상화 문법 대응</div>
+      <table class="ctbl" style="margin:0;">
+        <thead><tr><th>Java</th><th class="py">Python</th></tr></thead>
+        <tbody>
+          <tr><td>interface IMagicSquare { }</td><td>class IMagicSquare(ABC):</td></tr>
+          <tr><td>void make(); (본문 없음)</td><td>@abstractmethod def make(self): ...</td></tr>
+          <tr><td>abstract class MagicSquare implements X</td><td>class MagicSquare(IMagicSquare):  — 추상 메서드 미구현시 자동 추상 유지</td></tr>
+          <tr><td>인스턴스화 시 컴파일 에러</td><td>인스턴스화 시 런타임 TypeError</td></tr>
+          <tr><td>다중 인터페이스 구현 가능</td><td>다중 상속으로 여러 ABC 결합 가능 (더 유연)</td></tr>
+        </tbody>
+      </table>
+      <div class="note py" style="margin-top:12px;"><b>차이점</b> Java는 인터페이스 미구현을 <b>컴파일 시점</b>에 잡아내지만, Python의 ABC는 <b>런타임(객체 생성 시점)</b>에야 에러를 던집니다 — 정적 타입 vs 동적 타입 언어의 근본 차이가 그대로 드러나는 부분입니다.</div>
+    </div>
+  </div>
+
+  <div class="note acc"><b>추상화의 목적</b> SquareMain·MagicPrint가 다루는 변수 타입이 <code>MagicSquare</code>(s118)에서 <code>IMagicSquare</code>(s119)로 한 단계 더 올라갑니다. 이제 이 코드는 "MagicSquare를 상속했는가"조차 몰라도 되고, 오직 "make()와 print()를 가지고 있는가"라는 <b>계약</b>만 압니다 — 이것이 인터페이스 기반 추상화가 주는 느슨한 결합(loose coupling)입니다.</div>
+</div>
+
+<!-- ============ s120 ============ -->
+<div class="algo-section" id="tab-s120">
+  <div class="sec-head">
+    <div class="sec-icon">🏭</div>
+    <div>
+      <h2>s120 — 싱글턴 + 팩토리 메서드 패턴, 커스텀 예외</h2>
+      <p>객체를 <code>new</code>로 직접 만드는 책임을 <code>FactoryMagic</code>이라는 전담 클래스로 옮깁니다. 잘못된 입력은 자체 정의한 <code>MagicException</code>으로 처리하고, <code>try-with-resources</code>로 자원 정리를 자동화합니다.</p>
+      <div class="stage-badges">
+        <span class="sbadge file">패키지 kr.co.infopub.chapter.s120</span>
+        <span class="sbadge new">신규: FactoryMagic, MagicException</span>
+        <span class="sbadge pattern">GoF: Singleton + Factory Method</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="dirtree">
+<span class="d">s120/</span>
+├── <span class="f">IMagicSquare.java</span>
+├── <span class="f">MagicSquare.java</span>
+├── <span class="f">OddMagicSquare.java</span> / <span class="f">FourMagicSquare.java</span> / <span class="f">SixMagicSquare.java</span>
+├── <span class="fnew">MagicException.java</span>   <span class="cm">// NEW — 커스텀 체크 예외</span>
+├── <span class="fnew">FactoryMagic.java</span>     <span class="cm">// NEW — 싱글턴 + 팩토리 메서드 + AutoCloseable</span>
+└── <span class="f">SquareMain.java</span>       <span class="cm">// try-with-resources 사용</span>
+  </div>
+
+  <div class="split-card">
+    <div class="split-side java-side">
+      <div class="lang-label java"><span class="lang-dot"></span>Java — MagicException.java</div>
+      <div class="ds-title">커스텀 체크 예외 — extends Exception</div>
+      <div class="ds-sub">생성자 오버로딩 4종으로 다양한 사용 시나리오 지원</div>
+      <pre><span class="kw">public class</span> MagicException <span class="kw">extends</span> Exception {   <span class="cm">// 체크 예외 상속</span>
+    <span class="kw">public</span> MagicException() {
+        <span class="kw">this</span>(<span class="st">"이런마 방진 생성불가"</span>);      <span class="cm">// 생성자 위임</span>
+    }
+    <span class="kw">public</span> MagicException(String message) {
+        <span class="kw">super</span>(message + <span class="st">"형태의 마방진 생성 불가"</span>); <span class="cm">// 부모(Exception) 메시지 설정</span>
+    }
+    <span class="kw">public</span> MagicException(String message, Throwable cause) {
+        <span class="kw">super</span>(message, cause);                <span class="cm">// 원인 예외까지 함께 전달</span>
+    }
+    <span class="kw">public</span> MagicException(Throwable cause) { <span class="kw">super</span>(cause); }
+}</pre>
+      <div class="tag-row"><span class="tag java">extends Exception</span><span class="tag java">체크 예외</span></div>
+    </div>
+    <div class="split-side java-side" style="border-top-color:var(--muted2);">
+      <div class="lang-label" style="color:var(--muted);"><span class="lang-dot"></span>Java — FactoryMagic.java</div>
+      <div class="ds-title">싱글턴 + 팩토리 메서드 + AutoCloseable</div>
+      <div class="ds-sub">세 가지 패턴/문법이 한 클래스에 응축</div>
+      <pre><span class="kw">public class</span> FactoryMagic <span class="kw">implements</span> AutoCloseable {  <span class="cm">// try-with-resources 대상</span>
+    <span class="kw">private static</span> FactoryMagic ins;     <span class="cm">// ① 싱글턴: 유일한 인스턴스를 담는 static 필드</span>
+    <span class="kw">private</span> FactoryMagic() { }            <span class="cm">// ① 생성자를 private로 막아 외부의 new 금지</span>
+
+    <span class="kw">public static</span> FactoryMagic getInstence() {  <span class="cm">// ① 유일한 진입점</span>
+        <span class="kw">if</span> (ins == <span class="kw">null</span>) ins = <span class="kw">new</span> FactoryMagic();  <span class="cm">// 최초 1회만 생성(지연 초기화)</span>
+        <span class="kw">return</span> ins;
+    }
+    <span class="kw">public</span> IMagicSquare getMagicSquare(<span class="ty">int</span> n) <span class="kw">throws</span> MagicException {  <span class="cm">// ② 팩토리 메서드</span>
+        IMagicSquare im = <span class="kw">null</span>;
+        <span class="kw">if</span> (n &lt;= <span class="num">2</span>) {
+            <span class="kw">throw new</span> MagicException(<span class="st">"2보다 작은 수의 마장진은 "</span>);  <span class="cm">// 조건 위반시 예외 발생</span>
+        }
+        <span class="kw">if</span> (n % <span class="num">2</span> != <span class="num">0</span>)      im = <span class="kw">new</span> OddMagicSquare(n);
+        <span class="kw">else if</span> (n % <span class="num">4</span> == <span class="num">0</span>) im = <span class="kw">new</span> FourMagicSquare(n);
+        <span class="kw">else</span>                    im = <span class="kw">new</span> SixMagicSquare(n);
+        <span class="kw">return</span> im;   <span class="cm">// ② 어떤 구체 클래스를 만들지는 팩토리만 안다 → 클라이언트는 몰라도 됨</span>
+    }
+    <span class="kw">@Override</span>
+    <span class="kw">public void</span> close() <span class="kw">throws</span> Exception {  <span class="cm">// ③ AutoCloseable — try 블록 종료시 자동 호출</span>
+        System.out.<span class="fn">println</span>(<span class="st">"FactoryMagic End !!"</span>);
+    }
+}</pre>
+      <div class="tag-row"><span class="tag acc">Singleton</span><span class="tag acc">Factory Method</span><span class="tag acc">AutoCloseable</span></div>
+    </div>
+  </div>
+
+  <div class="split-card">
+    <div class="split-side java-side">
+      <div class="lang-label java"><span class="lang-dot"></span>Java — SquareMain.java</div>
+      <div class="ds-title">try-with-resources + 다중 catch</div>
+      <pre><span class="kw">public class</span> SquareMain {
+  <span class="kw">public static void</span> main(String[] args) {
+    <span class="ty">int</span> n = scann.<span class="fn">nextInt</span>();
+    <span class="kw">try</span> (FactoryMagic magicFactory = FactoryMagic.<span class="fn">getInstence</span>()) {  <span class="cm">// 괄호 안 자원은 블록 종료시 close() 자동호출</span>
+        IMagicSquare magic = magicFactory.<span class="fn">getMagicSquare</span>(n);  <span class="cm">// 팩토리에게 생성을 위임</span>
+        MagicPrint.<span class="fn">print</span>(magic);                            <span class="cm">// 다형성으로 모든 종류 출력</span>
+    } <span class="kw">catch</span> (MagicException e) {          <span class="cm">// 사용자 정의 예외를 구체적으로 처리</span>
+        System.out.<span class="fn">println</span>(e);
+    } <span class="kw">catch</span> (Exception e1) {              <span class="cm">// 나머지 예외 포괄 처리</span>
+    }
+  }
+}</pre>
+    </div>
+    <div class="split-side java-side" style="border-top-color:var(--muted2);">
+      <div class="lang-label" style="color:var(--muted);"><span class="lang-dot"></span>싱글턴 + 팩토리 메서드 패턴 요약</div>
+      <table class="ctbl" style="margin:0;">
+        <thead><tr><th>패턴</th><th>목적</th><th>이 코드의 구현</th></tr></thead>
+        <tbody>
+          <tr><td>Singleton</td><td>객체를 하나만 존재하게 강제</td><td>private 생성자 + static getInstence()</td></tr>
+          <tr><td>Factory Method</td><td>객체 생성 로직을 한 곳에 캡슐화</td><td>getMagicSquare(n) 안의 if-else 분기</td></tr>
+          <tr><td>커스텀 예외</td><td>비즈니스 규칙 위반을 타입으로 표현</td><td>MagicException extends Exception</td></tr>
+          <tr><td>자원 자동 해제</td><td>close() 호출 누락 방지</td><td>implements AutoCloseable + try(...)</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="viz">
+    <div class="viz-title">// UML — s120 클래스 다이어그램 (전체 완성형)</div>
+    <div class="graph-wrap">
+      <svg width="780" height="380" viewBox="0 0 780 380">
+        <rect x="300" y="10" width="190" height="56" rx="4" fill="#fdf4ff" stroke="#7c3aed" stroke-width="1.5"/>
+        <text x="395" y="26" text-anchor="middle" font-size="9.5" fill="#7c3aed">&lt;&lt;interface&gt;&gt;</text>
+        <text x="395" y="42" text-anchor="middle" font-size="11.5" font-weight="700" font-style="italic" fill="#5b21b6">IMagicSquare</text>
+        <text x="308" y="58" font-size="8.5" fill="#5b21b6">+ make() / print()</text>
+
+        <rect x="290" y="100" width="210" height="50" rx="4" fill="#fff" stroke="#0f172a" stroke-width="1.5"/>
+        <text x="395" y="116" text-anchor="middle" font-size="9.5" fill="#64748b" font-style="italic">&lt;&lt;abstract&gt;&gt;</text>
+        <text x="395" y="132" text-anchor="middle" font-size="11.5" font-weight="700" font-style="italic">MagicSquare</text>
+        <line x1="395" y1="100" x2="395" y2="66" stroke="#7c3aed" stroke-width="1.2" stroke-dasharray="4"/>
+        <polygon points="395,66 389,76 401,76" fill="#fff" stroke="#7c3aed" stroke-width="1.2"/>
+
+        <rect x="60" y="200" width="150" height="46" rx="4" fill="#fff" stroke="#d97706" stroke-width="1.4"/>
+        <text x="135" y="228" text-anchor="middle" font-size="10.5" font-weight="700" fill="#b45309">OddMagicSquare</text>
+        <rect x="280" y="200" width="150" height="46" rx="4" fill="#fff" stroke="#d97706" stroke-width="1.4"/>
+        <text x="355" y="228" text-anchor="middle" font-size="10.5" font-weight="700" fill="#b45309">FourMagicSquare</text>
+        <rect x="500" y="200" width="150" height="46" rx="4" fill="#fff" stroke="#d97706" stroke-width="1.4"/>
+        <text x="575" y="228" text-anchor="middle" font-size="10.5" font-weight="700" fill="#b45309">SixMagicSquare</text>
+
+        <line x1="135" y1="200" x2="360" y2="152" stroke="#0f172a" stroke-width="1.2"/>
+        <polygon points="360,152 349,148 350,159" fill="#fff" stroke="#0f172a" stroke-width="1.2"/>
+        <line x1="355" y1="200" x2="390" y2="152" stroke="#0f172a" stroke-width="1.2"/>
+        <polygon points="390,152 385,142 396,144" fill="#fff" stroke="#0f172a" stroke-width="1.2"/>
+        <line x1="575" y1="200" x2="425" y2="152" stroke="#0f172a" stroke-width="1.2"/>
+        <polygon points="425,152 415,148 417,159" fill="#fff" stroke="#0f172a" stroke-width="1.2"/>
+
+        <!-- FactoryMagic Singleton -->
+        <rect x="560" y="290" width="200" height="76" rx="4" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.5"/>
+        <text x="660" y="306" text-anchor="middle" font-size="9.5" fill="#16a34a">&lt;&lt;singleton&gt;&gt;</text>
+        <text x="660" y="322" text-anchor="middle" font-size="11.5" font-weight="700" fill="#15803d">FactoryMagic</text>
+        <text x="568" y="340" font-size="8.5" fill="#166534">- static ins / - FactoryMagic()</text>
+        <text x="568" y="352" font-size="8.5" fill="#166534">+ getInstence() / getMagicSquare(n)</text>
+
+        <line x1="620" y1="290" x2="460" y2="222" stroke="#16a34a" stroke-width="1.2" stroke-dasharray="4" marker-end="url(#arr3)"/>
+        <text x="470" y="270" font-size="8.5" fill="#16a34a">&lt;&lt;create&gt;&gt;</text>
+
+        <!-- MagicException -->
+        <rect x="40" y="290" width="180" height="60" rx="4" fill="#fef2f2" stroke="#dc2626" stroke-width="1.5"/>
+        <text x="130" y="308" text-anchor="middle" font-size="11.5" font-weight="700" fill="#b91c1c">MagicException</text>
+        <text x="48" y="326" font-size="8.5" fill="#991b1b">extends Exception</text>
+        <text x="48" y="340" font-size="8.5" fill="#991b1b">생성자 오버로딩 x4</text>
+        <line x1="240" y1="310" x2="558" y2="315" stroke="#94a3b8" stroke-width="1.1" stroke-dasharray="4" marker-end="url(#arr3)"/>
+        <text x="380" y="305" font-size="8" fill="#94a3b8">&lt;&lt;throws&gt;&gt;</text>
+
+        <defs><marker id="arr3" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="none" stroke="#94a3b8" stroke-width="1"/></marker></defs>
+      </svg>
+    </div>
+    <div class="uml-legend">FactoryMagic은 IMagicSquare 계열 객체를 <b>대신 생성</b>해 주는 책임을 갖고, 잘못된 값이 들어오면 MagicException을 던집니다. 클라이언트(SquareMain)는 구체 클래스 이름을 전혀 몰라도 됩니다.</div>
+  </div>
+
+  <div class="split-card">
+    <div class="split-side py-side">
+      <div class="lang-label py"><span class="lang-dot"></span>Python — magic_exception.py / factory_magic.py</div>
+      <div class="ds-title">커스텀 예외 + 싱글턴(__new__) + 컨텍스트 매니저</div>
+      <div class="ds-sub">try-with-resources는 Python의 with 문 + __enter__/__exit__로 대응</div>
+      <pre><span class="kw">class</span> MagicException(Exception):        <span class="cm"># 커스텀 예외 — Exception 상속</span>
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, message=<span class="st">"이런마 방진 생성불가"</span>):
+        <span class="fn">super</span>().<span class="fn">__init__</span>(f<span class="st">"{message}형태의 마방진 생성 불가"</span>)
+
+
+<span class="kw">class</span> FactoryMagic:
+    _instance = <span class="kw">None</span>                    <span class="cm"># ① 싱글턴: 클래스 변수에 유일 인스턴스 저장</span>
+
+    <span class="kw">def</span> <span class="fn">__new__</span>(cls):                  <span class="cm"># ① __new__를 오버라이딩해 생성 자체를 통제</span>
+        <span class="kw">if</span> cls._instance <span class="kw">is</span> <span class="kw">None</span>:
+            cls._instance = <span class="fn">super</span>().<span class="fn">__new__</span>(cls)
+        <span class="kw">return</span> cls._instance
+
+    <span class="kw">def</span> <span class="fn">get_magic_square</span>(self, n):        <span class="cm"># ② 팩토리 메서드</span>
+        <span class="kw">if</span> n &lt;= <span class="num">2</span>:
+            <span class="kw">raise</span> MagicException(<span class="st">"2보다 작은 수의 마장진은 "</span>)
+        <span class="kw">if</span> n % <span class="num">2</span> != <span class="num">0</span>:
+            <span class="kw">return</span> OddMagicSquare(n)
+        <span class="kw">elif</span> n % <span class="num">4</span> == <span class="num">0</span>:
+            <span class="kw">return</span> FourMagicSquare(n)
+        <span class="kw">else</span>:
+            <span class="kw">return</span> SixMagicSquare(n)
+
+    <span class="kw">def</span> <span class="fn">__enter__</span>(self):    <span class="cm"># ③ with 블록 시작 시 호출 (AutoCloseable의 진입부)</span>
+        <span class="kw">return</span> self
+
+    <span class="kw">def</span> <span class="fn">__exit__</span>(self, exc_type, exc_val, exc_tb):  <span class="cm"># ③ 블록 종료 시 자동 호출 = close()</span>
+        <span class="fn">print</span>(<span class="st">"FactoryMagic End !!"</span>)
+        <span class="kw">return</span> <span class="kw">False</span>       <span class="cm"># False = 예외를 삼키지 않고 그대로 전파</span>
+
+
+<span class="cm"># SquareMain 대응</span>
+n = <span class="fn">int</span>(<span class="fn">input</span>(<span class="st">"3이상의 정수 마방진을 입력하세요.\n"</span>))
+<span class="kw">try</span>:
+    <span class="kw">with</span> FactoryMagic() <span class="kw">as</span> factory:   <span class="cm"># with문 = try-with-resources 대응</span>
+        magic = factory.get_magic_square(n)
+        MagicPrint.print_magic(magic)
+<span class="kw">except</span> MagicException <span class="kw">as</span> e:         <span class="cm"># 커스텀 예외를 구체적으로 처리</span>
+    <span class="fn">print</span>(e)</pre>
+      <div class="tag-row"><span class="tag py">__new__ 싱글턴</span><span class="tag py">with / __enter__ / __exit__</span><span class="tag py">raise / except</span></div>
+    </div>
+    <div class="split-side py-side" style="border-top-color:var(--muted2);">
+      <div class="lang-label" style="color:var(--muted);"><span class="lang-dot"></span>Java ↔ Python 문법 대응 총정리</div>
+      <table class="ctbl" style="margin:0;">
+        <thead><tr><th>Java</th><th class="py">Python</th></tr></thead>
+        <tbody>
+          <tr><td>private 생성자로 싱글턴</td><td>__new__ 오버라이딩으로 싱글턴</td></tr>
+          <tr><td>throw new MagicException(...)</td><td>raise MagicException(...)</td></tr>
+          <tr><td>throws MagicException (선언 필수)</td><td>예외 선언 불필요 (모든 예외는 unchecked)</td></tr>
+          <tr><td>try (Resource r = ...) { }</td><td>with Resource() as r: </td></tr>
+          <tr><td>implements AutoCloseable + close()</td><td>__enter__ / __exit__ 매직 메서드</td></tr>
+          <tr><td>catch (MagicException e)</td><td>except MagicException as e:</td></tr>
+        </tbody>
+      </table>
+      <div class="note py" style="margin-top:12px;"><b>핵심 차이</b> Java의 체크 예외(throws 선언 강제)는 Python에 없습니다. Python은 모든 예외가 "un-checked"이므로 문서화나 타입 힌트로 대신 알려줘야 합니다.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ SUMMARY ============ -->
+<div class="algo-section" id="tab-summary">
+  <div class="sec-head">
+    <div class="sec-icon">📚</div>
+    <div>
+      <h2>패턴 · 문법 · UML 총정리</h2>
+      <p>6단계 전체를 관통하는 객체지향 설계 원칙과 디자인 패턴을 한 번에 복습합니다.</p>
+    </div>
+  </div>
+
+  <table class="ov-table" style="margin-bottom:24px;">
+    <thead><tr><th>단계</th><th>클래스 관계(UML)</th><th>핵심 원칙</th></tr></thead>
+    <tbody>
+      <tr><td>s115~s116</td><td>관계 없음 (독립 클래스)</td><td>캡슐화만 존재, 재사용 구조 없음</td></tr>
+      <tr><td>s117</td><td>의존(Dependency, &lt;&lt;use&gt;&gt;)</td><td>필요한 순간에만 다른 객체를 생성해 사용</td></tr>
+      <tr><td>s118</td><td>상속(Generalization) + 의존</td><td>DRY 원칙, 업캐스팅 다형성, 동적 바인딩</td></tr>
+      <tr><td>s119</td><td>실현(Realization) + 상속</td><td>SOLID의 "인터페이스에 의존하라"(DIP) 원칙</td></tr>
+      <tr><td>s120</td><td>실현 + 상속 + &lt;&lt;create&gt;&gt;</td><td>생성 책임 분리(SRP), 싱글턴, 팩토리 메서드</td></tr>
+    </tbody>
+  </table>
+
+  <div class="viz">
+    <div class="viz-title">// 디자인 패턴 두 가지 상세 설명</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+      <div style="background:#fff;border:1px solid var(--border);border-radius:8px;padding:16px;">
+        <div style="font-weight:800;font-size:14px;color:#15803d;margin-bottom:6px;">🔒 Singleton Pattern</div>
+        <div style="font-size:12px;line-height:1.7;color:var(--text);">
+          애플리케이션 전체에서 <b>단 하나의 인스턴스만</b> 존재하도록 보장하는 생성 패턴입니다.<br><br>
+          <b>구현 3요소</b><br>
+          1) 생성자를 private(Java) / __new__ 오버라이딩(Python)으로 외부 차단<br>
+          2) 자기 자신을 참조하는 static/class 변수(ins, _instance)<br>
+          3) 유일한 진입점 static 메서드(getInstence())<br><br>
+          <b>이 프로젝트에서 쓴 이유</b><br>
+          마방진을 만드는 "공장"은 상태를 갖지 않는 순수 로직이므로 여러 개를 만들 필요가 없고, 하나만 존재해도 충분합니다.
+        </div>
+      </div>
+      <div style="background:#fff;border:1px solid var(--border);border-radius:8px;padding:16px;">
+        <div style="font-weight:800;font-size:14px;color:#7e22ce;margin-bottom:6px;">🏭 Factory Method Pattern</div>
+        <div style="font-size:12px;line-height:1.7;color:var(--text);">
+          객체 생성 코드를 별도 메서드/클래스로 옮겨, <b>"무엇을 만들지 결정하는 로직"</b>과 <b>"만든 객체를 사용하는 로직"</b>을 분리하는 생성 패턴입니다.<br><br>
+          <b>이 프로젝트의 구현</b><br>
+          getMagicSquare(n) 메서드가 n의 특성(홀수/4배수/6n+2)을 보고 Odd/Four/Six 중 어떤 것을 new할지 스스로 결정합니다.<br><br>
+          <b>이점</b><br>
+          SquareMain은 OddMagicSquare라는 이름을 몰라도 됩니다 — new 키워드가 SquareMain에서 FactoryMagic 내부로 이동했기 때문입니다(제어의 역전, IoC의 축소판).
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="viz">
+    <div class="viz-title">// UML 관계 표기법 요약 사전</div>
+    <div class="graph-wrap">
+      <svg width="760" height="150" viewBox="0 0 760 150">
+        <line x1="20" y1="30" x2="90" y2="30" stroke="#0f172a" stroke-width="1.4"/>
+        <polygon points="90,30 78,24 78,36" fill="#fff" stroke="#0f172a" stroke-width="1.3"/>
+        <text x="100" y="34" font-size="11">상속(Generalization) — extends / class X(Y)</text>
+
+        <line x1="20" y1="65" x2="90" y2="65" stroke="#7c3aed" stroke-width="1.4" stroke-dasharray="4"/>
+        <polygon points="90,65 78,59 78,71" fill="#fff" stroke="#7c3aed" stroke-width="1.3"/>
+        <text x="100" y="69" font-size="11">실현(Realization) — implements / ABC 상속</text>
+
+        <line x1="20" y1="100" x2="90" y2="100" stroke="#94a3b8" stroke-width="1.2" stroke-dasharray="4" marker-end="url(#s1)"/>
+        <text x="100" y="104" font-size="11">의존(Dependency) — 메서드 안에서 잠깐 생성해 사용</text>
+
+        <line x1="420" y1="30" x2="490" y2="30" stroke="#16a34a" stroke-width="1.2" stroke-dasharray="4" marker-end="url(#s1)"/>
+        <text x="500" y="34" font-size="11">생성(&lt;&lt;create&gt;&gt;) — 팩토리가 다른 객체를 만들어냄</text>
+
+        <line x1="420" y1="65" x2="490" y2="65" stroke="#2563eb" stroke-width="1.4"/>
+        <text x="500" y="69" font-size="11">연관(Association) — 필드로 다른 객체를 오래 보유(이 프로젝트엔 없음)</text>
+
+        <defs><marker id="s1" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="none" stroke="#94a3b8" stroke-width="1"/></marker></defs>
+      </svg>
+    </div>
+  </div>
+
+  <table class="ctbl">
+    <thead><tr><th>Java 문법</th><th class="py">Python 대응</th><th>등장 단계</th></tr></thead>
+    <tbody>
+      <tr><td>private / protected / public</td><td>_ 밑줄 컨벤션 (강제 없음)</td><td>전 단계</td></tr>
+      <tr><td>생성자 오버로딩 (여러 개 정의)</td><td>기본값 매개변수 하나로 통합</td><td>s115~</td></tr>
+      <tr><td>class Child extends Parent</td><td>class Child(Parent):</td><td>s118</td></tr>
+      <tr><td>super(...) / super.method()</td><td>super().__init__(...) / super().method()</td><td>s118</td></tr>
+      <tr><td>@Override</td><td>표시 문법 없음(관례)</td><td>s118</td></tr>
+      <tr><td>interface + implements</td><td>ABC + 상속</td><td>s119</td></tr>
+      <tr><td>abstract class / abstract method</td><td>ABC + @abstractmethod</td><td>s119</td></tr>
+      <tr><td>static 필드/메서드로 싱글턴</td><td>클래스 변수 + __new__</td><td>s120</td></tr>
+      <tr><td>사용자 정의 Exception 상속</td><td>Exception 상속(동일)</td><td>s120</td></tr>
+      <tr><td>try-with-resources / AutoCloseable</td><td>with문 / __enter__·__exit__</td><td>s120</td></tr>
+    </tbody>
+  </table>
+
+  <div class="note acc">
+    <b>전체 요약</b>
+    이 6단계는 "실무에서 코드가 커질 때 왜 상속·다형성·추상화·디자인 패턴이 필요한가"를 아주 작은 예제(마방진)로 압축해서 보여줍니다. 처음엔 눈에 안 보이던 중복(s115~s117)이 상속으로 사라지고(s118), 인터페이스로 결합이 느슨해지고(s119), 마지막엔 객체 생성 책임까지 분리되어(s120) 유지보수가 쉬운 구조로 완성됩니다. Java와 Python은 문법은 다르지만 이 설계 사고방식 자체는 완전히 동일하게 적용됩니다.
+  </div>
+</div>
+
+</div><!-- end main -->
+
+<script>
+function showTab(name, btn) {
+  document.querySelectorAll('.algo-section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
+</body>
+</html>

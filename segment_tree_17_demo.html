@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Segment Tree / Segment Tree + Lazy (17개 예제)</title>
+  <style>
+    :root{
+      --bg:#0f172a;
+      --panel:#111827;
+      --panel2:#1f2937;
+      --text:#e5e7eb;
+      --muted:#94a3b8;
+      --line:#334155;
+      --primary:#38bdf8;
+      --green:#22c55e;
+      --yellow:#f59e0b;
+      --red:#ef4444;
+      --violet:#8b5cf6;
+      --pink:#ec4899;
+      --cyan:#06b6d4;
+      --card:#0b1220;
+      --shadow: 0 8px 20px rgba(0,0,0,.25);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: Inter, Pretendard, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background:linear-gradient(180deg,#020617 0%, #0f172a 100%);
+      color:var(--text);
+      line-height:1.55;
+    }
+    header{
+      padding:28px 20px 16px;
+      border-bottom:1px solid #1e293b;
+      background:rgba(2,6,23,.75);
+      position:sticky;
+      top:0;
+      z-index:20;
+      backdrop-filter: blur(8px);
+    }
+    h1,h2,h3{margin:.2em 0 .4em}
+    h1{font-size:28px}
+    h2{font-size:22px;margin-top:26px}
+    h3{font-size:18px;margin-top:18px}
+    .sub{color:var(--muted)}
+    .container{
+      max-width:1400px;
+      margin:0 auto;
+      padding:20px;
+    }
+    .grid{
+      display:grid;
+      grid-template-columns: 340px 1fr;
+      gap:18px;
+      align-items:start;
+    }
+    .card{
+      background:linear-gradient(180deg, rgba(17,24,39,.92), rgba(11,18,32,.96));
+      border:1px solid #1f2937;
+      border-radius:16px;
+      box-shadow:var(--shadow);
+      padding:16px;
+    }
+    .sticky{
+      position:sticky;
+      top:104px;
+    }
+    .controls label{
+      display:block;
+      margin-bottom:8px;
+      color:#cbd5e1;
+      font-size:14px;
+      font-weight:600;
+    }
+    textarea, input, select{
+      width:100%;
+      background:#020617;
+      color:var(--text);
+      border:1px solid #334155;
+      border-radius:12px;
+      padding:10px 12px;
+      outline:none;
+      font-size:14px;
+    }
+    textarea{
+      min-height:72px;
+      resize:vertical;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+    .row{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+    }
+    .row3{
+      display:grid;
+      grid-template-columns:1fr 1fr 1fr;
+      gap:10px;
+    }
+    .btns{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin-top:10px;
+    }
+    button{
+      border:0;
+      border-radius:12px;
+      padding:10px 14px;
+      cursor:pointer;
+      color:#020617;
+      font-weight:700;
+      background:var(--primary);
+      box-shadow:var(--shadow);
+    }
+    button.secondary{
+      background:#cbd5e1;
+      color:#0f172a;
+    }
+    button.warn{
+      background:var(--yellow);
+      color:#111827;
+    }
+    button.success{
+      background:var(--green);
+      color:#052e16;
+    }
+    button.danger{
+      background:var(--red);
+      color:#fff;
+    }
+    .muted{color:var(--muted)}
+    .note{
+      border-left:4px solid var(--primary);
+      background:rgba(56,189,248,.08);
+      padding:10px 12px;
+      border-radius:10px;
+      margin:10px 0;
+      color:#dbeafe;
+    }
+    .legend{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-top:10px;
+      font-size:13px;
+    }
+    .legend span{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      background:#0b1220;
+      border:1px solid #1f2937;
+      padding:6px 10px;
+      border-radius:999px;
+    }
+    .dot{
+      width:12px;height:12px;border-radius:999px;display:inline-block;
+    }
+    .section{
+      margin-bottom:18px;
+    }
+    .array-wrap{
+      overflow-x:auto;
+      padding-bottom:6px;
+    }
+    .array-grid{
+      display:grid;
+      grid-auto-flow:column;
+      grid-auto-columns:minmax(58px,58px);
+      gap:8px;
+      align-items:end;
+      margin-top:12px;
+    }
+    .cell{
+      text-align:center;
+    }
+    .bar{
+      width:58px;
+      border-radius:12px 12px 8px 8px;
+      background:linear-gradient(180deg, #38bdf8, #0369a1);
+      display:flex;
+      align-items:flex-end;
+      justify-content:center;
+      color:white;
+      font-weight:700;
+      transition:.25s ease;
+      border:2px solid rgba(255,255,255,.08);
+    }
+    .bar.highlight{
+      background:linear-gradient(180deg, #f59e0b, #b45309);
+      transform:translateY(-2px);
+    }
+    .bar.range{
+      background:linear-gradient(180deg, #22c55e, #15803d);
+    }
+    .bar.changed{
+      background:linear-gradient(180deg, #ec4899, #be185d);
+    }
+    .idx{
+      color:#94a3b8;
+      font-size:12px;
+      margin-top:4px;
+    }
+    .val{
+      margin-top:6px;
+      font-weight:700;
+    }
+    .tree-panel{
+      overflow:auto;
+      border:1px solid #1f2937;
+      border-radius:16px;
+      background:radial-gradient(circle at top, rgba(30,41,59,.35), rgba(2,6,23,.2));
+      padding:12px;
+    }
+    svg{
+      width:100%;
+      height:auto;
+      display:block;
+      min-height:700px;
+    }
+    .log{
+      max-height:420px;
+      overflow:auto;
+      background:#020617;
+      border:1px solid #1f2937;
+      border-radius:12px;
+      padding:10px 12px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size:13px;
+      white-space:pre-wrap;
+    }
+    .tabs{
+      display:flex;
+      gap:8px;
+      margin-bottom:12px;
+      flex-wrap:wrap;
+    }
+    .tab{
+      background:#0b1220;
+      color:#cbd5e1;
+      border:1px solid #334155;
+      border-radius:999px;
+      padding:8px 12px;
+      cursor:pointer;
+      user-select:none;
+    }
+    .tab.active{
+      background:var(--primary);
+      color:#082f49;
+      border-color:transparent;
+      font-weight:800;
+    }
+    .hidden{display:none}
+    .stepbox{
+      display:grid;
+      grid-template-columns: 1fr auto;
+      gap:12px;
+      align-items:center;
+      margin:10px 0;
+    }
+    .pill{
+      display:inline-block;
+      font-size:12px;
+      padding:3px 8px;
+      border-radius:999px;
+      background:#0b1220;
+      border:1px solid #334155;
+      color:#cbd5e1;
+    }
+    code{
+      background:#020617;
+      border:1px solid #1f2937;
+      border-radius:8px;
+      padding:1px 6px;
+    }
+    .small{font-size:13px}
+    .table{
+      width:100%;
+      border-collapse:collapse;
+      font-size:14px;
+    }
+    .table th, .table td{
+      border-bottom:1px solid #1f2937;
+      padding:8px 10px;
+      text-align:left;
+      vertical-align:top;
+    }
+    .table th{color:#cbd5e1;background:#0b1220}
+    .ok{color:#86efac}
+    .warntext{color:#fcd34d}
+    .err{color:#fca5a5}
+    @media (max-width: 1050px){
+      .grid{grid-template-columns:1fr}
+      .sticky{position:relative;top:auto}
+      svg{min-height:560px}
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Segment Tree / Segment Tree + Lazy Propagation</h1>
+    <div class="sub">원소 개수 <b>17개</b> 예제로, 트리와 단계별 과정을 그림으로 보여주는 인터랙티브 HTML</div>
+  </header>
+
+  <div class="container">
+    <div class="grid">
+      <aside class="card sticky controls">
+        <h2>설정</h2>
+        <label>초기 배열 (정수 17개, 쉼표로 구분)</label>
+        <textarea id="arrInput">5, 8, 6, 3, 2, 7, 2, 6, 4, 9, 1, 5, 8, 3, 7, 4, 6</textarea>
+
+        <div class="note small">
+          예제는 합(sum) 세그먼트 트리입니다.<br/>
+          인덱스는 <b>0 ~ 16</b> 입니다.
+        </div>
+
+        <div class="btns">
+          <button class="success" id="buildBtn">트리 만들기</button>
+          <button class="secondary" id="exampleBtn">기본 예제로 복원</button>
+        </div>
+
+        <hr style="border-color:#1f2937;margin:16px 0">
+
+        <h3>탭 선택</h3>
+        <div class="tabs">
+          <div class="tab active" data-tab="normal">Segment Tree</div>
+          <div class="tab" data-tab="lazy">Segment Tree + Lazy</div>
+        </div>
+
+        <div id="normalControls">
+          <h3>기본 Segment Tree 작업</h3>
+          <label>구간 합 쿼리 [l, r]</label>
+          <div class="row">
+            <input type="number" id="qL" min="0" max="16" value="3">
+            <input type="number" id="qR" min="0" max="16" value="11">
+          </div>
+          <div class="btns">
+            <button id="queryBtn">쿼리 실행</button>
+          </div>
+
+          <label style="margin-top:12px">점 업데이트: arr[idx] = value</label>
+          <div class="row">
+            <input type="number" id="uIdx" min="0" max="16" value="8">
+            <input type="number" id="uVal" value="12">
+          </div>
+          <div class="btns">
+            <button class="warn" id="updateBtn">점 업데이트 실행</button>
+          </div>
+        </div>
+
+        <div id="lazyControls" class="hidden">
+          <h3>Lazy Propagation 작업</h3>
+          <label>구간 덧셈 업데이트: [l, r]에 +delta</label>
+          <div class="row3">
+            <input type="number" id="lzUL" min="0" max="16" value="4">
+            <input type="number" id="lzUR" min="0" max="16" value="13">
+            <input type="number" id="lzDelta" value="3">
+          </div>
+          <div class="btns">
+            <button class="warn" id="lazyUpdateBtn">구간 업데이트 실행</button>
+          </div>
+
+          <label style="margin-top:12px">구간 합 쿼리 [l, r]</label>
+          <div class="row">
+            <input type="number" id="lzQL" min="0" max="16" value="5">
+            <input type="number" id="lzQR" min="0" max="16" value="12">
+          </div>
+          <div class="btns">
+            <button id="lazyQueryBtn">Lazy 쿼리 실행</button>
+          </div>
+        </div>
+
+        <hr style="border-color:#1f2937;margin:16px 0">
+
+        <h3>애니메이션/설명</h3>
+        <div class="stepbox">
+          <div class="small muted">단계별 설명과 트리 강조를 로그에 남깁니다.</div>
+          <div><span class="pill">17개 예제</span></div>
+        </div>
+        <div class="btns">
+          <button class="secondary" id="showBuildStepsBtn">빌드 과정 보기</button>
+          <button class="danger" id="clearLogBtn">로그 지우기</button>
+        </div>
+
+        <div class="legend">
+          <span><i class="dot" style="background:#38bdf8"></i>일반 노드</span>
+          <span><i class="dot" style="background:#f59e0b"></i>현재 탐색/갱신 중</span>
+          <span><i class="dot" style="background:#22c55e"></i>쿼리에 완전 포함</span>
+          <span><i class="dot" style="background:#ec4899"></i>값이 변경됨</span>
+          <span><i class="dot" style="background:#8b5cf6"></i>lazy 값 존재</span>
+        </div>
+      </aside>
+
+      <main>
+        <section class="card section">
+          <h2>1. 배열 (17개)</h2>
+          <div class="sub">
+            세그먼트 트리는 배열을 구간별로 반씩 나누며, 각 노드에 구간 합을 저장합니다.
+            원소가 17개처럼 <b>2의 거듭제곱이 아니어도</b> 문제없이 동작합니다.
+          </div>
+          <div class="array-wrap">
+            <div id="arrayView" class="array-grid"></div>
+          </div>
+        </section>
+
+        <section class="card section">
+          <h2>2. 왜 17개 예제가 재미있나?</h2>
+          <table class="table">
+            <tr>
+              <th>포인트</th>
+              <th>설명</th>
+            </tr>
+            <tr>
+              <td>딱 떨어지지 않는 길이</td>
+              <td>16이나 32 같은 2의 거듭제곱이 아니라서, 트리의 마지막 층이 고르게 차지 않습니다.</td>
+            </tr>
+            <tr>
+              <td>구간 분할 관찰</td>
+              <td><code>[0,16]</code> → <code>[0,8]</code> + <code>[9,16]</code> 처럼 나뉘고, 다시 재귀적으로 분할됩니다.</td>
+            </tr>
+            <tr>
+              <td>Lazy 설명에 좋음</td>
+              <td>큰 범위와 작은 범위가 섞여 있어, “지금 당장 자식까지 다 내려가지 않고 lazy에 미뤄두는 이유”가 잘 드러납니다.</td>
+            </tr>
+          </table>
+        </section>
+
+        <section class="card section">
+          <h2>3. 트리 그림</h2>
+          <div class="sub">
+            각 노드는 <b>구간 [l, r]</b> 과 <b>합(sum)</b> 을 보여줍니다.
+            Lazy 탭에서는 <b>lazy</b> 값도 함께 표시됩니다.
+          </div>
+          <div class="tree-panel">
+            <svg id="treeSvg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMin meet"></svg>
+          </div>
+        </section>
+
+        <section class="card section">
+          <h2>4. 설명 로그</h2>
+          <div id="log" class="log"></div>
+        </section>
+
+        <section class="card section">
+          <h2>5. 핵심 설명</h2>
+
+          <h3>Segment Tree란?</h3>
+          <p>
+            Segment Tree는 배열의 구간 정보를 빠르게 처리하기 위한 자료구조입니다.
+            예를 들어 “<code>[l, r]</code> 구간의 합”을 여러 번 물어보거나,
+            배열 원소 값이 바뀌는 상황에서 매우 유용합니다.
+          </p>
+          <p>
+            각 노드는 배열의 어떤 구간을 담당합니다.
+            루트는 전체 구간 <code>[0,16]</code> 을 담당하고,
+            자식으로 갈수록 구간이 반씩 쪼개집니다.
+            리프(leaf)는 최종적으로 원소 1개짜리 구간, 즉 <code>[i,i]</code> 입니다.
+          </p>
+
+          <h3>왜 빠른가?</h3>
+          <p>
+            구간 합 쿼리 때 전체 배열을 다 보지 않고,
+            필요한 구간과 관련된 노드들만 방문하기 때문입니다.
+            그래서 쿼리도 대체로 <b>O(log N)</b>,
+            점 업데이트도 <b>O(log N)</b> 입니다.
+          </p>
+
+          <h3>Lazy Propagation이란?</h3>
+          <p>
+            기본 Segment Tree에서 <b>구간 전체를 한꺼번에 업데이트</b>하려고 하면,
+            해당 구간 아래의 모든 자식으로 계속 내려가야 해서 비효율적일 수 있습니다.
+          </p>
+          <p>
+            Lazy Propagation은
+            “이 구간 전체에 나중에 적용해야 할 값이 있음”을
+            <b>lazy 배열</b>에 저장해 두고,
+            정말 필요할 때만 아래로 전파합니다.
+          </p>
+
+          <div class="note">
+            예를 들어 <code>[4,13]</code> 구간에 모두 <code>+3</code> 을 더할 때,
+            어떤 노드가 담당하는 구간이 이 범위에 완전히 포함되면
+            그 노드의 sum만 즉시 수정하고,
+            자식들로의 전파는 <b>lazy</b>에 “미뤄둘 수” 있습니다.
+          </div>
+
+          <h3>시간 복잡도</h3>
+          <table class="table">
+            <tr>
+              <th>작업</th>
+              <th>기본 Segment Tree</th>
+              <th>Lazy Segment Tree</th>
+            </tr>
+            <tr>
+              <td>빌드</td>
+              <td>O(N)</td>
+              <td>O(N)</td>
+            </tr>
+            <tr>
+              <td>구간 합 쿼리</td>
+              <td>O(log N)</td>
+              <td>O(log N)</td>
+            </tr>
+            <tr>
+              <td>점 업데이트</td>
+              <td>O(log N)</td>
+              <td>O(log N)</td>
+            </tr>
+            <tr>
+              <td>구간 업데이트</td>
+              <td>비효율적일 수 있음</td>
+              <td>O(log N)</td>
+            </tr>
+          </table>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    const DEFAULT_ARR = [5,8,6,3,2,7,2,6,4,9,1,5,8,3,7,4,6];
+
+    let currentTab = 'normal';
+    let arr = [...DEFAULT_ARR];
+
+    const state = {
+      normal: {
+        tree: [],
+        nodes: [],
+      },
+      lazy: {
+        tree: [],
+        lazy: [],
+        nodes: [],
+      },
+      highlight: {
+        activeNodes: new Set(),
+        fullNodes: new Set(),
+        changedNodes: new Set(),
+        lazyNodes: new Set(),
+        activeRange: null,
+        changedIndices: new Set()
+      }
+    };
+
+    const arrInput = document.getElementById('arrInput');
+    const arrayView = document.getElementById('arrayView');
+    const treeSvg = document.getElementById('treeSvg');
+    const logEl = document.getElementById('log');
+
+    function log(msg){
+      const time = new Date().toLocaleTimeString();
+      logEl.textContent += `[${time}] ${msg}\n`;
+      logEl.scrollTop = logEl.scrollHeight;
+    }
+
+    function clearHighlights(){
+      state.highlight.activeNodes.clear();
+      state.highlight.fullNodes.clear();
+      state.highlight.changedNodes.clear();
+      state.highlight.lazyNodes.clear();
+      state.highlight.activeRange = null;
+      state.highlight.changedIndices.clear();
+    }
+
+    function parseArrayInput(){
+      const nums = arrInput.value.split(',').map(s=>s.trim()).filter(Boolean).map(Number);
+      if(nums.length !== 17 || nums.some(v=>Number.isNaN(v))){
+        alert('정수 17개를 정확히 입력해주세요. 예: 5, 8, 6, ...');
+        return null;
+      }
+      return nums;
+    }
+
+    function renderArray(){
+      arrayView.innerHTML = '';
+      const maxVal = Math.max(...arr, 1);
+      arr.forEach((v, i) => {
+        const cell = document.createElement('div');
+        cell.className = 'cell';
+
+        const bar = document.createElement('div');
+        let cls = 'bar';
+        if (state.highlight.changedIndices.has(i)) cls += ' changed';
+        else if (state.highlight.activeRange && i >= state.highlight.activeRange[0] && i <= state.highlight.activeRange[1]) cls += ' range';
+        bar.className = cls;
+        bar.style.height = (40 + (v / maxVal) * 110) + 'px';
+        bar.textContent = v;
+
+        const idx = document.createElement('div');
+        idx.className = 'idx';
+        idx.textContent = `idx ${i}`;
+
+        const val = document.createElement('div');
+        val.className = 'val';
+        val.textContent = v;
+
+        cell.appendChild(bar);
+        cell.appendChild(idx);
+        cell.appendChild(val);
+        arrayView.appendChild(cell);
+      });
+    }
+
+    function buildNormal(){
+      state.normal.tree = Array(4 * arr.length).fill(0);
+      state.normal.nodes = [];
+
+      function dfs(node, l, r, depth=0, parent=null){
+        if(l === r){
+          state.normal.tree[node] = arr[l];
+          state.normal.nodes.push({node,l,r,depth,parent});
+          return state.normal.tree[node];
+        }
+        const mid = Math.floor((l+r)/2);
+        const left = dfs(node*2, l, mid, depth+1, node);
+        const right = dfs(node*2+1, mid+1, r, depth+1, node);
+        state.normal.tree[node] = left + right;
+        state.normal.nodes.push({node,l,r,depth,parent});
+        return state.normal.tree[node];
+      }
+      dfs(1,0,arr.length-1);
+    }
+
+    function buildLazy(){
+      state.lazy.tree = Array(4 * arr.length).fill(0);
+      state.lazy.lazy = Array(4 * arr.length).fill(0);
+      state.lazy.nodes = [];
+
+      function dfs(node, l, r, depth=0, parent=null){
+        if(l === r){
+          state.lazy.tree[node] = arr[l];
+          state.lazy.nodes.push({node,l,r,depth,parent});
+          return state.lazy.tree[node];
+        }
+        const mid = Math.floor((l+r)/2);
+        const left = dfs(node*2, l, mid, depth+1, node);
+        const right = dfs(node*2+1, mid+1, r, depth+1, node);
+        state.lazy.tree[node] = left + right;
+        state.lazy.nodes.push({node,l,r,depth,parent});
+        return state.lazy.tree[node];
+      }
+      dfs(1,0,arr.length-1);
+    }
+
+    function getCurrentNodes(){
+      return currentTab === 'normal' ? state.normal.nodes : state.lazy.nodes;
+    }
+
+    function getCurrentTree(){
+      return currentTab === 'normal' ? state.normal.tree : state.lazy.tree;
+    }
+
+    function renderTree(){
+      treeSvg.innerHTML = '';
+      const nodes = getCurrentNodes();
+      const tree = getCurrentTree();
+      const lazy = state.lazy.lazy;
+
+      const levels = {};
+      nodes.forEach(n=>{
+        if(!levels[n.depth]) levels[n.depth] = [];
+        levels[n.depth].push(n);
+      });
+      Object.values(levels).forEach(level => level.sort((a,b)=>a.l-b.l));
+
+      const pos = {};
+      const maxDepth = Math.max(...nodes.map(n=>n.depth), 0);
+      const width = 1600;
+      const topY = 50;
+      const vGap = 130;
+
+      for(let d=0; d<=maxDepth; d++){
+        const level = levels[d] || [];
+        const count = level.length;
+        level.forEach((n, idx)=>{
+          const x = (width / (count + 1)) * (idx + 1);
+          const y = topY + d * vGap;
+          pos[n.node] = {x,y};
+        });
+      }
+
+      nodes.forEach(n=>{
+        if(n.parent && pos[n.parent] && pos[n.node]){
+          const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+          line.setAttribute('x1', pos[n.parent].x);
+          line.setAttribute('y1', pos[n.parent].y + 28);
+          line.setAttribute('x2', pos[n.node].x);
+          line.setAttribute('y2', pos[n.node].y - 28);
+          line.setAttribute('stroke', '#475569');
+          line.setAttribute('stroke-width', '2');
+          treeSvg.appendChild(line);
+        }
+      });
+
+      nodes.forEach(n=>{
+        const {x,y} = pos[n.node];
+        const g = document.createElementNS('http://www.w3.org/2000/svg','g');
+
+        let fill = '#38bdf8';
+        let stroke = '#e0f2fe';
+        if(state.highlight.lazyNodes.has(n.node) || (currentTab==='lazy' && lazy[n.node] !== 0)){
+          fill = '#8b5cf6';
+          stroke = '#ede9fe';
+        }
+        if(state.highlight.fullNodes.has(n.node)){
+          fill = '#22c55e';
+          stroke = '#dcfce7';
+        }
+        if(state.highlight.changedNodes.has(n.node)){
+          fill = '#ec4899';
+          stroke = '#fce7f3';
+        }
+        if(state.highlight.activeNodes.has(n.node)){
+          fill = '#f59e0b';
+          stroke = '#fffbeb';
+        }
+
+        const rect = document.createElementNS('http://www.w3.org/2000/svg','rect');
+        rect.setAttribute('x', x-70);
+        rect.setAttribute('y', y-34);
+        rect.setAttribute('width', 140);
+        rect.setAttribute('height', currentTab==='lazy' ? 78 : 64);
+        rect.setAttribute('rx', 14);
+        rect.setAttribute('fill', fill);
+        rect.setAttribute('stroke', stroke);
+        rect.setAttribute('stroke-width', '2.5');
+        g.appendChild(rect);
+
+        const t1 = document.createElementNS('http://www.w3.org/2000/svg','text');
+        t1.setAttribute('x', x);
+        t1.setAttribute('y', y-8);
+        t1.setAttribute('text-anchor', 'middle');
+        t1.setAttribute('fill', '#06283D');
+        t1.setAttribute('font-size', '16');
+        t1.setAttribute('font-weight', '800');
+        t1.textContent = `[${n.l}, ${n.r}]`;
+        g.appendChild(t1);
+
+        const t2 = document.createElementNS('http://www.w3.org/2000/svg','text');
+        t2.setAttribute('x', x);
+        t2.setAttribute('y', y+14);
+        t2.setAttribute('text-anchor', 'middle');
+        t2.setAttribute('fill', '#082f49');
+        t2.setAttribute('font-size', '15');
+        t2.setAttribute('font-weight', '700');
+        t2.textContent = `sum = ${tree[n.node]}`;
+        g.appendChild(t2);
+
+        if(currentTab === 'lazy'){
+          const t3 = document.createElementNS('http://www.w3.org/2000/svg','text');
+          t3.setAttribute('x', x);
+          t3.setAttribute('y', y+34);
+          t3.setAttribute('text-anchor', 'middle');
+          t3.setAttribute('fill', '#faf5ff');
+          t3.setAttribute('font-size', '13');
+          t3.setAttribute('font-weight', '800');
+          t3.textContent = `lazy = ${lazy[n.node]}`;
+          g.appendChild(t3);
+        }
+
+        const small = document.createElementNS('http://www.w3.org/2000/svg','text');
+        small.setAttribute('x', x);
+        small.setAttribute('y', y - (currentTab==='lazy' ? 44 : 42));
+        small.setAttribute('text-anchor', 'middle');
+        small.setAttribute('fill', '#e2e8f0');
+        small.setAttribute('font-size', '11');
+        small.setAttribute('font-weight', '700');
+        small.textContent = `node ${n.node}`;
+        g.appendChild(small);
+
+        treeSvg.appendChild(g);
+      });
+    }
+
+    function rebuildAll(){
+      buildNormal();
+      buildLazy();
+      clearHighlights();
+      renderArray();
+      renderTree();
+      log(`트리 생성 완료. 전체 합 = ${arr.reduce((a,b)=>a+b,0)}`);
+    }
+
+    function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
+
+    async function showBuildSteps(){
+      clearHighlights();
+      renderArray();
+      renderTree();
+      log('빌드 과정 설명 시작');
+      log('루트 노드는 전체 구간 [0,16]을 담당한다.');
+      await sleep(500);
+
+      const order = [
+        [1,0,16],[2,0,8],[4,0,4],[8,0,2],[16,0,1],[32,0,0],[33,1,1],[17,2,2],[9,3,4],[18,3,3],[19,4,4],
+        [5,5,8],[10,5,6],[20,5,5],[21,6,6],[11,7,8],[22,7,7],[23,8,8],
+        [3,9,16],[6,9,12],[12,9,10],[24,9,9],[25,10,10],[13,11,12],[26,11,11],[27,12,12],
+        [7,13,16],[14,13,14],[28,13,13],[29,14,14],[15,15,16],[30,15,15],[31,16,16]
+      ];
+
+      for(const [node,l,r] of order){
+        clearHighlights();
+        state.highlight.activeNodes.add(node);
+        if(l===r){
+          state.highlight.changedIndices.add(l);
+          log(`리프 node ${node}: [${l},${r}] => arr[${l}] = ${arr[l]}`);
+        }else{
+          log(`내부 node ${node}: [${l},${r}] 구간은 자식 구간들의 합으로 계산된다.`);
+        }
+        renderArray();
+        renderTree();
+        await sleep(280);
+      }
+
+      clearHighlights();
+      renderArray();
+      renderTree();
+      log('빌드 과정 종료');
+    }
+
+    async function normalQuery(l, r){
+      if(l > r) [l,r] = [r,l];
+      clearHighlights();
+      state.highlight.activeRange = [l,r];
+      renderArray();
+      renderTree();
+
+      log(`기본 Segment Tree 쿼리 시작: 합([${l},${r}])`);
+      const tree = state.normal.tree;
+
+      async function query(node, nl, nr){
+        state.highlight.activeNodes.add(node);
+        renderTree();
+        await sleep(350);
+
+        if(r < nl || nr < l){
+          log(`node ${node} [${nl},${nr}] 는 쿼리와 겹치지 않음 => 0 반환`);
+          state.highlight.activeNodes.delete(node);
+          renderTree();
+          await sleep(220);
+          return 0;
+        }
+
+        if(l <= nl && nr <= r){
+          state.highlight.fullNodes.add(node);
+          renderTree();
+          log(`node ${node} [${nl},${nr}] 는 완전히 포함 => 저장된 sum ${tree[node]} 사용`);
+          await sleep(350);
+          state.highlight.activeNodes.delete(node);
+          return tree[node];
+        }
+
+        const mid = Math.floor((nl+nr)/2);
+        log(`node ${node} [${nl},${nr}] 는 일부만 겹침 => 자식으로 내려감`);
+        const left = await query(node*2, nl, mid);
+        const right = await query(node*2+1, mid+1, nr);
+        const res = left + right;
+        log(`node ${node} [${nl},${nr}] 에서 left(${left}) + right(${right}) = ${res}`);
+        state.highlight.activeNodes.delete(node);
+        renderTree();
+        await sleep(240);
+        return res;
+      }
+
+      const ans = await query(1,0,arr.length-1);
+      log(`최종 답: 합([${l},${r}]) = ${ans}`);
+      clearHighlights();
+      state.highlight.activeRange = [l,r];
+      renderArray();
+      renderTree();
+    }
+
+    async function normalUpdate(idx, value){
+      if(idx < 0 || idx >= arr.length) return alert('idx는 0~16');
+      clearHighlights();
+      const old = arr[idx];
+      log(`점 업데이트 시작: arr[${idx}] = ${old} -> ${value}`);
+      arr[idx] = value;
+      state.highlight.changedIndices.add(idx);
+      renderArray();
+
+      async function update(node, nl, nr){
+        state.highlight.activeNodes.add(node);
+        renderTree();
+        await sleep(320);
+
+        if(idx < nl || idx > nr){
+          state.highlight.activeNodes.delete(node);
+          renderTree();
+          return;
+        }
+
+        if(nl === nr){
+          state.normal.tree[node] = value;
+          state.highlight.changedNodes.add(node);
+          renderTree();
+          log(`리프 node ${node} [${nl},${nr}] 값을 ${value}로 변경`);
+          await sleep(320);
+          state.highlight.activeNodes.delete(node);
+          return;
+        }
+
+        const mid = Math.floor((nl+nr)/2);
+        if(idx <= mid) await update(node*2, nl, mid);
+        else await update(node*2+1, mid+1, nr);
+
+        state.normal.tree[node] = state.normal.tree[node*2] + state.normal.tree[node*2+1];
+        state.highlight.changedNodes.add(node);
+        renderTree();
+        log(`node ${node} [${nl},${nr}] = 왼쪽 + 오른쪽 = ${state.normal.tree[node]}`);
+        await sleep(280);
+        state.highlight.activeNodes.delete(node);
+      }
+
+      await update(1,0,arr.length-1);
+
+      // lazy 트리도 같은 실제 배열 기준으로 재빌드해서 일관성 유지
+      buildLazy();
+
+      clearHighlights();
+      state.highlight.changedIndices.add(idx);
+      renderArray();
+      renderTree();
+      log(`점 업데이트 완료`);
+    }
+
+    async function lazyRangeUpdate(l, r, delta){
+      if(l > r) [l,r] = [r,l];
+      clearHighlights();
+      state.highlight.activeRange = [l,r];
+      renderArray();
+      renderTree();
+      log(`Lazy 구간 업데이트 시작: [${l},${r}] 에 +${delta}`);
+
+      const tree = state.lazy.tree;
+      const lazy = state.lazy.lazy;
+
+      function push(node, nl, nr){
+        if(lazy[node] !== 0){
+          const pending = lazy[node];
+          tree[node] += (nr - nl + 1) * pending;
+          state.highlight.lazyNodes.add(node);
+
+          if(nl !== nr){
+            lazy[node*2] += pending;
+            lazy[node*2+1] += pending;
+          }
+          log(`push(node ${node}, [${nl},${nr}]): sum에 ${(nr-nl+1)}*${pending} 반영, 자식에게 lazy 전파`);
+          lazy[node] = 0;
+        }
+      }
+
+      async function update(node, nl, nr){
+        state.highlight.activeNodes.add(node);
+        renderTree();
+        await sleep(320);
+
+        push(node, nl, nr);
+        renderTree();
+        await sleep(180);
+
+        if(r < nl || nr < l){
+          log(`node ${node} [${nl},${nr}] 는 업데이트 범위와 겹치지 않음`);
+          state.highlight.activeNodes.delete(node);
+          renderTree();
+          return;
+        }
+
+        if(l <= nl && nr <= r){
+          tree[node] += (nr - nl + 1) * delta;
+          state.highlight.changedNodes.add(node);
+
+          if(nl !== nr){
+            lazy[node*2] += delta;
+            lazy[node*2+1] += delta;
+            state.highlight.lazyNodes.add(node*2);
+            state.highlight.lazyNodes.add(node*2+1);
+          }
+          log(`node ${node} [${nl},${nr}] 완전 포함 => sum 즉시 수정, 자식은 lazy에 +${delta}`);
+          renderTree();
+          await sleep(380);
+          state.highlight.activeNodes.delete(node);
+          return;
+        }
+
+        const mid = Math.floor((nl+nr)/2);
+        await update(node*2, nl, mid);
+        await update(node*2+1, mid+1, nr);
+
+        tree[node] = tree[node*2] + tree[node*2+1];
+        state.highlight.changedNodes.add(node);
+        log(`node ${node} [${nl},${nr}] 합 재계산 => ${tree[node]}`);
+        renderTree();
+        await sleep(260);
+        state.highlight.activeNodes.delete(node);
+      }
+
+      await update(1,0,arr.length-1);
+
+      for(let i=l;i<=r;i++){
+        arr[i] += delta;
+        state.highlight.changedIndices.add(i);
+      }
+
+      // 일반 트리는 실제 arr 기준으로 재빌드해서 일관성 유지
+      buildNormal();
+
+      renderArray();
+      renderTree();
+      log(`Lazy 구간 업데이트 완료: 실제 배열에도 [${l},${r}] 구간 +${delta} 반영`);
+    }
+
+    async function lazyQuery(l, r){
+      if(l > r) [l,r] = [r,l];
+      clearHighlights();
+      state.highlight.activeRange = [l,r];
+      renderArray();
+      renderTree();
+      log(`Lazy 쿼리 시작: 합([${l},${r}])`);
+
+      const tree = state.lazy.tree;
+      const lazy = state.lazy.lazy;
+
+      function push(node, nl, nr){
+        if(lazy[node] !== 0){
+          const pending = lazy[node];
+          tree[node] += (nr - nl + 1) * pending;
+          state.highlight.lazyNodes.add(node);
+
+          if(nl !== nr){
+            lazy[node*2] += pending;
+            lazy[node*2+1] += pending;
+            state.highlight.lazyNodes.add(node*2);
+            state.highlight.lazyNodes.add(node*2+1);
+          }
+          log(`push(node ${node}, [${nl},${nr}]): 미뤄둔 lazy ${pending} 반영`);
+          lazy[node] = 0;
+        }
+      }
+
+      async function query(node, nl, nr){
+        state.highlight.activeNodes.add(node);
+        renderTree();
+        await sleep(320);
+
+        push(node, nl, nr);
+        renderTree();
+        await sleep(180);
+
+        if(r < nl || nr < l){
+          log(`node ${node} [${nl},${nr}] 는 겹치지 않음 => 0`);
+          state.highlight.activeNodes.delete(node);
+          renderTree();
+          return 0;
+        }
+
+        if(l <= nl && nr <= r){
+          state.highlight.fullNodes.add(node);
+          renderTree();
+          log(`node ${node} [${nl},${nr}] 완전 포함 => sum ${tree[node]} 반환`);
+          await sleep(320);
+          state.highlight.activeNodes.delete(node);
+          return tree[node];
+        }
+
+        const mid = Math.floor((nl+nr)/2);
+        log(`node ${node} [${nl},${nr}] 일부만 겹침 => 자식 탐색`);
+        const left = await query(node*2, nl, mid);
+        const right = await query(node*2+1, mid+1, nr);
+        const res = left + right;
+        log(`node ${node} [${nl},${nr}] 결과 = ${left} + ${right} = ${res}`);
+        state.highlight.activeNodes.delete(node);
+        renderTree();
+        await sleep(220);
+        return res;
+      }
+
+      const ans = await query(1,0,arr.length-1);
+      log(`최종 답: 합([${l},${r}]) = ${ans}`);
+      clearHighlights();
+      state.highlight.activeRange = [l,r];
+      renderArray();
+      renderTree();
+    }
+
+    document.querySelectorAll('.tab').forEach(tab=>{
+      tab.addEventListener('click', ()=>{
+        document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+        tab.classList.add('active');
+        currentTab = tab.dataset.tab;
+        document.getElementById('normalControls').classList.toggle('hidden', currentTab !== 'normal');
+        document.getElementById('lazyControls').classList.toggle('hidden', currentTab !== 'lazy');
+        clearHighlights();
+        renderArray();
+        renderTree();
+        log(currentTab === 'normal'
+          ? '탭 전환: 기본 Segment Tree'
+          : '탭 전환: Segment Tree + Lazy Propagation'
+        );
+      });
+    });
+
+    document.getElementById('buildBtn').addEventListener('click', ()=>{
+      const parsed = parseArrayInput();
+      if(!parsed) return;
+      arr = parsed;
+      rebuildAll();
+    });
+
+    document.getElementById('exampleBtn').addEventListener('click', ()=>{
+      arr = [...DEFAULT_ARR];
+      arrInput.value = DEFAULT_ARR.join(', ');
+      rebuildAll();
+      log('기본 예제로 복원');
+    });
+
+    document.getElementById('queryBtn').addEventListener('click', async ()=>{
+      const l = Number(document.getElementById('qL').value);
+      const r = Number(document.getElementById('qR').value);
+      await normalQuery(l,r);
+    });
+
+    document.getElementById('updateBtn').addEventListener('click', async ()=>{
+      const idx = Number(document.getElementById('uIdx').value);
+      const value = Number(document.getElementById('uVal').value);
+      await normalUpdate(idx, value);
+    });
+
+    document.getElementById('lazyUpdateBtn').addEventListener('click', async ()=>{
+      const l = Number(document.getElementById('lzUL').value);
+      const r = Number(document.getElementById('lzUR').value);
+      const delta = Number(document.getElementById('lzDelta').value);
+      await lazyRangeUpdate(l,r,delta);
+    });
+
+    document.getElementById('lazyQueryBtn').addEventListener('click', async ()=>{
+      const l = Number(document.getElementById('lzQL').value);
+      const r = Number(document.getElementById('lzQR').value);
+      await lazyQuery(l,r);
+    });
+
+    document.getElementById('showBuildStepsBtn').addEventListener('click', async ()=>{
+      await showBuildSteps();
+    });
+
+    document.getElementById('clearLogBtn').addEventListener('click', ()=>{
+      logEl.textContent = '';
+    });
+
+    // init
+    rebuildAll();
+    log('설명:');
+    log('- Segment Tree 탭: 구간 합 쿼리 + 점 업데이트를 시각화');
+    log('- Lazy 탭: 구간 덧셈 업데이트 + 구간 합 쿼리를 시각화');
+    log('- 노드 색을 보면서 "완전 포함 / 부분 겹침 / 미뤄진 lazy"를 관찰해보세요.');
+  </script>
+</body>
+</html>

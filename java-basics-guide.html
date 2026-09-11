@@ -1,0 +1,1242 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>자바 기본 완전학습서</title>
+<script>
+  window.MathJax = { tex: { inlineMath: [['$','$']], displayMath: [['$$','$$']] } };
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap');
+
+  :root{
+    --paper:#faf5ec;
+    --paper2:#f3ead9;
+    --ink:#2c2620;
+    --ink-soft:#5c5248;
+    --accent:#bd5a2e;
+    --accent-soft:#e7c9ab;
+    --accent-bg:#fbe9d8;
+    --green:#6b7d4f;
+    --green-bg:#e9edda;
+    --blue:#4d6a8a;
+    --blue-bg:#dfe8f0;
+    --line:#e3d5bd;
+    --code-bg:#2c2620;
+    --code-ink:#f3ead9;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--paper); color:var(--ink);
+    font-family:'Pretendard','Spectral',-apple-system,'Malgun Gothic',sans-serif;
+    line-height:1.75; font-size:16px;
+  }
+  h1,h2,h3,h4{ font-family:'Spectral',serif; font-weight:700; color:var(--ink); }
+  .layout{ display:flex; max-width:1280px; margin:0 auto; }
+  nav#toc{
+    width:250px; flex-shrink:0; position:sticky; top:0; align-self:flex-start;
+    height:100vh; overflow-y:auto; padding:28px 16px; border-right:1px solid var(--line);
+    background:var(--paper2);
+  }
+  nav#toc h3{ font-size:13px; letter-spacing:.08em; color:var(--accent); text-transform:uppercase; margin:0 0 12px 4px;}
+  nav#toc a{
+    display:block; padding:6px 8px; border-radius:6px; color:var(--ink-soft);
+    text-decoration:none; font-size:13.5px; margin-bottom:2px; border-left:2px solid transparent;
+  }
+  nav#toc a:hover{ background:var(--accent-bg); color:var(--accent);}
+  nav#toc a.active{ background:var(--accent-bg); color:var(--accent); border-left:2px solid var(--accent); font-weight:600;}
+  main{ flex:1; padding:40px 56px 120px; max-width:900px; }
+  header.hero{
+    padding:36px 32px; background:linear-gradient(135deg,var(--accent-bg),var(--paper2));
+    border:1px solid var(--accent-soft); border-radius:16px; margin-bottom:48px;
+  }
+  header.hero h1{ font-size:32px; margin:0 0 10px; }
+  header.hero p{ margin:0; color:var(--ink-soft); font-size:15px; }
+  .badge{ display:inline-block; background:var(--accent); color:#fff; font-size:11px; padding:3px 10px;
+    border-radius:20px; margin-right:6px; margin-top:12px; letter-spacing:.03em;}
+  section{ margin-bottom:64px; scroll-margin-top:20px; }
+  section h2{
+    font-size:26px; border-bottom:3px solid var(--accent); padding-bottom:10px; margin-bottom:22px;
+    display:flex; align-items:center; gap:10px;
+  }
+  section h2 .num{
+    display:inline-flex; align-items:center; justify-content:center;
+    width:34px; height:34px; background:var(--accent); color:#fff; border-radius:8px;
+    font-size:15px; font-family:'JetBrains Mono',monospace;
+  }
+  section h3{ font-size:19px; color:var(--accent); margin-top:32px; }
+  p{ color:var(--ink); }
+  .note{
+    background:var(--blue-bg); border-left:4px solid var(--blue); padding:14px 18px;
+    border-radius:0 8px 8px 0; margin:18px 0; font-size:14.5px;
+  }
+  .warn{
+    background:var(--accent-bg); border-left:4px solid var(--accent); padding:14px 18px;
+    border-radius:0 8px 8px 0; margin:18px 0; font-size:14.5px;
+  }
+  .tip{
+    background:var(--green-bg); border-left:4px solid var(--green); padding:14px 18px;
+    border-radius:0 8px 8px 0; margin:18px 0; font-size:14.5px;
+  }
+  table{ width:100%; border-collapse:collapse; margin:20px 0; font-size:14.5px; }
+  th,td{ border:1px solid var(--line); padding:10px 12px; text-align:left; }
+  th{ background:var(--accent-bg); color:var(--accent); font-family:'Spectral',serif; }
+  tr:nth-child(even){ background:var(--paper2); }
+  code{ font-family:'JetBrains Mono',monospace; background:var(--paper2); padding:2px 5px; border-radius:4px; font-size:13.5px; color:var(--accent);}
+  pre.code-block{
+    background:var(--code-bg); color:var(--code-ink); padding:18px 20px; border-radius:10px 10px 0 0;
+    overflow-x:auto; font-family:'JetBrains Mono',monospace; font-size:13.5px; margin:0; line-height:1.6;
+  }
+  .code-label{
+    background:#1d1812; color:var(--accent-soft); font-family:'JetBrains Mono',monospace; font-size:11.5px;
+    padding:6px 20px; border-radius:10px 10px 0 0; letter-spacing:.05em;
+  }
+  .code-label + pre.code-block{ border-radius:0; }
+  pre.output-block{
+    background:#efe7d6; color:var(--ink); padding:14px 20px; border-radius:0 0 10px 10px;
+    border-top:2px dashed var(--accent-soft); font-family:'JetBrains Mono',monospace; font-size:13px; margin:0 0 20px;
+  }
+  .output-label{ font-size:11px; color:var(--ink-soft); padding:6px 20px 0; letter-spacing:.05em;}
+  svg text{ font-family:'Pretendard','Spectral',sans-serif; }
+  .diagram-wrap{ background:#fff; border:1px solid var(--line); border-radius:12px; padding:16px; margin:22px 0; }
+  .diagram-cap{ text-align:center; font-size:13px; color:var(--ink-soft); margin-top:8px; }
+  .grid2{ display:grid; grid-template-columns:1fr 1fr; gap:18px; margin:20px 0;}
+  .card{ background:var(--paper2); border:1px solid var(--line); border-radius:10px; padding:16px 18px;}
+  .card h4{ margin:0 0 8px; color:var(--accent); font-size:15px;}
+  .checklist{ list-style:none; padding:0; }
+  .checklist li{ padding:8px 0 8px 30px; position:relative; border-bottom:1px dashed var(--line); font-size:14.5px;}
+  .checklist li::before{ content:"✓"; position:absolute; left:0; color:var(--green); font-weight:700; }
+  footer{ text-align:center; color:var(--ink-soft); font-size:13px; padding:40px 0; }
+</style>
+</head>
+<body>
+<div class="layout">
+  <nav id="toc">
+    <h3>목차</h3>
+    <a href="#ch1">1. JDK · JRE · JVM</a>
+    <a href="#ch2">2. 컴파일과 실행과정</a>
+    <a href="#ch3">3. JVM 메모리 구조</a>
+    <a href="#ch4">4. 메모리 라이프사이클 · GC</a>
+    <a href="#ch5">5. 메모리 특징 4원칙</a>
+    <a href="#ch6">6. OOP 4대 특징 (APIE)</a>
+    <a href="#ch7">7. 상속 (extends)</a>
+    <a href="#ch8">8. 캡슐화 · 접근제어자</a>
+    <a href="#ch9">9. 생성자</a>
+    <a href="#ch10">10. 오버로딩 vs 오버라이딩</a>
+    <a href="#ch11">11. 다형성 · 형변환 · VMI</a>
+    <a href="#ch12">12. final 키워드</a>
+    <a href="#ch13">13. String 클래스</a>
+    <a href="#ch14">14. static 키워드</a>
+    <a href="#ch15">15. Object 클래스</a>
+    <a href="#ch16">16. 추상클래스 vs 인터페이스</a>
+    <a href="#ch18">18. 메모리 종합 다이어그램</a>
+    <a href="#ch19">19. 참조타입 vs 실제타입 다이어그램</a>
+    <a href="#ch20">20. 종합 체크리스트</a>
+  </nav>
+
+  <main>
+    <header class="hero">
+      <h1>자바 기본 완전학습서</h1>
+      <p>JDK/JRE/JVM부터 메모리 구조, 객체지향 4대 특징, 상속·다형성, 생성자, final, Object 클래스, 추상클래스/인터페이스까지 —
+      원리 · 실행과정 · 소스코드 · 실행결과를 한 흐름으로 정리했습니다.</p>
+      <span class="badge">JVM 구조</span><span class="badge">메모리 관리</span><span class="badge">OOP</span><span class="badge">상속/다형성</span><span class="badge">인터페이스</span>
+    </header>
+
+    <!-- CH1 -->
+    <section id="ch1">
+      <h2><span class="num">1</span>JDK · JRE · JVM</h2>
+      <p>세 용어는 <strong>포함관계</strong>입니다: <code>JDK ⊃ JRE ⊃ JVM</code>. 바깥쪽으로 갈수록 "개발"에 필요한 도구가 추가됩니다.</p>
+
+      <div class="diagram-wrap">
+      <svg viewBox="0 0 640 260" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="320" cy="140" r="115" fill="none" stroke="#bd5a2e" stroke-width="2.5"/>
+        <circle cx="320" cy="150" r="80"  fill="none" stroke="#4d6a8a" stroke-width="2.5"/>
+        <circle cx="320" cy="163" r="45"  fill="#e9edda" stroke="#6b7d4f" stroke-width="2.5"/>
+        <text x="320" y="55" text-anchor="middle" font-size="17" font-weight="700" fill="#bd5a2e">JDK</text>
+        <text x="320" y="75" text-anchor="middle" font-size="11" fill="#8a7a63">javac · javap · java · lib · .jar</text>
+        <text x="320" y="98" text-anchor="middle" font-size="15" font-weight="700" fill="#4d6a8a">JRE</text>
+        <text x="320" y="115" text-anchor="middle" font-size="10.5" fill="#8a7a63">실행에 필요한 라이브러리</text>
+        <text x="320" y="160" text-anchor="middle" font-size="14" font-weight="700" fill="#4a5a33">JVM</text>
+        <text x="320" y="177" text-anchor="middle" font-size="10" fill="#5c6b45">바이트코드 실행엔진</text>
+      </svg>
+      <p class="diagram-cap">JDK(개발도구) ⊃ JRE(실행환경) ⊃ JVM(실행엔진) — 바깥 원일수록 "만드는" 역할, 안쪽일수록 "실행하는" 역할</p>
+      </div>
+
+      <table>
+        <tr><th>구성</th><th>정식 명칭</th><th>역할</th><th>포함 요소</th></tr>
+        <tr><td>JVM</td><td>Java Virtual Machine</td><td>바이트코드(.class)를 OS에 맞춰 실행하는 가상머신</td><td>클래스로더, 실행엔진, 런타임 메모리 영역</td></tr>
+        <tr><td>JRE</td><td>Java Runtime Environment</td><td>JVM + 실행에 필요한 표준 라이브러리(lib)</td><td>JVM, 핵심 API 클래스</td></tr>
+        <tr><td>JDK</td><td>Java Development Kit</td><td>JRE + 개발 도구 일체</td><td>JRE, javac(컴파일러), java(실행기), javap(역어셈블), 개발용 lib/.jar</td></tr>
+      </table>
+
+      <h3>JDK의 실행파일(.exe)과 PATH</h3>
+      <p><code>JAVA_HOME/bin</code>에 존재하는 대표 실행파일과 역할입니다. 이 경로를 OS의 <strong>PATH 환경변수</strong>에 등록해야 어느 폴더에서든 <code>javac</code>, <code>java</code> 명령을 바로 사용할 수 있습니다.</p>
+      <table>
+        <tr><th>명령어</th><th>기능</th></tr>
+        <tr><td><code>javac</code></td><td>.java 소스코드를 .class 바이트코드로 컴파일</td></tr>
+        <tr><td><code>java</code></td><td>.class 바이트코드를 JVM 위에서 실행</td></tr>
+        <tr><td><code>javap</code></td><td>.class 파일을 역어셈블하여 바이트코드 구조 확인(디버깅용)</td></tr>
+      </table>
+
+      <div class="note"><strong>JVM은 OS마다 다르게 구현됩니다.</strong> Windows JVM, Unix/Linux JVM은 내부 구현이 다르지만, 동일한 <code>.class</code> 바이트코드를 입력받아 각자의 방식으로 해석·실행합니다. 이것이 자바의 "<em>Write Once, Run Anywhere</em>"의 핵심 원리입니다 — 소스코드가 아니라 <strong>바이트코드가 이식되는 것</strong>입니다.</div>
+    </section>
+
+    <!-- CH2 -->
+    <section id="ch2">
+      <h2><span class="num">2</span>컴파일과 실행과정</h2>
+      <p>자바는 컴파일 언어이면서 동시에 가상머신 위에서 인터프리팅되는 <strong>하이브리드 방식</strong>입니다.</p>
+
+      <div class="diagram-wrap">
+      <svg viewBox="0 0 720 140" xmlns="http://www.w3.org/2000/svg">
+        <g font-size="13" font-family="JetBrains Mono, monospace">
+          <rect x="10" y="40" width="130" height="55" rx="8" fill="#fbe9d8" stroke="#bd5a2e" stroke-width="2"/>
+          <text x="75" y="63" text-anchor="middle" fill="#bd5a2e" font-weight="700">Hello.java</text>
+          <text x="75" y="80" text-anchor="middle" fill="#8a7a63" font-size="10">소스코드</text>
+
+          <text x="165" y="72" fill="#5c5248" font-size="18">→</text>
+          <text x="150" y="35" fill="#5c5248" font-size="11">javac (컴파일)</text>
+
+          <rect x="190" y="40" width="130" height="55" rx="8" fill="#dfe8f0" stroke="#4d6a8a" stroke-width="2"/>
+          <text x="255" y="63" text-anchor="middle" fill="#4d6a8a" font-weight="700">Hello.class</text>
+          <text x="255" y="80" text-anchor="middle" fill="#8a7a63" font-size="10">바이트코드(IL)</text>
+
+          <text x="345" y="72" fill="#5c5248" font-size="18">→</text>
+          <text x="330" y="35" fill="#5c5248" font-size="11">java (로드)</text>
+
+          <rect x="370" y="10" width="150" height="115" rx="8" fill="#e9edda" stroke="#6b7d4f" stroke-width="2"/>
+          <text x="445" y="30" text-anchor="middle" fill="#4a5a33" font-weight="700">JVM</text>
+          <text x="445" y="50" text-anchor="middle" fill="#5c6b45" font-size="10">① 클래스로더</text>
+          <text x="445" y="66" text-anchor="middle" fill="#5c6b45" font-size="10">② 바이트코드 검증</text>
+          <text x="445" y="82" text-anchor="middle" fill="#5c6b45" font-size="10">③ 실행엔진(인터프리터/JIT)</text>
+          <text x="445" y="98" text-anchor="middle" fill="#5c6b45" font-size="10">④ 런타임 메모리 영역</text>
+
+          <text x="545" y="72" fill="#5c5248" font-size="18">→</text>
+          <rect x="575" y="40" width="130" height="55" rx="8" fill="#f3ead9" stroke="#bd5a2e" stroke-width="2"/>
+          <text x="640" y="63" text-anchor="middle" fill="#bd5a2e" font-weight="700">OS 실행</text>
+          <text x="640" y="80" text-anchor="middle" fill="#8a7a63" font-size="10">Windows / Unix</text>
+        </g>
+      </svg>
+      <p class="diagram-cap">.java(사람이 읽는 소스) → javac → .class(플랫폼 독립 바이트코드) → JVM이 로드·검증·실행 → OS별 네이티브 명령으로 변환</p>
+      </div>
+
+      <div class="code-label">Hello.java</div>
+<pre class="code-block">public class Hello {
+    public static void main(String[] args) {
+        System.out.println("Hello, JVM!");
+    }
+}</pre>
+      <div class="output-label">터미널</div>
+<pre class="output-block">$ javac Hello.java     <span style="color:#bd5a2e">// Hello.class 생성</span>
+$ java Hello
+Hello, JVM!</pre>
+
+      <p><code>.class</code> 파일은 사람이 읽을 수 없는 <strong>바이트코드(중간언어, IL)</strong>입니다. <code>javap -c Hello.class</code>로 역어셈블하면 JVM 명령어(opcode) 형태를 확인할 수 있습니다.</p>
+    </section>
+
+    <!-- CH3 -->
+    <section id="ch3">
+      <h2><span class="num">3</span>JVM 메모리 구조</h2>
+      <p>JVM은 프로그램 실행 중 사용할 메모리를 용도에 따라 <strong>세 영역</strong>으로 나눠 관리합니다: <strong>Method Area(클래스 영역)</strong>, <strong>Stack(스택 영역)</strong>, <strong>Heap(힙 영역)</strong>.</p>
+
+      <div class="diagram-wrap">
+      <svg viewBox="0 0 700 260" xmlns="http://www.w3.org/2000/svg">
+        <rect x="10" y="20" width="200" height="220" rx="6" fill="#fbe9d8" stroke="#bd5a2e" stroke-width="2"/>
+        <text x="110" y="45" text-anchor="middle" fill="#bd5a2e" font-weight="700" font-size="14">Method Area</text>
+        <text x="110" y="65" text-anchor="middle" fill="#8a7a63" font-size="10">(클래스 영역 / blueprint)</text>
+        <text x="110" y="100" text-anchor="middle" fill="#5c5248" font-size="11">class 정보</text>
+        <text x="110" y="118" text-anchor="middle" fill="#5c5248" font-size="11">static 변수</text>
+        <text x="110" y="136" text-anchor="middle" fill="#5c5248" font-size="11">메소드 바이트코드</text>
+        <text x="110" y="154" text-anchor="middle" fill="#5c5248" font-size="11">상수풀(constant pool)</text>
+        <text x="110" y="200" text-anchor="middle" fill="#a3937a" font-size="10">→ 모든 스레드가 공유</text>
+
+        <rect x="230" y="20" width="150" height="220" rx="6" fill="#dfe8f0" stroke="#4d6a8a" stroke-width="2"/>
+        <text x="305" y="45" text-anchor="middle" fill="#4d6a8a" font-weight="700" font-size="14">Stack</text>
+        <text x="305" y="65" text-anchor="middle" fill="#8a7a63" font-size="10">(스레드별 독립 · FILO)</text>
+        <rect x="250" y="80" width="110" height="26" fill="#fff" stroke="#4d6a8a"/>
+        <text x="305" y="97" text-anchor="middle" font-size="10">main() 프레임</text>
+        <rect x="250" y="110" width="110" height="26" fill="#fff" stroke="#4d6a8a"/>
+        <text x="305" y="127" text-anchor="middle" font-size="10">지역변수 v1(참조값)</text>
+        <rect x="250" y="140" width="110" height="26" fill="#fff" stroke="#4d6a8a"/>
+        <text x="305" y="157" text-anchor="middle" font-size="10">메소드 호출 프레임</text>
+        <text x="305" y="200" text-anchor="middle" fill="#a3937a" font-size="10">→ 스레드마다 1개씩 생성</text>
+
+        <rect x="400" y="20" width="290" height="220" rx="6" fill="#e9edda" stroke="#6b7d4f" stroke-width="2"/>
+        <text x="545" y="45" text-anchor="middle" fill="#4a5a33" font-weight="700" font-size="14">Heap</text>
+        <text x="545" y="65" text-anchor="middle" fill="#5c6b45" font-size="10">(모든 객체 · 인스턴스변수, 공유)</text>
+
+        <rect x="415" y="80" width="130" height="150" rx="4" fill="#f3f6ea" stroke="#8a9a5b"/>
+        <text x="480" y="96" text-anchor="middle" font-size="10.5" font-weight="700" fill="#4a5a33">Young Generation</text>
+        <rect x="425" y="105" width="45" height="45" fill="#fff" stroke="#8a9a5b"/><text x="447" y="132" text-anchor="middle" font-size="9">Eden</text>
+        <rect x="475" y="105" width="28" height="45" fill="#fff" stroke="#8a9a5b"/><text x="489" y="132" text-anchor="middle" font-size="8">S0</text>
+        <rect x="508" y="105" width="28" height="45" fill="#fff" stroke="#8a9a5b"/><text x="522" y="132" text-anchor="middle" font-size="8">S1</text>
+        <text x="480" y="170" text-anchor="middle" font-size="9" fill="#6b7d4f">새 객체 생성 위치</text>
+        <text x="480" y="185" text-anchor="middle" font-size="9" fill="#6b7d4f">Minor GC 빈발</text>
+
+        <rect x="560" y="80" width="115" height="150" rx="4" fill="#fbe9d8" stroke="#bd5a2e"/>
+        <text x="617" y="98" text-anchor="middle" font-size="10.5" font-weight="700" fill="#8a4a24">Old Generation</text>
+        <text x="617" y="140" text-anchor="middle" font-size="9" fill="#8a4a24">오래 살아남은</text>
+        <text x="617" y="155" text-anchor="middle" font-size="9" fill="#8a4a24">객체 승격</text>
+        <text x="617" y="185" text-anchor="middle" font-size="9" fill="#8a4a24">Major GC(느림)</text>
+
+        <text x="545" y="215" text-anchor="middle" fill="#a3937a" font-size="9">free storage → GC가 회수해 되돌리는 공간</text>
+      </svg>
+      <p class="diagram-cap">Method Area(공유·설계도) · Stack(스레드별·값과 참조) · Heap(공유·실제 객체, Young/Old 세대로 분리)</p>
+      </div>
+
+      <table>
+        <tr><th>영역</th><th>저장 내용</th><th>생성 시점</th><th>공유 여부</th></tr>
+        <tr><td><strong>Method Area</strong></td><td>클래스 구조, static 변수, 메소드 바이트코드, 상수풀</td><td>클래스 최초 로딩 시</td><td>모든 스레드 공유</td></tr>
+        <tr><td><strong>Stack</strong></td><td>메소드 호출 프레임, 지역변수, 매개변수, <em>참조형 변수의 주소값</em></td><td>메소드 호출 시 프레임 push, 종료 시 pop</td><td>스레드마다 독립</td></tr>
+        <tr><td><strong>Heap</strong></td><td><code>new</code>로 생성된 모든 객체(인스턴스), 인스턴스 변수</td><td><code>new</code> 실행 시</td><td>모든 스레드 공유</td></tr>
+      </table>
+
+      <div class="code-label">MemoryExample.java</div>
+<pre class="code-block">class Fish {
+    String name;   // 인스턴스 변수 → Heap
+}
+
+public class MemoryExample {
+    public static void main(String[] args) {
+        Fish f = new Fish();   // f: Stack(참조값) / new Fish(): Heap(실제객체)
+        f.name = "Nemo";
+        f = null;               // Stack의 참조를 끊음 → Heap 객체는 GC 대상이 됨
+    }
+}</pre>
+      <p><code>Fish f</code>라는 <strong>참조변수 자체</strong>는 Stack에, <code>new Fish()</code>로 만들어진 <strong>실제 객체</strong>는 Heap에 생성됩니다. <code>f = null</code>은 Stack의 참조값만 지울 뿐 Heap의 객체를 즉시 지우지 않습니다 — 더 이상 어떤 참조도 가리키지 않게 된 객체를 GC가 나중에 회수합니다.</p>
+    </section>
+
+    <!-- CH4 -->
+    <section id="ch4">
+      <h2><span class="num">4</span>메모리 라이프사이클 · GC</h2>
+      <p>Stack과 Heap은 서로 다른 생명주기 원칙(<strong>FILO</strong> vs <strong>GC</strong>)을 따릅니다.</p>
+
+      <h3>Stack: FILO (First In Last Out)</h3>
+      <p>메소드가 호출되면 그 메소드의 실행 정보(프레임)가 스택에 <strong>push</strong>되고, 메소드가 끝나면 <strong>pop</strong>됩니다. 가장 나중에 호출된 메소드가 가장 먼저 종료되는 후입선출 구조입니다.</p>
+
+      <div class="code-label">StackDemo.java</div>
+<pre class="code-block">public class StackDemo {
+    static void a() { b(); System.out.println("a 종료"); }
+    static void b() { c(); System.out.println("b 종료"); }
+    static void c() { System.out.println("c 종료"); }
+    public static void main(String[] args) { a(); }
+}</pre>
+      <div class="output-label">실행결과 — push 순서: main→a→b→c, pop 순서: c→b→a→main</div>
+<pre class="output-block">c 종료
+b 종료
+a 종료</pre>
+
+      <h3>Heap: Young Generation → GC → Old Generation</h3>
+      <ol>
+        <li><strong>객체 생성</strong> — 새 객체는 항상 Young Generation의 <strong>Eden</strong> 영역에 먼저 생성된다.</li>
+        <li><strong>Minor GC</strong> — Eden이 차면, 여전히 참조되고 있는(살아있는) 객체만 골라 Survivor(S0↔S1)로 이동시키고 나머지는 회수한다.</li>
+        <li><strong>승격(Promotion)</strong> — Survivor에서 일정 횟수 이상 살아남은 객체는 <strong>Old Generation</strong>으로 이동한다.</li>
+        <li><strong>Major(Full) GC</strong> — Old Generation이 차면 발생. Minor GC보다 느리고 애플리케이션을 더 오래 멈춘다(Stop-The-World).</li>
+      </ol>
+
+      <div class="note"><strong>GC의 판단 기준은 "도달 가능성(Reachability)"</strong>입니다. 즉 어떤 참조 체인으로도 접근할 수 없게 된 객체만 회수 대상이 됩니다. Java는 C/C++와 달리 개발자가 직접 <code>free()</code>를 호출하지 않아도 됩니다 — 이것이 <strong>자동 메모리 관리</strong>의 핵심입니다.</div>
+    </section>
+
+    <!-- CH5 -->
+    <section id="ch5">
+      <h2><span class="num">5</span>메모리 특징 4원칙</h2>
+      <p>상속 관계에 있는 클래스가 <strong>클래스 로딩 → 객체 생성 → 메모리 배치 → 메소드 사용</strong> 4단계에서 각각 부모와 어떤 관계를 맺는지 정리한 4원칙입니다. 모두 "자식은 혼자 존재할 수 없고, 항상 부모를 전제로 한다"는 하나의 원리로 귀결됩니다.</p>
+
+      <div class="grid2">
+        <div class="card">
+          <h4>1. 자생부생 — 자식이 생성되면 부모가 생성된다</h4>
+          <p style="font-size:14px;"><code>new 자식()</code>을 실행하면, 자식 생성자 본문이 실행되기 <strong>전에</strong> 반드시 부모 생성자가 먼저 호출됩니다(암묵적 <code>super()</code>). 즉 힙(Heap)에 자식 객체가 만들어질 때 그 내부에 부모 부분이 먼저 채워집니다 — <strong>객체 생성 순서: 부모 → 자식</strong>.</p>
+        </div>
+        <div class="card">
+          <h4>2. 자설부설 — 자식의 설계도가 올라가면 부모의 설계도가 올라간다</h4>
+          <p style="font-size:14px;">클래스가 처음 사용될 때 JVM이 <code>.class</code>를 Method Area(설계도 영역)에 로딩하는데, 자식 클래스를 로딩하려면 <strong>부모 클래스가 먼저 로딩</strong>되어 있어야 합니다. 부모 설계도 없이는 자식 설계도가 완전할 수 없기 때문입니다 — <strong>클래스 로딩 순서: 부모 → 자식</strong>.</p>
+        </div>
+        <div class="card">
+          <h4>3. 생주부주 — 생성된 주소는 부모의 주소다</h4>
+          <p style="font-size:14px;">자식 객체는 힙에 <strong>하나의 메모리 블록</strong>으로 만들어지고, 그 블록 안에 부모가 갖는 필드 영역이 포함되어 있습니다. 즉 자식 객체의 참조 주소를 통해 부모가 정의한 필드/영역까지 함께 접근할 수 있습니다 — <strong>자식 객체 주소 = 부모 영역을 포함한 주소</strong>.</p>
+        </div>
+        <div class="card">
+          <h4>4. 설공메사 — 설계도에 공개된 메서드만 사용할 수 있다</h4>
+          <p style="font-size:14px;">부모 설계도(class)에 <code>public</code>/<code>protected</code>로 <strong>공개된 메소드·필드만</strong> 자식(또는 외부)이 사용할 수 있습니다. <code>private</code>로 감춰진 멤버는 같은 객체 메모리 안에 존재하더라도 이름으로 접근할 수 없습니다 — 캡슐화 원칙과 직결됩니다.</p>
+        </div>
+      </div>
+      <div class="warn">4원칙을 한 문장으로 요약하면: <strong>"부모의 설계도가 먼저 로딩되고(2) → 부모 생성자가 먼저 실행되어(1) → 자식 객체의 주소 자체가 부모 영역을 포함한 주소이며(3) → 그중 공개된 것만 꺼내 쓸 수 있다(4)"</strong>. 이는 8장(상속)의 "부모것이 내것"과 11장(다형성)의 "부타자생·부타자참·부메자호" 원리로 이어집니다.</div>
+    </section>
+
+    <!-- CH6 -->
+    <section id="ch6">
+      <h2><span class="num">6</span>OOP 4대 특징 (APIE)</h2>
+      <p>객체지향 프로그래밍의 4대 특징은 앞글자를 따 <strong>APIE</strong>로 부릅니다.</p>
+      <table>
+        <tr><th>약자</th><th>이름</th><th>한 줄 정의</th></tr>
+        <tr><td><strong>A</strong></td><td>Abstraction (추상화)</td><td>공통 속성·행위만 뽑아 하나의 틀(추상클래스/인터페이스)로 정의</td></tr>
+        <tr><td><strong>P</strong></td><td>Polymorphism (다형성)</td><td>같은 타입 참조로 서로 다른 실제 객체의 동작을 호출</td></tr>
+        <tr><td><strong>I</strong></td><td>Inheritance (상속)</td><td>부모의 필드·메소드를 자식이 물려받아 재사용</td></tr>
+        <tr><td><strong>E</strong></td><td>Encapsulation (캡슐화)</td><td>내부 구현을 숨기고(private) 필요한 통로(getter/setter)만 공개</td></tr>
+      </table>
+      <p>7~11장에서 이 네 가지를 순서대로 실습 코드와 함께 깊게 다룹니다.</p>
+    </section>
+
+    <!-- CH7 -->
+    <section id="ch7">
+      <h2><span class="num">7</span>상속 (extends)</h2>
+      <p><code>extends</code> 키워드로 부모 클래스를 지정하면, 자식은 부모의 <strong>public/protected 멤버를 그대로 물려받습니다</strong>. 핵심 문장은 "<strong>부모것이 곧 내것</strong>"입니다.</p>
+
+      <div class="diagram-wrap">
+      <svg viewBox="0 0 400 170" xmlns="http://www.w3.org/2000/svg">
+        <rect x="160" y="15" width="80" height="40" rx="6" fill="#fbe9d8" stroke="#bd5a2e" stroke-width="2"/>
+        <text x="200" y="40" text-anchor="middle" fill="#bd5a2e" font-weight="700">A (부모)</text>
+        <line x1="200" y1="55" x2="130" y2="110" stroke="#5c5248" stroke-width="1.5"/>
+        <line x1="200" y1="55" x2="270" y2="110" stroke="#5c5248" stroke-width="1.5"/>
+        <polygon points="200,55 190,80 210,80" fill="#fff" stroke="#5c5248"/>
+        <rect x="90" y="110" width="80" height="40" rx="6" fill="#dfe8f0" stroke="#4d6a8a" stroke-width="2"/>
+        <text x="130" y="135" text-anchor="middle" fill="#4d6a8a" font-weight="700">B (자식)</text>
+        <rect x="230" y="110" width="80" height="40" rx="6" fill="#e9edda" stroke="#6b7d4f" stroke-width="2"/>
+        <text x="270" y="135" text-anchor="middle" fill="#4a5a33" font-weight="700">C (자식)</text>
+      </svg>
+      <p class="diagram-cap">삼각형 화살표는 UML 표기법에서 "상속(is-a)"을 의미 — B extends A, C extends A</p>
+      </div>
+
+      <div class="code-label">Inheritance.java</div>
+<pre class="code-block">class A {
+    int x = 10;
+    void open() { System.out.println("A.open() 호출"); }
+}
+class B extends A { }   // B는 x, open()을 그대로 물려받음
+class C extends A { }
+
+public class Inheritance {
+    public static void main(String[] args) {
+        A a1 = new A();
+        B bObj = new B();
+        System.out.println(bObj.x);      // 부모 필드 재사용
+        bObj.open();                      // 부모 메소드 재사용
+    }
+}</pre>
+      <div class="output-label">실행결과</div>
+<pre class="output-block">10
+A.open() 호출</pre>
+
+      <div class="warn"><strong>비자금(private) — "내 것도 자식한테는 안 준다"</strong><br>
+      부모의 <code>private</code> 멤버는 상속되지 않습니다(정확히는 자식 클래스 코드에서 직접 접근할 수 없습니다). 자식 객체 안에 메모리 공간 자체는 존재하지만, 캡슐화 원칙상 자식이 이름으로 접근할 수 없어 "물려받지 못한 것"과 같은 효과를 냅니다. 그래서 <code>private</code>은 흔히 "부모가 몰래 감춰둔 <em>비자금</em>"에 비유됩니다.</div>
+
+      <div class="code-label">PrivateInherit.java</div>
+<pre class="code-block">class Parent {
+    private int secret = 1000;   // 비자금 — 자식이 직접 못 씀
+    public int getSecret() { return secret; }  // 공개 통로만 허용
+}
+class Child extends Parent { }
+
+public class PrivateInherit {
+    public static void main(String[] args) {
+        Child c = new Child();
+        // System.out.println(c.secret);  // ❌ 컴파일 에러 - private
+        System.out.println(c.getSecret()); // ✅ 200 - public 메소드로 접근
+    }
+}</pre>
+    </section>
+
+    <!-- CH8 -->
+    <section id="ch8">
+      <h2><span class="num">8</span>캡슐화 · 접근제어자</h2>
+      <p>캡슐화는 <strong>필드는 감추고(private), 접근은 메소드로만</strong> 허용하는 설계 원칙입니다.</p>
+      <table>
+        <tr><th>제어자</th><th>같은 클래스</th><th>같은 패키지</th><th>자식 클래스(다른패키지)</th><th>전체</th></tr>
+        <tr><td><code>private</code></td><td>O</td><td>X</td><td>X</td><td>X</td></tr>
+        <tr><td>default(생략)</td><td>O</td><td>O</td><td>X</td><td>X</td></tr>
+        <tr><td><code>protected</code></td><td>O</td><td>O</td><td>O</td><td>X</td></tr>
+        <tr><td><code>public</code></td><td>O</td><td>O</td><td>O</td><td>O</td></tr>
+      </table>
+      <div class="tip">실무 규칙: <strong>필드는 private, 접근은 getter/setter(public)</strong>로 — 값 검증 로직을 setter 안에 넣을 수 있어 데이터 무결성을 지킬 수 있습니다.</div>
+    </section>
+
+    <!-- CH9 -->
+    <section id="ch9">
+      <h2><span class="num">9</span>생성자</h2>
+      <p>생성자는 "<strong>이름이 클래스명과 같고 반환타입이 없는</strong>" 특수 메소드로, <code>new</code> 시점에 객체를 초기화합니다. 흔히 "<em>이름 생성자</em>" — 클래스와 동일한 이름을 가진 생성자 — 로 요약됩니다.</p>
+
+      <div class="code-label">Constructor.java</div>
+<pre class="code-block">class Person {
+    String name;
+    int age;
+
+    Person() {                 // 기본 생성자
+        this("이름없음", 0);    // this()로 다른 생성자 재사용
+    }
+    Person(String name, int age) {  // 매개변수 생성자
+        this.name = name;      // this.필드 = 매개변수 (동명이의 구분)
+        this.age = age;
+    }
+}
+
+public class Constructor {
+    public static void main(String[] args) {
+        Person p1 = new Person();
+        Person p2 = new Person("홍길동", 20);
+        System.out.println(p1.name + " " + p1.age);
+        System.out.println(p2.name + " " + p2.age);
+    }
+}</pre>
+      <div class="output-label">실행결과</div>
+<pre class="output-block">이름없음 0
+홍길동 20</pre>
+
+      <div class="note">클래스에 생성자를 <strong>하나도 안 쓰면</strong> 컴파일러가 매개변수 없는 <strong>기본 생성자</strong>를 자동으로 넣어줍니다. 하지만 매개변수 있는 생성자를 <strong>하나라도 직접 정의하면</strong> 기본 생성자는 자동 생성되지 않으므로, 필요하면 직접 추가해야 합니다.</div>
+    </section>
+
+    <!-- CH10 -->
+    <section id="ch10">
+      <h2><span class="num">10</span>오버로딩 vs 오버라이딩</h2>
+      <table>
+        <tr><th></th><th>오버로딩 (Overloading)</th><th>오버라이딩 (Overriding)</th></tr>
+        <tr><td>관계</td><td>같은 클래스 안</td><td>부모-자식 클래스 간</td></tr>
+        <tr><td>이름</td><td>같음</td><td>같음</td></tr>
+        <tr><td>매개변수</td><td><strong>달라야 함</strong>(개수/타입/순서)</td><td><strong>동일해야 함</strong></td></tr>
+        <tr><td>반환타입</td><td>무관</td><td>동일(또는 자식 타입 - 공변 반환)</td></tr>
+        <tr><td>목적</td><td>같은 기능을 다양한 입력으로 제공</td><td>부모 기능을 자식이 재정의</td></tr>
+        <tr><td>결정 시점</td><td>컴파일 타임(정적 바인딩)</td><td>런타임(동적 바인딩, VMI)</td></tr>
+      </table>
+
+      <div class="code-label">OverloadVsOverride.java</div>
+<pre class="code-block">class Calc {
+    void say() { System.out.println("say()"); }
+    void say(int a) { System.out.println("say(int) : " + a); }  // 오버로딩
+}
+class SpecialCalc extends Calc {
+    @Override
+    void say() { System.out.println("자식이 재정의한 say()"); }  // 오버라이딩
+}
+
+public class OverloadVsOverride {
+    public static void main(String[] args) {
+        Calc c = new SpecialCalc();
+        c.say();      // 오버라이딩된 자식 메소드 호출 (런타임 결정)
+        c.say(5);     // 오버로딩된 메소드 호출 (컴파일타임 결정)
+    }
+}</pre>
+      <div class="output-label">실행결과</div>
+<pre class="output-block">자식이 재정의한 say()
+say(int) : 5</pre>
+
+      <div class="warn"><strong>오버라이딩 3원칙:</strong> ① 메소드 시그니처(이름+매개변수) 동일 ② 접근제어자는 <strong>부모보다 좁힐 수 없음</strong> ③ 예외는 부모보다 더 넓게 던질 수 없음.</div>
+    </section>
+
+    <!-- CH11 -->
+    <section id="ch11">
+      <h2><span class="num">11</span>다형성 · 형변환 · VMI</h2>
+      <p><strong>다형성 발생 원리 = 반드시 상속(또는 구현) 관계여야 성립</strong>합니다. 부모 타입 참조변수가 자식 객체를 가리킬 수 있기 때문에 "하나의 타입, 여러 모습"이 가능해집니다. 이 장에서는 <strong>V(탈것)</strong>을 부모로, <strong>A(비행기) · B(버스) · C(택시)</strong>를 자식으로 하는 예제로 설명합니다.</p>
+
+      <div class="diagram-wrap">
+      <svg viewBox="0 0 460 220" xmlns="http://www.w3.org/2000/svg">
+        <rect x="160" y="15" width="140" height="46" rx="8" fill="#f3ead9" stroke="#5c5248" stroke-width="2"/>
+        <text x="230" y="43" text-anchor="middle" fill="#2c2620" font-weight="700" font-size="15">V (탈것)</text>
+        <line x1="230" y1="61" x2="80" y2="120" stroke="#5c5248" stroke-width="1.5"/>
+        <line x1="230" y1="61" x2="230" y2="120" stroke="#5c5248" stroke-width="1.5"/>
+        <line x1="230" y1="61" x2="380" y2="120" stroke="#5c5248" stroke-width="1.5"/>
+        <polygon points="230,61 218,88 242,88" fill="#fff" stroke="#5c5248"/>
+
+        <rect x="20" y="120" width="120" height="60" rx="8" fill="#dfe8f0" stroke="#4d6a8a" stroke-width="2"/>
+        <text x="80" y="145" text-anchor="middle" fill="#4d6a8a" font-weight="700" font-size="14">A (비행기)</text>
+        <text x="80" y="165" text-anchor="middle" fill="#5c5248" font-size="10">날아서 이동</text>
+
+        <rect x="170" y="120" width="120" height="60" rx="8" fill="#fbe9d8" stroke="#bd5a2e" stroke-width="2"/>
+        <text x="230" y="145" text-anchor="middle" fill="#bd5a2e" font-weight="700" font-size="14">B (버스)</text>
+        <text x="230" y="165" text-anchor="middle" fill="#5c5248" font-size="10">도로로 이동</text>
+
+        <rect x="320" y="120" width="120" height="60" rx="8" fill="#e9edda" stroke="#6b7d4f" stroke-width="2"/>
+        <text x="380" y="145" text-anchor="middle" fill="#4a5a33" font-weight="700" font-size="14">C (택시)</text>
+        <text x="380" y="165" text-anchor="middle" fill="#5c5248" font-size="10">손님 태우고 이동</text>
+
+        <text x="230" y="205" text-anchor="middle" font-size="11" fill="#8a7a63">모두 V(탈것)를 extends — move()를 각자 다르게 override</text>
+      </svg>
+      <p class="diagram-cap">부모 V(탈것) 타입 하나로 자식 A/B/C를 모두 가리킬 수 있고, 실제 호출되는 동작은 각 자식마다 다르다 — 이것이 다형성</p>
+      </div>
+
+      <h3>다형성 발생 원리 3원칙</h3>
+      <div class="grid2">
+        <div class="card">
+          <h4>1. 부타자생 — 부모의 타입으로 자식을 생성할 수 있다</h4>
+          <p style="font-size:14px;"><code>V v1 = new A();</code> — 선언 타입은 부모(V)지만, 실제로 <code>new</code> 되는 것은 자식(A) 객체입니다. 부모 타입 변수 하나로 원하는 자식을 골라 생성할 수 있습니다.</p>
+        </div>
+        <div class="card">
+          <h4>2. 부타자참 — 부모의 타입으로 자식을 받을 수 있다</h4>
+          <p style="font-size:14px;">이미 만들어진 자식 객체도 <code>V v4 = a3;</code>처럼 부모 타입 변수에 <strong>대입(참조)</strong>받을 수 있습니다. 메소드 매개변수가 <code>V</code> 타입이면 A·B·C 객체를 전부 인자로 넘길 수 있는 것도 같은 원리입니다.</p>
+        </div>
+        <div class="card">
+          <h4>3. 부메자호 — 부모의 메서드로 자식을 호출할 수 있다</h4>
+          <p style="font-size:14px;">부모 타입 변수 <code>v1</code>로 <code>v1.move()</code>를 호출하면, 컴파일러는 V에 <code>move()</code>가 있는지만 확인하고, 실제 실행되는 코드는 <strong>런타임에 힙 속 진짜 객체(A)</strong>가 오버라이딩한 버전입니다(VMI).</p>
+        </div>
+      </div>
+
+      <div class="code-label">Vehicle.java</div>
+<pre class="code-block">class V {                          // 부모: 탈것
+    void move() { System.out.println("이동한다"); }
+}
+class A extends V {                // 자식: 비행기
+    @Override void move() { System.out.println("비행기가 날아서 이동한다"); }
+    void fly() { System.out.println("이륙!"); }   // A 전용 메소드
+}
+class B extends V {                // 자식: 버스
+    @Override void move() { System.out.println("버스가 도로로 이동한다"); }
+}
+class C extends V {                // 자식: 택시
+    @Override void move() { System.out.println("택시가 손님을 태우고 이동한다"); }
+}
+
+public class Vehicle {
+    public static void main(String[] args) {
+        A a3 = new A();            // 자식 타입으로 생성
+
+        V v1 = new A();            // ① 부타자생 - 부모타입으로 자식을 생성
+        V v2 = new B();            // ① 부타자생
+        V v3 = new C();            // ① 부타자생
+        V v4 = a3;                 // ② 부타자참 - 부모타입으로 이미 만든 자식을 받음
+
+        v1.move();                 // ③ 부메자호 - "비행기가 날아서 이동한다" (VMI)
+        v2.move();                 // ③ "버스가 도로로 이동한다"
+        v3.move();                 // ③ "택시가 손님을 태우고 이동한다"
+        v4.move();                 // ③ "비행기가 날아서 이동한다"
+
+        // v1.fly();               // ❌ 컴파일 에러 - V타입 참조로는 A 전용 메소드 호출 불가
+        ((A) v1).fly();            // ✅ 다운캐스팅 후 호출 가능 - "이륙!"
+    }
+}</pre>
+      <div class="output-label">실행결과</div>
+<pre class="output-block">비행기가 날아서 이동한다
+버스가 도로로 이동한다
+택시가 손님을 태우고 이동한다
+비행기가 날아서 이동한다
+이륙!</pre>
+
+      <h3>업캐스팅 / 다운캐스팅</h3>
+      <div class="diagram-wrap">
+      <svg viewBox="0 0 640 190" xmlns="http://www.w3.org/2000/svg">
+        <rect x="20" y="20" width="180" height="46" rx="6" fill="#fbe9d8" stroke="#bd5a2e" stroke-width="2"/>
+        <text x="110" y="48" text-anchor="middle" fill="#bd5a2e" font-family="JetBrains Mono, monospace" font-size="13">A a3 = new A();</text>
+
+        <rect x="230" y="20" width="220" height="46" rx="6" fill="#dfe8f0" stroke="#4d6a8a" stroke-width="2"/>
+        <text x="340" y="48" text-anchor="middle" fill="#4d6a8a" font-family="JetBrains Mono, monospace" font-size="13">V v4 = a3;  // 업캐스팅(암묵적)</text>
+
+        <line x1="450" y1="65" x2="230" y2="95" stroke="#5c5248" stroke-width="1.5" marker-end="url(#arrow)"/>
+        <rect x="230" y="100" width="220" height="46" rx="6" fill="#e9edda" stroke="#6b7d4f" stroke-width="2"/>
+        <text x="340" y="128" text-anchor="middle" fill="#4a5a33" font-family="JetBrains Mono, monospace" font-size="13">A a5 = (A) v4; // 명시적 캐스팅</text>
+
+        <defs>
+          <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#5c5248"/></marker>
+        </defs>
+        <text x="340" y="175" text-anchor="middle" font-size="11" fill="#8a7a63">업캐스팅: 자식→부모, 자동 · 다운캐스팅: 부모→자식, 명시적 캐스팅 필요(런타임 ClassCastException 위험)</text>
+      </svg>
+      </div>
+
+      <h3>VMI (Virtual Method Invocation)</h3>
+      <p><strong>V v1 = new A();</strong> 형태로 선언해도, <code>v1.move()</code>를 호출하면 컴파일러가 아니라 <strong>런타임에 실제 힙에 있는 객체의 타입</strong>을 보고 어떤 <code>move()</code>를 실행할지 결정합니다. 이것이 <strong>가상 메소드 호출(VMI)</strong>이며, 오버라이딩이 다형성으로 이어지는 핵심 메커니즘입니다.</p>
+      <div class="note">정리: <strong>참조변수의 타입(V)은 "무엇을 호출할 수 있는지"(컴파일타임)</strong>를 결정하고, <strong>실제 객체의 타입(A/B/C)은 "어떤 코드가 실행되는지"(런타임)</strong>를 결정합니다. 부타자생·부타자참·부메자호 3원칙이 바로 이 구조를 가능하게 하는 문법적 근거입니다.</div>
+    </section>
+
+    <!-- CH12 -->
+    <section id="ch12">
+      <h2><span class="num">12</span>final 키워드</h2>
+      <table>
+        <tr><th>사용 위치</th><th>의미</th></tr>
+        <tr><td><code>final</code> 변수</td><td>값 재할당 불가 (상수화)</td></tr>
+        <tr><td><code>final</code> 메소드</td><td>자식 클래스에서 오버라이딩 금지</td></tr>
+        <tr><td><code>final</code> 클래스</td><td>상속 자체가 금지 — 자식 클래스를 만들 수 없음</td></tr>
+      </table>
+
+      <div class="code-label">FinalDemo.java</div>
+<pre class="code-block">final class MyUtil {          // final class → 상속 불가
+    static final double PI = 3.14159; // final 변수 → 재할당 불가
+}
+// class Sub extends MyUtil {}   // ❌ 컴파일 에러
+
+class Base {
+    final void rule() { System.out.println("규칙은 못 바꿈"); } // final 메소드
+}
+class Sub2 extends Base {
+    // void rule() { }   // ❌ 컴파일 에러 - 오버라이딩 금지
+}</pre>
+
+      <div class="warn"><strong>final class String</strong> — 자바의 <code>String</code>은 대표적인 <code>final</code> 클래스입니다. 문자열은 상수풀(String Pool)에서 공유·재사용되며 <strong>불변(immutable)</strong>이어야 안전하기 때문에, 상속으로 동작이 바뀌는 것을 원천 차단합니다. <code>String</code>의 <code>+</code> 연산이 매번 "새 객체"를 만드는 이유도 이 불변성 때문입니다.</div>
+    </section>
+
+    <!-- CH13 -->
+    <section id="ch13">
+      <h2><span class="num">13</span>String 클래스</h2>
+      <p><code>String</code>은 12장에서 배운 <strong>final class</strong>의 대표 사례이자, 자바에서 가장 많이 쓰이는 참조타입입니다. <code>char[]</code>을 감싸고 있지만 <strong>불변(immutable)</strong>이라는 점이 다른 클래스와 근본적으로 다릅니다.</p>
+
+      <h3>String Pool과 불변성</h3>
+      <div class="diagram-wrap">
+      <svg viewBox="0 0 640 190" xmlns="http://www.w3.org/2000/svg">
+        <rect x="20" y="20" width="600" height="150" rx="8" fill="#fbe9d8" stroke="#bd5a2e" stroke-width="2"/>
+        <text x="320" y="45" text-anchor="middle" fill="#bd5a2e" font-weight="700" font-size="14">String Constant Pool (Heap 내부, Method Area 상수풀과 연동)</text>
+
+        <rect x="50" y="65" width="120" height="40" rx="6" fill="#fff" stroke="#8a7a63"/>
+        <text x="110" y="90" text-anchor="middle" font-size="12" font-family="JetBrains Mono, monospace">"hi"</text>
+
+        <text x="200" y="90" font-size="11" fill="#5c5248">←</text>
+        <text x="220" y="80" font-size="10" fill="#5c5248">s1</text>
+        <text x="220" y="95" font-size="10" fill="#5c5248">s2</text>
+        <text x="250" y="80" font-size="10" fill="#5c5248">String s1 = "hi";</text>
+        <text x="250" y="95" font-size="10" fill="#5c5248">String s2 = "hi";  → 같은 객체 재사용</text>
+
+        <rect x="420" y="65" width="150" height="40" rx="6" fill="#dfe8f0" stroke="#4d6a8a"/>
+        <text x="495" y="90" text-anchor="middle" font-size="11" font-family="JetBrains Mono, monospace">new String("hi")</text>
+        <text x="420" y="120" font-size="10" fill="#5c5248">s3 = new String("hi") → Pool 밖에 별도 객체 생성</text>
+        <text x="320" y="150" text-anchor="middle" font-size="10.5" fill="#8a4a24">s1 == s2 → true (같은 Pool 객체) · s1 == s3 → false (다른 객체) · s1.equals(s3) → true (값은 같음)</text>
+      </svg>
+      </div>
+
+      <div class="code-label">StringPoolDemo.java</div>
+<pre class="code-block">public class StringPoolDemo {
+    public static void main(String[] args) {
+        String s1 = "hi";
+        String s2 = "hi";
+        String s3 = new String("hi");
+
+        System.out.println(s1 == s2);        // true  - Pool의 같은 객체 참조
+        System.out.println(s1 == s3);        // false - new는 Pool 밖에 새 객체
+        System.out.println(s1.equals(s3));   // true  - 값 비교는 같음
+
+        String s4 = s1 + "!";   // 문자열 연산은 매번 "새 객체" 생성 (불변이므로)
+        System.out.println(s1);  // "hi" - 원본은 절대 바뀌지 않는다
+        System.out.println(s4);  // "hi!"
+    }
+}</pre>
+      <div class="output-label">실행결과</div>
+<pre class="output-block">true
+false
+true
+hi
+hi!</pre>
+
+      <div class="warn"><strong>왜 불변인가?</strong> 문자열은 Pool에서 여러 참조가 <strong>동시에 공유</strong>합니다. 만약 값이 바뀔 수 있다면 <code>s1</code>을 바꿨을 때 같은 객체를 참조하던 <code>s2</code>도 함께 바뀌어버리는 부작용이 생깁니다. 그래서 <code>String</code>은 <code>final class</code>이자 내부 값도 <code>final</code>로 고정되어, 어떤 "변경"도 사실은 새 객체를 만드는 방식으로 처리됩니다.</div>
+
+      <h3>주요 메서드</h3>
+      <table>
+        <tr><th>메서드</th><th>기능</th><th>예시</th><th>결과</th></tr>
+        <tr><td><code>length()</code></td><td>문자열 길이</td><td><code>"hello".length()</code></td><td><code>5</code></td></tr>
+        <tr><td><code>charAt(i)</code></td><td>i번째 문자</td><td><code>"hello".charAt(1)</code></td><td><code>'e'</code></td></tr>
+        <tr><td><code>substring(a,b)</code></td><td>부분 문자열 [a,b)</td><td><code>"hello".substring(1,3)</code></td><td><code>"el"</code></td></tr>
+        <tr><td><code>indexOf(str)</code></td><td>처음 등장 위치(없으면 -1)</td><td><code>"hello".indexOf("l")</code></td><td><code>2</code></td></tr>
+        <tr><td><code>replace(a,b)</code></td><td>문자/문자열 치환</td><td><code>"hello".replace('l','L')</code></td><td><code>"heLLo"</code></td></tr>
+        <tr><td><code>toUpperCase()/toLowerCase()</code></td><td>대소문자 변환</td><td><code>"Hi".toUpperCase()</code></td><td><code>"HI"</code></td></tr>
+        <tr><td><code>trim()/strip()</code></td><td>양 끝 공백 제거</td><td><code>"  hi  ".trim()</code></td><td><code>"hi"</code></td></tr>
+        <tr><td><code>split(regex)</code></td><td>구분자로 분리 → String[]</td><td><code>"a,b,c".split(",")</code></td><td><code>["a","b","c"]</code></td></tr>
+        <tr><td><code>equals(obj)</code></td><td>내용 비교</td><td><code>"hi".equals("hi")</code></td><td><code>true</code></td></tr>
+        <tr><td><code>equalsIgnoreCase()</code></td><td>대소문자 무시 비교</td><td><code>"Hi".equalsIgnoreCase("hi")</code></td><td><code>true</code></td></tr>
+        <tr><td><code>compareTo(str)</code></td><td>사전순 비교(음수/0/양수)</td><td><code>"a".compareTo("b")</code></td><td><code>-1</code></td></tr>
+        <tr><td><code>contains(str)</code></td><td>포함 여부</td><td><code>"hello".contains("ell")</code></td><td><code>true</code></td></tr>
+        <tr><td><code>isEmpty()/isBlank()</code></td><td>빈 문자열 여부</td><td><code>"".isEmpty()</code></td><td><code>true</code></td></tr>
+        <tr><td><code>String.valueOf(x)</code></td><td>다른 타입 → 문자열</td><td><code>String.valueOf(10)</code></td><td><code>"10"</code></td></tr>
+      </table>
+
+      <div class="code-label">StringMethods.java</div>
+<pre class="code-block">public class StringMethods {
+    public static void main(String[] args) {
+        String s = "  Hello, Java World  ";
+        System.out.println(s.trim());                       // "Hello, Java World"
+        System.out.println(s.trim().toUpperCase());          // "HELLO, JAVA WORLD"
+        System.out.println(s.trim().split(", "));            // [Hello, Java World] (배열 참조 출력)
+        System.out.println(s.trim().split(", ")[1]);         // "Java World"
+        System.out.println(s.contains("Java"));               // true
+        System.out.println(s.trim().length());                // 18
+    }
+}</pre>
+      <div class="output-label">실행결과</div>
+<pre class="output-block">Hello, Java World
+HELLO, JAVA WORLD
+[Ljava.lang.String;@1b6d3586
+Java World
+true
+18</pre>
+
+      <div class="tip"><strong>StringBuilder / StringBuffer</strong> — 문자열을 반복해서 이어붙여야 할 때(<code>+</code> 연산 반복)는 매번 새 객체가 생겨 비효율적입니다. 이때는 <strong>가변(mutable)</strong>인 <code>StringBuilder</code>(단일 스레드용, 빠름) 또는 <code>StringBuffer</code>(스레드 안전, 느림)를 사용합니다.</div>
+    </section>
+
+    <!-- CH14 -->
+    <section id="ch14">
+      <h2><span class="num">14</span>static 키워드</h2>
+      <p><code>static</code>은 "인스턴스가 아니라 <strong>클래스(설계도) 자체에 소속</strong>"됨을 의미합니다. 3장의 메모리 구조와 연결하면, <code>static</code> 멤버는 Heap이 아니라 <strong>Method Area(클래스 영역)</strong>에 딱 하나만 저장되어 모든 인스턴스가 공유합니다.</p>
+
+      <div class="diagram-wrap">
+      <svg viewBox="0 0 640 200" xmlns="http://www.w3.org/2000/svg">
+        <rect x="20" y="20" width="180" height="160" rx="8" fill="#fbe9d8" stroke="#bd5a2e" stroke-width="2"/>
+        <text x="110" y="45" text-anchor="middle" fill="#bd5a2e" font-weight="700" font-size="13">Method Area</text>
+        <rect x="40" y="60" width="140" height="35" fill="#fff" stroke="#bd5a2e"/>
+        <text x="110" y="82" text-anchor="middle" font-size="11" font-family="JetBrains Mono, monospace">static int count</text>
+        <text x="110" y="115" text-anchor="middle" font-size="10" fill="#8a4a24">클래스당 딱 1개</text>
+        <text x="110" y="132" text-anchor="middle" font-size="10" fill="#8a4a24">모든 인스턴스가 공유</text>
+
+        <rect x="260" y="20" width="150" height="60" rx="8" fill="#e9edda" stroke="#6b7d4f" stroke-width="2"/>
+        <text x="335" y="45" text-anchor="middle" fill="#4a5a33" font-size="12">Heap - 객체1</text>
+        <text x="335" y="65" text-anchor="middle" font-size="10" fill="#5c6b45">instance field</text>
+
+        <rect x="260" y="100" width="150" height="60" rx="8" fill="#e9edda" stroke="#6b7d4f" stroke-width="2"/>
+        <text x="335" y="125" text-anchor="middle" fill="#4a5a33" font-size="12">Heap - 객체2</text>
+        <text x="335" y="145" text-anchor="middle" font-size="10" fill="#5c6b45">instance field</text>
+
+        <line x1="180" y1="77" x2="260" y2="50" stroke="#8a7a63" stroke-width="1.3" stroke-dasharray="3,3"/>
+        <line x1="180" y1="77" x2="260" y2="130" stroke="#8a7a63" stroke-width="1.3" stroke-dasharray="3,3"/>
+        <text x="480" y="60" font-size="10.5" fill="#8a7a63">객체1, 객체2 모두</text>
+        <text x="480" y="76" font-size="10.5" fill="#8a7a63">같은 static count를</text>
+        <text x="480" y="92" font-size="10.5" fill="#8a7a63">바라본다(공유)</text>
+      </svg>
+      </div>
+
+      <table>
+        <tr><th>구분</th><th>인스턴스 멤버</th><th>static 멤버</th></tr>
+        <tr><td>저장 위치</td><td>Heap(객체마다 별도)</td><td>Method Area(클래스당 1개)</td></tr>
+        <tr><td>생성 시점</td><td><code>new</code> 할 때마다</td><td>클래스 로딩 시 단 한 번</td></tr>
+        <tr><td>접근 방법</td><td><code>객체.필드</code></td><td><code>클래스명.필드</code> (객체 통해서도 가능하지만 권장 X)</td></tr>
+        <tr><td>static 메소드에서</td><td>인스턴스 필드 직접 사용 불가</td><td>static 필드만 직접 사용 가능</td></tr>
+      </table>
+
+      <div class="code-label">StaticDemo.java</div>
+<pre class="code-block">class Counter {
+    static int count = 0;   // 모든 객체가 공유하는 카운터 (Method Area)
+    int id;                  // 객체마다 따로 갖는 고유 번호 (Heap)
+
+    Counter() {
+        count++;              // 공유 변수 증가
+        id = count;            // 이 시점의 count값을 내 번호로 기록
+    }
+
+    static void printCount() {           // static 메소드
+        System.out.println("현재 개수: " + count);
+        // System.out.println(id);        // ❌ 컴파일 에러 - static 메소드에서 인스턴스 필드 직접 사용 불가
+    }
+}
+
+public class StaticDemo {
+    public static void main(String[] args) {
+        Counter c1 = new Counter();
+        Counter c2 = new Counter();
+        Counter c3 = new Counter();
+
+        System.out.println(c1.id + " " + c2.id + " " + c3.id);  // 1 2 3 (각자 다름)
+        System.out.println(Counter.count);                       // 3 (공유값, 클래스명으로 접근)
+        Counter.printCount();
+    }
+}</pre>
+      <div class="output-label">실행결과</div>
+<pre class="output-block">1 2 3
+3
+현재 개수: 3</pre>
+
+      <div class="note"><strong>static 메소드의 제약:</strong> static 메소드는 객체가 하나도 생성되기 전(클래스 로딩 시점)부터 호출될 수 있어야 하므로, <code>this</code>를 쓸 수 없고 인스턴스 필드·인스턴스 메소드를 직접 참조할 수 없습니다. <code>main(String[] args)</code>가 항상 <code>static</code>인 이유도 — JVM이 객체 생성 없이 프로그램을 시작해야 하기 때문입니다.</div>
+      <div class="tip"><strong>static 블록</strong>은 클래스가 처음 로딩될 때(5장의 "자설부설" — 설계도가 Method Area에 올라갈 때) 딱 한 번 실행되며, static 필드의 복잡한 초기화에 사용됩니다: <code>static { count = 100; }</code></div>
+    </section>
+
+    <!-- CH15 -->
+    <section id="ch15">
+      <h2><span class="num">15</span>Object 클래스</h2>
+      <p><strong>9. java.lang.Object</strong> — 자바의 모든 클래스는 명시하지 않아도 <code>Object</code>를 상속합니다(<code>extends Object</code>가 생략되어 있음). 즉 상속트리의 최상위 뿌리입니다. 대표 메소드 4가지는 다음과 같습니다.</p>
+      <table>
+        <tr><th>메소드</th><th>기본 동작(재정의 안 했을 때)</th><th>보통 재정의하는 이유</th></tr>
+        <tr><td><code>toString()</code></td><td><code>클래스명@해시코드16진수</code> 형태 문자열 반환</td><td>객체를 사람이 읽기 좋은 문자열로 표현</td></tr>
+        <tr><td><code>hashCode()</code></td><td>객체의 메모리 주소 기반 정수값</td><td>HashMap/HashSet 등 해시 자료구조의 버킷 결정</td></tr>
+        <tr><td><code>equals()</code></td><td><code>==</code>와 동일 — 참조(주소) 비교</td><td>"같은 주소"가 아니라 "같은 값"인지 비교</td></tr>
+        <tr><td><code>getClass()</code></td><td>런타임 실제 클래스 정보(Class 객체) 반환</td><td>런타임 타입 확인, 리플렉션</td></tr>
+      </table>
+
+      <div class="code-label">ObjectMethods.java</div>
+<pre class="code-block">class Point {
+    int x, y;
+    Point(int x, int y) { this.x = x; this.y = y; }
+
+    @Override
+    public String toString() { return "Point(" + x + ", " + y + ")"; }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Point)) return false;
+        Point p = (Point) o;
+        return this.x == p.x && this.y == p.y;
+    }
+
+    @Override
+    public int hashCode() { return java.util.Objects.hash(x, y); }
+}
+
+public class ObjectMethods {
+    public static void main(String[] args) {
+        Point p1 = new Point(1, 2);
+        Point p2 = new Point(1, 2);
+
+        System.out.println(p1);                 // toString() 자동 호출
+        System.out.println(p1 == p2);            // 주소 비교 → false
+        System.out.println(p1.equals(p2));        // 값 비교(재정의) → true
+        System.out.println(p1.getClass().getName());
+    }
+}</pre>
+      <div class="output-label">실행결과</div>
+<pre class="output-block">Point(1, 2)
+false
+true
+Point</pre>
+
+      <div class="warn"><strong>규칙:</strong> <code>equals()</code>를 재정의하면 <code>hashCode()</code>도 반드시 함께 재정의해야 합니다. "같다고 판단되는 두 객체는 반드시 같은 hashCode를 가져야 한다"는 계약을 지키지 않으면 HashMap/HashSet에서 중복 저장, 검색 실패 같은 버그가 발생합니다.</div>
+    </section>
+
+    <!-- CH14 -->
+    <section id="ch16">
+      <h2><span class="num">16</span>추상클래스 vs 인터페이스</h2>
+      <p><strong>10. interface는 100% 구현 X</strong> — 전통적으로 인터페이스는 메소드의 "이름표(시그니처)"만 정의하고, 실제 몸통(구현)은 이를 구현하는 클래스가 100% 채워야 했습니다(추상 메소드만 허용). 이것이 "interface 100% 구현 X" (구현체가 없다)의 의미입니다.</p>
+
+      <table>
+        <tr><th></th><th>추상클래스 (abstract class)</th><th>인터페이스 (interface)</th></tr>
+        <tr><td>키워드</td><td><code>abstract class</code></td><td><code>interface</code></td></tr>
+        <tr><td>상속/구현</td><td><code>extends</code> (단일 상속만)</td><td><code>implements</code> (다중 구현 가능)</td></tr>
+        <tr><td>일반 필드</td><td>가능</td><td>기본적으로 <code>public static final</code>(상수)만</td></tr>
+        <tr><td>일반(구현있는) 메소드</td><td>가능</td><td>Java 8+부터 <code>default</code>/<code>static</code> 메소드로 가능</td></tr>
+        <tr><td>생성자</td><td>가능(자식이 <code>super()</code>로 호출)</td><td>불가</td></tr>
+        <tr><td>목적</td><td>"~은 ~이다"(is-a) 관계, 공통 구현 재사용</td><td>"~을 할 수 있다"(can-do) 관계, 규격/약속</td></tr>
+      </table>
+
+      <div class="code-label">AbstractVsInterface.java</div>
+<pre class="code-block">abstract class Animal {              // 추상클래스: 공통 필드+일부 구현 보유
+    String name;
+    Animal(String name) { this.name = name; }
+    abstract void sound();            // 추상 메소드 - 자식이 반드시 구현
+    void sleep() { System.out.println(name + " 잠잔다"); } // 공통 구현 제공
+}
+interface Flyable {                  // 인터페이스: 할 수 있는 행위의 약속
+    void fly();                       // 추상 메소드
+    default void land() { System.out.println("착지"); } // Java8+ default 구현
+}
+
+class Bird extends Animal implements Flyable {
+    Bird(String name) { super(name); }
+    void sound() { System.out.println(name + " 짹짹"); }
+    public void fly() { System.out.println(name + " 날다"); }
+}
+
+public class AbstractVsInterface {
+    public static void main(String[] args) {
+        Bird b = new Bird("참새");
+        b.sound();   // 추상 메소드 구현
+        b.sleep();   // 추상클래스의 공통 구현 재사용
+        b.fly();     // 인터페이스 구현
+        b.land();    // 인터페이스의 default 메소드
+    }
+}</pre>
+      <div class="output-label">실행결과</div>
+<pre class="output-block">참새 짹짹
+참새 잠잔다
+참새 날다
+착지</pre>
+
+      <div class="tip">둘 다 <strong>추상화(A)</strong>와 <strong>다형성(P)</strong>의 기반입니다: 추상클래스/인터페이스 타입으로 여러 자식 객체를 통일하게 다룰 수 있고, 실제 실행은 항상 각 자식이 재정의한 메소드가 VMI로 호출됩니다.</div>
+
+      <h3>다중 구현 예제 — 펭귄 (Penguin extends Bird implements Fish)</h3>
+      <p>가장 중요한 차이 하나를 이 예제로 정리합니다: <strong>클래스 상속(extends)은 오직 하나만</strong> 가능하지만, <strong>인터페이스 구현(implements)은 여러 개를 동시에</strong> 할 수 있습니다. 펭귄은 "새(Bird)이면서 동시에 물고기처럼 헤엄칠 수 있는(Fish)" 존재이므로 이 둘을 함께 표현하기에 좋은 예입니다.</p>
+
+      <div class="diagram-wrap">
+      <svg viewBox="0 0 620 300" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="hollowTri" markerWidth="14" markerHeight="12" refX="12" refY="6" orient="auto">
+            <path d="M0,0 L12,6 L0,12 z" fill="#fff" stroke="#5c5248" stroke-width="1.2"/>
+          </marker>
+        </defs>
+
+        <!-- Animal (조상) -->
+        <rect x="210" y="10" width="200" height="42" rx="6" fill="#f3ead9" stroke="#5c5248" stroke-width="2"/>
+        <text x="310" y="36" text-anchor="middle" font-size="13" font-weight="700" fill="#2c2620">Animal (abstract)</text>
+
+        <!-- Bird2 (부모클래스) -->
+        <rect x="110" y="110" width="170" height="42" rx="6" fill="#dfe8f0" stroke="#4d6a8a" stroke-width="2"/>
+        <text x="195" y="136" text-anchor="middle" font-size="13" font-weight="700" fill="#4d6a8a">Bird2 (abstract)</text>
+
+        <!-- Fish (인터페이스) - Bird2 옆(같은 행)에 배치 -->
+        <rect x="340" y="110" width="150" height="42" rx="6" fill="#e9edda" stroke="#6b7d4f" stroke-width="2"/>
+        <text x="415" y="128" text-anchor="middle" font-size="10.5" font-weight="700" fill="#4a5a33">«interface»</text>
+        <text x="415" y="144" text-anchor="middle" font-size="13" font-weight="700" fill="#4a5a33">Fish</text>
+
+        <!-- Penguin (자식) -->
+        <rect x="190" y="220" width="200" height="46" rx="6" fill="#fbe9d8" stroke="#bd5a2e" stroke-width="2.5"/>
+        <text x="290" y="248" text-anchor="middle" font-size="14" font-weight="700" fill="#bd5a2e">Penguin</text>
+
+        <!-- Bird2 -> Animal : extends, 실선 + 속이 빈 삼각형 (자식→부모) -->
+        <line x1="220" y1="110" x2="270" y2="55" stroke="#5c5248" stroke-width="1.6" marker-end="url(#hollowTri)"/>
+
+        <!-- Penguin -> Bird2 : extends, 실선 + 속이 빈 삼각형 (자식→부모) -->
+        <line x1="250" y1="220" x2="205" y2="155" stroke="#5c5248" stroke-width="1.6" marker-end="url(#hollowTri)"/>
+
+        <!-- Penguin -> Fish : implements, 점선 + 속이 빈 삼각형 (구현체→인터페이스) -->
+        <line x1="340" y1="222" x2="400" y2="155" stroke="#6b7d4f" stroke-width="1.6" stroke-dasharray="5,4" marker-end="url(#hollowTri)"/>
+
+        <text x="310" y="290" text-anchor="middle" font-size="11" fill="#8a7a63">실선 화살표(▷) = extends(상속, 1개만) · 점선 화살표(▷) = implements(구현, 여러 개 가능) · 화살표는 항상 "자식 → 부모/인터페이스" 방향</text>
+      </svg>
+      <p class="diagram-cap">Penguin extends Bird2 (실선, 상속) · Penguin implements Fish (점선, 구현) — Fish는 Bird2와 같은 위(상위) 레벨에 나란히 배치, 화살표는 모두 Penguin에서 위쪽(부모/인터페이스)을 향한다</p>
+      </div>
+
+      <div class="code-label">PenguinDemo.java</div>
+<pre class="code-block">abstract class Animal2 {
+    String name;
+    Animal2(String name) { this.name = name; }
+    abstract void sound();
+}
+
+abstract class Bird2 extends Animal2 {          // 추상클래스: Animal2를 딱 1개만 상속(extends)
+    Bird2(String name) { super(name); }
+    void layEgg() { System.out.println(name + " 알을 낳는다"); }  // 새의 공통 구현
+    abstract void fly();                          // 새는 원래 날 수 있어야 하지만, 자식이 재정의하도록 추상으로 둠
+}
+
+interface Fish {                                  // 인터페이스: "헤엄칠 수 있다"는 약속
+    void swim();
+    default void breathe() { System.out.println("아가미 대신 폐로 숨을 참는다"); }
+}
+
+class Penguin extends Bird2 implements Fish {     // extends는 1개, implements는 여러 개 가능
+    Penguin(String name) { super(name); }
+    void sound() { System.out.println(name + " 꽥꽥"); }
+    void fly() { System.out.println(name + "은(는) 날지 못한다"); }   // 새이지만 오버라이딩으로 예외 표현
+    public void swim() { System.out.println(name + "이(가) 헤엄친다"); } // Fish 인터페이스 구현
+}
+
+public class PenguinDemo {
+    public static void main(String[] args) {
+        Penguin p = new Penguin("뽀로로");
+        p.sound();      // Animal2에서 내려온 추상 메소드 구현
+        p.layEgg();      // Bird2의 공통 구현 재사용
+        p.fly();          // Bird2의 추상 메소드를 재정의(날지 못함)
+        p.swim();         // Fish 인터페이스 구현
+        p.breathe();      // Fish의 default 메소드
+
+        Bird2 asBird = p;    // 부타자참 - 부모(Bird2) 타입으로 자식(Penguin)을 받음
+        Fish asFish = p;      // 인터페이스 타입으로도 같은 객체를 받을 수 있음
+        asBird.fly();
+        asFish.swim();
+    }
+}</pre>
+      <div class="output-label">실행결과</div>
+<pre class="output-block">뽀로로 꽥꽥
+뽀로로 알을 낳는다
+뽀로로은(는) 날지 못한다
+뽀로로이(가) 헤엄친다
+아가미 대신 폐로 숨을 참는다
+뽀로로은(는) 날지 못한다
+뽀로로이(가) 헤엄친다</pre>
+
+      <div class="note"><strong>핵심 포인트 3가지</strong><br>
+      ① <code>Penguin</code>은 <code>extends</code>를 <strong>단 하나(Bird2)</strong>만 쓸 수 있지만, <code>implements</code>는 <code>Fish</code> 외에도 <code>implements Fish, Swimmable, Trainable</code>처럼 <strong>콤마로 여러 개</strong> 나열할 수 있습니다.<br>
+      ② 부모(Bird2)가 정의한 추상 메소드(<code>fly()</code>)를 자식이 "새답지 않게" 재정의할 수 있는 것도 오버라이딩의 자유입니다 — 다형성은 "펭귄답게" 동작을 바꾸는 것을 허용합니다.<br>
+      ③ 같은 <code>Penguin</code> 객체를 <code>Bird2</code> 타입으로도, <code>Fish</code> 타입으로도 받을 수 있는 것이 11장의 <strong>부타자참</strong> 원리이며, 인터페이스가 있기에 상속 트리와 무관한 타입으로도 다형성을 확장할 수 있습니다.</div>
+    </section>
+
+    <!-- CH18 -->
+    <section id="ch18">
+      <h2><span class="num">18</span>메모리 종합 다이어그램 — A a1 = new A();</h2>
+      <p>지금까지 배운 <strong>Method Area(설계도) · Heap(실제 객체) · Stack(참조)</strong>, <strong>상속 계층(A extends V extends Object)</strong>, <strong>Object의 hashCode()</strong>를 하나의 그림으로 통합합니다. <code>A a1 = new A();</code> 한 줄이 실행되는 순간 세 영역에서 각각 무슨 일이 일어나는지 원(circle) 레이어로 표현했습니다.</p>
+
+      <div class="diagram-wrap">
+      <svg viewBox="0 0 780 400" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="refArrow" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+            <path d="M0,0 L8,4 L0,8 z" fill="#5c5248"/>
+          </marker>
+        </defs>
+
+        <!-- Method Area -->
+        <rect x="10" y="15" width="230" height="370" rx="8" fill="#fbe9d8" stroke="#bd5a2e" stroke-width="2"/>
+        <text x="125" y="40" text-anchor="middle" fill="#bd5a2e" font-weight="700" font-size="14">Method Area</text>
+        <text x="125" y="58" text-anchor="middle" fill="#8a4a24" font-size="10">(설계도 · class 정보)</text>
+
+        <circle cx="125" cy="330" r="60" fill="#fff" stroke="#bd5a2e" stroke-width="2"/>
+        <text x="125" y="336" text-anchor="middle" font-size="15" font-weight="700" fill="#bd5a2e">A</text>
+        <circle cx="125" cy="250" r="46" fill="#fdf3e8" stroke="#4d6a8a" stroke-width="2"/>
+        <text x="125" y="256" text-anchor="middle" font-size="14" font-weight="700" fill="#4d6a8a">V</text>
+        <circle cx="125" cy="185" r="32" fill="#fff9f0" stroke="#5c5248" stroke-width="2"/>
+        <text x="118" y="190" text-anchor="middle" font-size="11" font-weight="700" fill="#2c2620">O</text>
+        <text x="125" y="150" text-anchor="middle" font-size="9.5" fill="#8a7a63">(Object)</text>
+
+        <text x="125" y="380" text-anchor="middle" font-size="10" fill="#8a4a24">로딩 순서: O → V → A</text>
+
+        <!-- Stack -->
+        <rect x="270" y="15" width="140" height="370" rx="8" fill="#dfe8f0" stroke="#4d6a8a" stroke-width="2"/>
+        <text x="340" y="40" text-anchor="middle" fill="#4d6a8a" font-weight="700" font-size="14">Stack</text>
+        <text x="340" y="58" text-anchor="middle" fill="#3d5a78" font-size="10">(참조 저장)</text>
+
+        <rect x="290" y="180" width="100" height="36" rx="5" fill="#fff" stroke="#4d6a8a" stroke-width="2"/>
+        <text x="340" y="203" text-anchor="middle" font-size="12" font-family="JetBrains Mono, monospace" fill="#2c2620">a1</text>
+
+        <line x1="390" y1="198" x2="470" y2="198" stroke="#5c5248" stroke-width="2" marker-end="url(#refArrow)"/>
+        <text x="430" y="188" text-anchor="middle" font-size="9.5" fill="#5c5248">참조</text>
+
+        <!-- Heap -->
+        <rect x="470" y="15" width="300" height="370" rx="8" fill="#e9edda" stroke="#6b7d4f" stroke-width="2"/>
+        <text x="620" y="40" text-anchor="middle" fill="#4a5a33" font-weight="700" font-size="14">Heap</text>
+        <text x="620" y="58" text-anchor="middle" fill="#4a5a33" font-size="10">(new A() 로 생성된 실제 객체)</text>
+
+        <circle cx="600" cy="330" r="60" fill="#fff" stroke="#bd5a2e" stroke-width="2.5"/>
+        <text x="600" y="336" text-anchor="middle" font-size="15" font-weight="700" fill="#bd5a2e">A</text>
+        <circle cx="600" cy="250" r="46" fill="#fdf3e8" stroke="#4d6a8a" stroke-width="2"/>
+        <text x="600" y="256" text-anchor="middle" font-size="14" font-weight="700" fill="#4d6a8a">V</text>
+        <circle cx="600" cy="185" r="32" fill="#fff9f0" stroke="#5c5248" stroke-width="2.5"/>
+        <text x="593" y="190" text-anchor="middle" font-size="11" font-weight="700" fill="#2c2620">O</text>
+
+        <!-- hashCode tag on the Object circle -->
+        <line x1="628" y1="175" x2="700" y2="140" stroke="#8a7a63" stroke-width="1.3" stroke-dasharray="3,3"/>
+        <rect x="695" y="115" width="75" height="34" rx="5" fill="#fff" stroke="#8a7a63"/>
+        <text x="732" y="130" text-anchor="middle" font-size="9" font-family="JetBrains Mono, monospace" fill="#2c2620">hashCode()</text>
+        <text x="732" y="143" text-anchor="middle" font-size="8.5" font-family="JetBrains Mono, monospace" fill="#8a4a24">1a2b3c4d</text>
+
+        <line x1="470" y1="198" x2="569" y2="187" stroke="#5c5248" stroke-width="2" marker-end="url(#refArrow)" stroke-dasharray="0"/>
+
+        <text x="620" y="380" text-anchor="middle" font-size="10" fill="#4a5a33">a1은 Object 영역(hashCode의 근거)을 참조 — 객체 전체(A⊃V⊃O)가 힙에 함께 생성되지만, 참조가 향하는 정체성의 뿌리는 Object다</text>
+      </svg>
+      <p class="diagram-cap">Method Area(왼쪽)의 설계도 O→V→A 순서로 로딩된 뒤, <code>new A()</code>가 Heap(오른쪽)에 그 설계도 그대로 O⊂V⊂A 구조의 실제 객체를 만들고, Stack의 참조변수 a1은 그 객체의 Object 영역(hashCode)을 가리킨다.</p>
+      </div>
+
+      <div class="code-label">A_V_Object.java</div>
+<pre class="code-block">class V { void move() { System.out.println("이동한다"); } }   // Object를 암묵적으로 extends
+class A extends V { void open() { System.out.println("A.open()"); } }
+
+public class A_V_Object {
+    public static void main(String[] args) {
+        A a1 = new A();   // Method Area: O→V→A 설계도가 이미 로딩되어 있음
+                            // Heap: O를 포함한 V를 포함한 A 객체 1개 생성
+                            // Stack: 참조변수 a1이 그 Heap 객체의 주소를 저장
+        System.out.println(a1.hashCode());   // Object가 제공하는 고유 식별값
+        System.out.println(a1);              // Object.toString() 기본형: 클래스명@16진수hashCode
+    }
+}</pre>
+      <div class="output-label">실행결과 (실제 값은 실행마다 다름)</div>
+<pre class="output-block">439288016
+A@1a2b3c4d</pre>
+
+      <div class="note">이 그림이 5장(메모리 특징 4원칙)과 만나는 지점: <strong>자설부설</strong>(Method Area에 O→V→A 순서로 설계도 로딩) → <strong>자생부생</strong>(Heap에 O→V→A 순서로 생성자 실행) → <strong>생주부주</strong>(Heap에 만들어진 하나의 주소 안에 A뿐 아니라 V, Object 영역까지 포함) → <strong>설공메사</strong>(a1로는 A·V·Object 중 공개된 멤버만 호출 가능). <code>hashCode()</code>는 그중 Object가 공개한 대표적인 메소드입니다.</div>
+    </section>
+
+    <!-- CH19 -->
+    <section id="ch19">
+      <h2><span class="num">19</span>참조타입 vs 실제타입 다이어그램 — V v1 = new A();</h2>
+      <p>18장과 같은 구조이지만, 이번에는 <strong>참조변수의 선언 타입(V)</strong>과 <strong>실제 생성된 객체의 타입(A)</strong>이 다릅니다. 11장의 다형성(부타자생)이 메모리 위에서 어떻게 그려지는지 확인합니다.</p>
+
+      <div class="diagram-wrap">
+      <svg viewBox="0 0 780 400" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="refArrow2" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto">
+            <path d="M0,0 L8,4 L0,8 z" fill="#5c5248"/>
+          </marker>
+        </defs>
+
+        <!-- Method Area : 참조타입 V의 관점 -> V, O 만 표시 -->
+        <rect x="10" y="15" width="230" height="370" rx="8" fill="#fbe9d8" stroke="#bd5a2e" stroke-width="2"/>
+        <text x="125" y="40" text-anchor="middle" fill="#bd5a2e" font-weight="700" font-size="14">Method Area</text>
+        <text x="125" y="58" text-anchor="middle" fill="#8a4a24" font-size="10">(참조타입 V 기준 설계도)</text>
+
+        <circle cx="125" cy="290" r="55" fill="#fff" stroke="#4d6a8a" stroke-width="2.5"/>
+        <text x="125" y="296" text-anchor="middle" font-size="15" font-weight="700" fill="#4d6a8a">V</text>
+        <circle cx="125" cy="205" r="34" fill="#fff9f0" stroke="#5c5248" stroke-width="2"/>
+        <text x="118" y="210" text-anchor="middle" font-size="11" font-weight="700" fill="#2c2620">O</text>
+        <text x="125" y="165" text-anchor="middle" font-size="9.5" fill="#8a7a63">(Object)</text>
+
+        <text x="125" y="345" text-anchor="middle" font-size="10" fill="#8a4a24">v1의 선언 타입 기준: O → V만 표시</text>
+        <text x="125" y="362" text-anchor="middle" font-size="9" fill="#a3937a">(A의 설계도는 별도로 이미 로딩되어 있음)</text>
+
+        <!-- Stack -->
+        <rect x="270" y="15" width="140" height="370" rx="8" fill="#dfe8f0" stroke="#4d6a8a" stroke-width="2"/>
+        <text x="340" y="40" text-anchor="middle" fill="#4d6a8a" font-weight="700" font-size="14">Stack</text>
+        <text x="340" y="58" text-anchor="middle" fill="#3d5a78" font-size="10">(참조 저장)</text>
+
+        <rect x="290" y="180" width="100" height="36" rx="5" fill="#fff" stroke="#4d6a8a" stroke-width="2"/>
+        <text x="340" y="203" text-anchor="middle" font-size="12" font-family="JetBrains Mono, monospace" fill="#2c2620">v1</text>
+
+        <line x1="390" y1="198" x2="470" y2="198" stroke="#5c5248" stroke-width="2" marker-end="url(#refArrow2)"/>
+        <text x="430" y="188" text-anchor="middle" font-size="9.5" fill="#5c5248">참조</text>
+
+        <!-- Heap : 실제 객체 -> A, V, O 전부 -->
+        <rect x="470" y="15" width="300" height="370" rx="8" fill="#e9edda" stroke="#6b7d4f" stroke-width="2"/>
+        <text x="620" y="40" text-anchor="middle" fill="#4a5a33" font-weight="700" font-size="14">Heap</text>
+        <text x="620" y="58" text-anchor="middle" fill="#4a5a33" font-size="10">(new A() 로 생성된 실제 객체)</text>
+
+        <circle cx="600" cy="330" r="60" fill="#fff" stroke="#bd5a2e" stroke-width="2.5"/>
+        <text x="600" y="336" text-anchor="middle" font-size="15" font-weight="700" fill="#bd5a2e">A</text>
+        <circle cx="600" cy="250" r="46" fill="#fdf3e8" stroke="#4d6a8a" stroke-width="2"/>
+        <text x="600" y="256" text-anchor="middle" font-size="14" font-weight="700" fill="#4d6a8a">V</text>
+        <circle cx="600" cy="185" r="32" fill="#fff9f0" stroke="#5c5248" stroke-width="2.5"/>
+        <text x="593" y="190" text-anchor="middle" font-size="11" font-weight="700" fill="#2c2620">O</text>
+
+        <!-- hashCode tag on the Object circle -->
+        <line x1="628" y1="175" x2="700" y2="140" stroke="#8a7a63" stroke-width="1.3" stroke-dasharray="3,3"/>
+        <rect x="695" y="115" width="75" height="34" rx="5" fill="#fff" stroke="#8a7a63"/>
+        <text x="732" y="130" text-anchor="middle" font-size="9" font-family="JetBrains Mono, monospace" fill="#2c2620">hashCode()</text>
+        <text x="732" y="143" text-anchor="middle" font-size="8.5" font-family="JetBrains Mono, monospace" fill="#8a4a24">7f9e1d5c</text>
+
+        <line x1="470" y1="198" x2="569" y2="187" stroke="#5c5248" stroke-width="2" marker-end="url(#refArrow2)"/>
+
+        <text x="620" y="380" text-anchor="middle" font-size="10" fill="#4a5a33">v1은 Object 영역(hashCode)을 참조 — 힙에는 A⊃V⊃O 전체가 만들어지지만, v1의 "타입"은 V일 뿐이다</text>
+      </svg>
+      <p class="diagram-cap">Method Area에는 v1의 <strong>선언 타입(V)</strong> 기준 설계도(O→V)만 표시 — 실제로는 A의 설계도도 이미 로딩되어 있지만, v1이 "알고 있는" 범위는 V까지다. Heap에는 <strong>실제 생성된 A 객체</strong>가 O⊂V⊂A 구조 그대로 만들어지고, Stack의 v1은 그 객체의 Object 영역을 참조한다.</p>
+      </div>
+
+      <div class="code-label">V_v1_new_A.java</div>
+<pre class="code-block">class V { void move() { System.out.println("V.move()"); } }         // Object를 암묵적으로 extends
+class A extends V { void move() { System.out.println("A.move()"); } void open() { System.out.println("A.open()"); } }
+
+public class V_v1_new_A {
+    public static void main(String[] args) {
+        V v1 = new A();     // 선언 타입 V, 실제 객체 A (부타자생 - 11장)
+                              // Method Area: v1은 V→Object 설계도까지만 "보인다"
+                              // Heap: 실제로는 A 전체(O⊂V⊂A)가 만들어짐
+                              // Stack: 참조변수 v1이 그 객체를 가리킴
+
+        v1.move();             // "A.move()" - 실제 객체(A) 기준으로 VMI 실행 (부메자호)
+        // v1.open();          // ❌ 컴파일 에러 - V타입 참조로는 A 전용 메소드 호출 불가
+        System.out.println(v1.hashCode());   // Object가 제공하는 고유 식별값
+    }
+}</pre>
+      <div class="output-label">실행결과 (해시값은 실행마다 다름)</div>
+<pre class="output-block">A.move()
+439288016</pre>
+
+      <div class="note"><strong>18장과의 차이:</strong> <code>A a1 = new A()</code>는 선언 타입과 실제 타입이 같아 Method Area에 A까지 보였지만, <code>V v1 = new A()</code>는 선언 타입이 V이므로 Method Area에는 V까지만 표시했습니다. 그러나 <strong>Heap에 만들어지는 실제 객체는 두 경우 모두 동일하게 O⊂V⊂A 전체</strong>입니다 — 이것이 "타입은 컴파일타임에 호출 가능 범위를 제한하지만, 실행은 항상 런타임의 진짜 객체를 따른다"는 다형성의 핵심(11장 VMI)입니다.</div>
+    </section>
+
+    <!-- CH15 -->
+    <section id="ch20">
+      <h2><span class="num">20</span>종합 체크리스트</h2>
+      <ul class="checklist">
+        <li>JDK ⊃ JRE ⊃ JVM 포함관계와 각 구성요소(javac/java/javap)를 설명할 수 있다</li>
+        <li>.java → .class(바이트코드) → JVM 실행 흐름을 그릴 수 있다</li>
+        <li>Method Area(공유·설계도) / Stack(스레드별·FILO) / Heap(공유·GC대상)의 역할을 구분한다</li>
+        <li>Young Generation(Eden/S0/S1) → Old Generation 승격과 Minor/Major GC 차이를 안다</li>
+        <li>OOP 4대 특징 APIE(추상화/다형성/상속/캡슐화)를 각각 예시로 설명할 수 있다</li>
+        <li>상속에서 private 멤버는 물려받지 못한다는 것과 그 이유(캡슐화)를 안다</li>
+        <li>생성자의 특징(이름=클래스명, 반환타입 없음, this()/super() 사용법)을 안다</li>
+        <li>오버로딩(같은 클래스·매개변수 다름·컴파일타임)과 오버라이딩(부모자식·시그니처 동일·런타임)을 구분한다</li>
+        <li>다형성 3원칙(부타자생·부타자참·부메자호)과 업캐스팅/다운캐스팅, VMI(실제 객체 기준 메소드 호출)를 설명할 수 있다</li>
+        <li>final 변수/메소드/클래스의 차이와 String이 final class인 이유를 안다</li>
+        <li>String Pool과 불변성(<code>==</code> vs <code>equals()</code>) 및 주요 메서드(substring/split/trim 등)를 안다</li>
+        <li>static 멤버가 Method Area에 저장되어 모든 인스턴스가 공유한다는 것과 static 메소드의 제약을 안다</li>
+        <li>Object의 toString/hashCode/equals/getClass 기본 동작과 재정의 이유를 안다</li>
+        <li>equals() 재정의 시 hashCode()도 함께 재정의해야 하는 이유를 설명할 수 있다</li>
+        <li>A a1 = new A(); 한 줄이 Method Area(O→V→A 설계도) · Heap(O⊂V⊂A 실제객체) · Stack(참조 a1) 세 영역에서 어떻게 처리되는지 그림으로 설명할 수 있다</li>
+        <li>V v1 = new A(); 처럼 선언 타입과 실제 타입이 다를 때, Method Area(선언타입 기준)와 Heap(실제타입 기준)의 차이를 그림으로 설명할 수 있다</li>
+        <li>추상클래스(is-a, 부분구현)와 인터페이스(can-do, Java8+ default) 차이를 안다</li>
+        <li>Penguin extends Bird implements Fish처럼 extends는 1개만, implements는 여러 개 가능함을 UML로 설명할 수 있다</li>
+      </ul>
+    </section>
+
+    <footer>자바 기본 완전학습서 · warm-paper study series</footer>
+  </main>
+</div>
+
+<script>
+  const links = document.querySelectorAll('#toc a');
+  const sections = Array.from(links).map(l => document.querySelector(l.getAttribute('href')));
+  function onScroll(){
+    let idx = 0;
+    const y = window.scrollY + 120;
+    sections.forEach((s,i)=>{ if(s && s.offsetTop <= y) idx = i; });
+    links.forEach(l=>l.classList.remove('active'));
+    if(links[idx]) links[idx].classList.add('active');
+  }
+  window.addEventListener('scroll', onScroll);
+  onScroll();
+</script>
+</body>
+</html>

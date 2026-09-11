@@ -1,0 +1,1956 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python vs Java — 그래프 알고리즘 비교</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Noto+Sans+KR:wght@300;400;700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --py: #2563eb;
+  --py2: #1d4ed8;
+  --py-bg: rgba(37,99,235,0.07);
+  --py-border: #bfdbfe;
+  --java: #d97706;
+  --java2: #b45309;
+  --java-bg: rgba(217,119,6,0.07);
+  --java-border: #fde68a;
+  --bg: #ffffff;
+  --surface: #f8fafc;
+  --surface2: #f1f5f9;
+  --border: #e2e8f0;
+  --text: #0f172a;
+  --muted: #64748b;
+  --muted2: #94a3b8;
+  --accent: #7c3aed;
+  --green: #16a34a;
+  --red: #dc2626;
+  --orange: #ea580c;
+  --teal: #0891b2;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:var(--bg); color:var(--text); font-family:'Noto Sans KR',sans-serif; min-height:100vh; }
+
+/* HERO */
+.hero {
+  padding: 52px 24px 36px;
+  text-align: center;
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(to bottom, #f8fafc, #ffffff);
+}
+.hero-badge {
+  display:inline-block; font-family:'JetBrains Mono',monospace;
+  font-size:10px; letter-spacing:3px; color:var(--accent);
+  border:1px solid #ddd6fe; background:#faf5ff;
+  padding:4px 14px; border-radius:20px; margin-bottom:18px; text-transform:uppercase;
+}
+.hero h1 { font-size:clamp(1.8rem,4vw,3rem); font-weight:900; line-height:1.1; margin-bottom:10px; }
+.hero h1 .py { color:var(--py); }
+.hero h1 .java { color:var(--java); }
+.hero p { color:var(--muted); font-size:14px; font-weight:300; }
+
+/* TAB NAV */
+.tab-nav {
+  display:flex; flex-wrap:wrap; gap:4px;
+  padding:16px 20px; background:var(--surface);
+  border-bottom:1px solid var(--border); position:sticky; top:0; z-index:100;
+}
+.tab-btn {
+  font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.5px;
+  padding:6px 14px; border:1px solid var(--border); background:var(--bg);
+  color:var(--muted); cursor:pointer; border-radius:4px; transition:all .18s;
+  white-space:nowrap;
+}
+.tab-btn:hover { border-color:var(--py); color:var(--py); background:#eff6ff; }
+.tab-btn.active { background:var(--py); border-color:var(--py); color:#fff; }
+
+/* MAIN */
+.main { max-width:1320px; margin:0 auto; padding:0 20px 60px; }
+
+/* SECTION */
+.algo-section { display:none; animation:fadeIn .25s ease; padding-top:28px; }
+.algo-section.active { display:block; }
+@keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+
+/* SECTION HEADER */
+.sec-head {
+  display:flex; align-items:flex-start; gap:14px;
+  margin-bottom:22px; padding-bottom:16px; border-bottom:2px solid var(--border);
+}
+.sec-icon {
+  width:44px; height:44px; border-radius:10px; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  font-size:20px; background:var(--surface2); border:1px solid var(--border);
+}
+.sec-head h2 { font-size:22px; font-weight:800; }
+.sec-head p { font-size:12px; color:var(--muted); margin-top:3px; }
+.complexity-badges { display:flex; gap:6px; margin-top:6px; flex-wrap:wrap; }
+.cb {
+  font-family:'JetBrains Mono',monospace; font-size:10px; padding:2px 9px;
+  border-radius:3px; border:1px solid; white-space:nowrap;
+}
+.cb.time { color:#7c3aed; border-color:#ddd6fe; background:#faf5ff; }
+.cb.space { color:#0891b2; border-color:#bae6fd; background:#f0f9ff; }
+.cb.type { color:#16a34a; border-color:#bbf7d0; background:#f0fdf4; }
+
+/* SPLIT CARD */
+.split-card {
+  display:grid; grid-template-columns:1fr 1fr; gap:2px;
+  border:1px solid var(--border); border-radius:10px; overflow:hidden;
+  margin-bottom:20px; background:var(--border);
+}
+.split-side { background:var(--bg); padding:22px; }
+.split-side.py-side { border-top:3px solid var(--py); }
+.split-side.java-side { border-top:3px solid var(--java); }
+
+.lang-label {
+  font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px;
+  text-transform:uppercase; margin-bottom:8px;
+  display:flex; align-items:center; gap:7px;
+}
+.lang-label.py { color:var(--py); }
+.lang-label.java { color:var(--java); }
+.lang-dot { width:7px; height:7px; border-radius:50%; background:currentColor; }
+.ds-title { font-size:16px; font-weight:700; margin-bottom:2px; }
+.ds-sub { font-size:11px; color:var(--muted); margin-bottom:14px; }
+
+/* CODE */
+pre {
+  background:var(--surface); border:1px solid var(--border); border-radius:7px;
+  padding:14px; font-family:'JetBrains Mono',monospace; font-size:11.5px;
+  line-height:1.75; overflow-x:auto; tab-size:4;
+}
+.kw { color:#7c3aed; font-weight:600; }
+.st { color:#16a34a; }
+.cm { color:#94a3b8; font-style:italic; }
+.num { color:#ea580c; }
+.fn { color:#2563eb; }
+.ty { color:#0891b2; }
+.op { color:#64748b; }
+
+/* COMPARE TABLE */
+.ctbl { width:100%; border-collapse:collapse; margin-bottom:20px; font-size:13px; }
+.ctbl th {
+  padding:10px 14px; text-align:left; font-family:'JetBrains Mono',monospace;
+  font-size:10px; letter-spacing:1px; text-transform:uppercase;
+  border-bottom:2px solid var(--border); color:var(--muted);
+}
+.ctbl th.py { color:var(--py); border-bottom-color:var(--py); }
+.ctbl th.java { color:var(--java); border-bottom-color:var(--java); }
+.ctbl td { padding:9px 14px; border-bottom:1px solid var(--border); vertical-align:top; line-height:1.5; }
+.ctbl td:first-child { color:var(--muted); font-size:11px; white-space:nowrap; font-family:'JetBrains Mono',monospace; }
+.ctbl tr:hover td { background:#fafafa; }
+
+/* VIZ PANEL */
+.viz { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:22px; margin-bottom:20px; }
+.viz-title {
+  font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px;
+  text-transform:uppercase; color:var(--accent); margin-bottom:16px;
+}
+
+/* GRAPH NODES */
+.graph-wrap { overflow-x:auto; }
+svg text { font-family:'JetBrains Mono',monospace; }
+
+/* TAG ROW */
+.tag-row { display:flex; flex-wrap:wrap; gap:5px; margin-top:10px; }
+.tag {
+  font-size:10px; font-family:'JetBrains Mono',monospace;
+  padding:2px 9px; border-radius:3px; border:1px solid; letter-spacing:.3px;
+}
+.tag.py { color:#1d4ed8; border-color:#bfdbfe; background:rgba(37,99,235,0.05); }
+.tag.java { color:#b45309; border-color:#fde68a; background:rgba(217,119,6,0.05); }
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:3px}
+
+/* OVERVIEW TABLE */
+.ov-table { width:100%; border-collapse:collapse; font-size:13px; }
+.ov-table th { padding:10px 14px; background:var(--surface2); font-weight:700; font-size:11px; text-align:left; border:1px solid var(--border); }
+.ov-table td { padding:9px 14px; border:1px solid var(--border); vertical-align:middle; line-height:1.5; }
+.ov-table tr:nth-child(even) td { background:var(--surface); }
+.badge { display:inline-block; font-family:'JetBrains Mono',monospace; font-size:10px; padding:1px 8px; border-radius:3px; }
+.badge.g { background:#dcfce7; color:#15803d; }
+.badge.y { background:#fef9c3; color:#a16207; }
+.badge.b { background:#dbeafe; color:#1d4ed8; }
+.badge.p { background:#f3e8ff; color:#7e22ce; }
+
+@media(max-width:768px){
+  .split-card{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-badge">Graph Algorithms</div>
+  <h1><span class="py">Python</span> vs <span class="java">Java</span></h1>
+  <p>BFS · DFS · Flood Fill · Union Find · Kruskal · Prim · Dijkstra · Floyd-Warshall</p>
+</div>
+
+<div class="tab-nav">
+  <button class="tab-btn active" onclick="showTab('overview',this)">전체 비교</button>
+  <button class="tab-btn" onclick="showTab('bfs',this)">BFS</button>
+  <button class="tab-btn" onclick="showTab('dfs',this)">DFS</button>
+  <button class="tab-btn" onclick="showTab('ff',this)">Flood Fill</button>
+  <button class="tab-btn" onclick="showTab('uf',this)">Union Find</button>
+  <button class="tab-btn" onclick="showTab('kruskal',this)">Kruskal</button>
+  <button class="tab-btn" onclick="showTab('prim',this)">Prim</button>
+  <button class="tab-btn" onclick="showTab('dijkstra',this)">Dijkstra</button>
+  <button class="tab-btn" onclick="showTab('fw',this)">Floyd-Warshall</button>
+</div>
+
+<div class="main">
+
+<!-- ===== OVERVIEW ===== -->
+<div class="algo-section active" id="tab-overview">
+  <div class="sec-head">
+    <div class="sec-icon">🗺️</div>
+    <div>
+      <h2>전체 알고리즘 비교</h2>
+      <p>8가지 핵심 그래프 알고리즘 — 분류 · 복잡도 · 용도</p>
+    </div>
+  </div>
+
+  <table class="ov-table" style="margin-bottom:24px;">
+    <thead>
+      <tr>
+        <th>알고리즘</th>
+        <th>분류</th>
+        <th>시간 복잡도</th>
+        <th>공간 복잡도</th>
+        <th>핵심 자료구조</th>
+        <th>주요 용도</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><b>BFS</b></td>
+        <td><span class="badge b">탐색</span></td>
+        <td>O(V + E)</td>
+        <td>O(V)</td>
+        <td>Queue</td>
+        <td>최단 경로(가중치 없음), 레벨 탐색</td>
+      </tr>
+      <tr>
+        <td><b>DFS</b></td>
+        <td><span class="badge b">탐색</span></td>
+        <td>O(V + E)</td>
+        <td>O(V)</td>
+        <td>Stack / Recursion</td>
+        <td>연결 요소, 사이클 감지, 위상 정렬</td>
+      </tr>
+      <tr>
+        <td><b>Flood Fill</b></td>
+        <td><span class="badge b">탐색</span></td>
+        <td>O(V + E)</td>
+        <td>O(V)</td>
+        <td>Queue / Stack / Recursion</td>
+        <td>2D 그리드 영역 채우기, 연결 요소 탐색</td>
+      </tr>
+      <tr>
+        <td><b>Union Find</b></td>
+        <td><span class="badge g">집합</span></td>
+        <td>O(α(n)) ≈ O(1)</td>
+        <td>O(V)</td>
+        <td>배열 (parent, rank)</td>
+        <td>연결 요소, MST (Kruskal 내부)</td>
+      </tr>
+      <tr>
+        <td><b>Kruskal</b></td>
+        <td><span class="badge g">MST</span></td>
+        <td>O(E log E)</td>
+        <td>O(V + E)</td>
+        <td>Union Find + 정렬</td>
+        <td>최소 신장 트리 (간선 정렬 방식)</td>
+      </tr>
+      <tr>
+        <td><b>Prim</b></td>
+        <td><span class="badge g">MST</span></td>
+        <td>O(E log V)</td>
+        <td>O(V + E)</td>
+        <td>Priority Queue</td>
+        <td>최소 신장 트리 (정점 확장 방식)</td>
+      </tr>
+      <tr>
+        <td><b>Dijkstra</b></td>
+        <td><span class="badge y">최단 경로</span></td>
+        <td>O(E log V)</td>
+        <td>O(V + E)</td>
+        <td>Priority Queue</td>
+        <td>단일 출발 최단 경로 (양수 가중치)</td>
+      </tr>
+      <tr>
+        <td><b>Floyd-Warshall</b></td>
+        <td><span class="badge y">최단 경로</span></td>
+        <td>O(V³)</td>
+        <td>O(V²)</td>
+        <td>2D 배열 (DP)</td>
+        <td>전체 쌍 최단 경로, 음수 간선 가능</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="viz">
+    <div class="viz-title">// Python vs Java — 구현 스타일 핵심 차이</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+      <div>
+        <div class="lang-label py" style="margin-bottom:10px;"><span class="lang-dot"></span>Python 관용 패턴</div>
+        <div style="display:flex;flex-direction:column;gap:8px;font-size:12px;line-height:1.7;">
+          <div style="background:var(--py-bg);border:1px solid var(--py-border);border-radius:6px;padding:10px 12px;">
+            <b>그래프 표현:</b> <code style="font-family:'JetBrains Mono',monospace;color:var(--py)">defaultdict(list)</code> — 간결한 인접 리스트
+          </div>
+          <div style="background:var(--py-bg);border:1px solid var(--py-border);border-radius:6px;padding:10px 12px;">
+            <b>Priority Queue:</b> <code style="font-family:'JetBrains Mono',monospace;color:var(--py)">heapq</code> — 튜플 (cost, node) 직접 push
+          </div>
+          <div style="background:var(--py-bg);border:1px solid var(--py-border);border-radius:6px;padding:10px 12px;">
+            <b>방문 체크:</b> <code style="font-family:'JetBrains Mono',monospace;color:var(--py)">set()</code> — O(1) 조회, 직관적
+          </div>
+          <div style="background:var(--py-bg);border:1px solid var(--py-border);border-radius:6px;padding:10px 12px;">
+            <b>무한대:</b> <code style="font-family:'JetBrains Mono',monospace;color:var(--py)">float('inf')</code> — 별도 상수 불필요
+          </div>
+          <div style="background:var(--py-bg);border:1px solid var(--py-border);border-radius:6px;padding:10px 12px;">
+            <b>DFS:</b> 재귀 + sys.setrecursionlimit 또는 스택 명시
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="lang-label java" style="margin-bottom:10px;"><span class="lang-dot"></span>Java 관용 패턴</div>
+        <div style="display:flex;flex-direction:column;gap:8px;font-size:12px;line-height:1.7;">
+          <div style="background:var(--java-bg);border:1px solid var(--java-border);border-radius:6px;padding:10px 12px;">
+            <b>그래프 표현:</b> <code style="font-family:'JetBrains Mono',monospace;color:var(--java)">List&lt;List&lt;int[]&gt;&gt;</code> — 명시적 타입
+          </div>
+          <div style="background:var(--java-bg);border:1px solid var(--java-border);border-radius:6px;padding:10px 12px;">
+            <b>Priority Queue:</b> <code style="font-family:'JetBrains Mono',monospace;color:var(--java)">PriorityQueue</code> — Comparator 또는 int[]
+          </div>
+          <div style="background:var(--java-bg);border:1px solid var(--java-border);border-radius:6px;padding:10px 12px;">
+            <b>방문 체크:</b> <code style="font-family:'JetBrains Mono',monospace;color:var(--java)">boolean[]</code> — 배열로 메모리 효율적
+          </div>
+          <div style="background:var(--java-bg);border:1px solid var(--java-border);border-radius:6px;padding:10px 12px;">
+            <b>무한대:</b> <code style="font-family:'JetBrains Mono',monospace;color:var(--java)">Integer.MAX_VALUE</code> 또는 큰 상수
+          </div>
+          <div style="background:var(--java-bg);border:1px solid var(--java-border);border-radius:6px;padding:10px 12px;">
+            <b>DFS:</b> 재귀 (스택 오버플로 주의) 또는 Deque 스택
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 알고리즘 관계도 SVG -->
+  <div class="viz">
+    <div class="viz-title">// 알고리즘 활용 영역</div>
+    <div style="display:flex;justify-content:center;">
+      <svg width="700" height="300" viewBox="0 0 700 300" style="max-width:100%;">
+        <!-- 영역 배경 -->
+        <rect x="20" y="20" width="200" height="260" rx="12" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1.5"/>
+        <rect x="240" y="20" width="200" height="260" rx="12" fill="#f0fdf4" stroke="#bbf7d0" stroke-width="1.5"/>
+        <rect x="460" y="20" width="220" height="260" rx="12" fill="#fefce8" stroke="#fde68a" stroke-width="1.5"/>
+
+        <!-- 영역 제목 -->
+        <text x="120" y="46" text-anchor="middle" fill="#2563eb" font-size="12" font-weight="700">그래프 탐색</text>
+        <text x="340" y="46" text-anchor="middle" fill="#16a34a" font-size="12" font-weight="700">최소 신장 트리</text>
+        <text x="570" y="46" text-anchor="middle" fill="#d97706" font-size="12" font-weight="700">최단 경로</text>
+
+        <!-- BFS DFS -->
+        <rect x="50" y="60" width="140" height="40" rx="6" fill="white" stroke="#2563eb" stroke-width="1.5"/>
+        <text x="120" y="85" text-anchor="middle" fill="#2563eb" font-size="13" font-weight="700">BFS</text>
+        <rect x="50" y="115" width="140" height="40" rx="6" fill="white" stroke="#2563eb" stroke-width="1.5"/>
+        <text x="120" y="140" text-anchor="middle" fill="#2563eb" font-size="13" font-weight="700">DFS</text>
+
+        <!-- Union Find -->
+        <rect x="50" y="175" width="140" height="40" rx="6" fill="white" stroke="#2563eb" stroke-width="1.5" stroke-dasharray="4"/>
+        <text x="120" y="200" text-anchor="middle" fill="#64748b" font-size="12">Union Find</text>
+        <text x="120" y="213" text-anchor="middle" fill="#94a3b8" font-size="9">(보조 자료구조)</text>
+
+        <!-- Flood Fill -->
+        <rect x="50" y="230" width="140" height="40" rx="6" fill="#e0f2fe" stroke="#0891b2" stroke-width="1.5"/>
+        <text x="120" y="255" text-anchor="middle" fill="#0891b2" font-size="12" font-weight="700">Flood Fill</text>
+        <text x="120" y="267" text-anchor="middle" fill="#0891b2" font-size="9">그리드 탐색</text>
+
+        <!-- Kruskal, Prim -->
+        <rect x="265" y="60" width="150" height="40" rx="6" fill="white" stroke="#16a34a" stroke-width="1.5"/>
+        <text x="340" y="85" text-anchor="middle" fill="#16a34a" font-size="13" font-weight="700">Kruskal</text>
+        <rect x="265" y="115" width="150" height="40" rx="6" fill="white" stroke="#16a34a" stroke-width="1.5"/>
+        <text x="340" y="140" text-anchor="middle" fill="#16a34a" font-size="13" font-weight="700">Prim</text>
+
+        <!-- Uses arrow -->
+        <line x1="190" y1="192" x2="258" y2="100" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3"/>
+        <text x="210" y="155" fill="#94a3b8" font-size="9" transform="rotate(-30,210,155)">uses</text>
+
+        <!-- Dijkstra, FW -->
+        <rect x="482" y="60" width="176" height="40" rx="6" fill="white" stroke="#d97706" stroke-width="1.5"/>
+        <text x="570" y="85" text-anchor="middle" fill="#d97706" font-size="13" font-weight="700">Dijkstra</text>
+        <rect x="482" y="115" width="176" height="40" rx="6" fill="white" stroke="#d97706" stroke-width="1.5"/>
+        <text x="570" y="140" text-anchor="middle" fill="#d97706" font-size="13" font-weight="700">Floyd-Warshall</text>
+
+        <!-- 특성 -->
+        <text x="570" y="185" text-anchor="middle" fill="#94a3b8" font-size="10">Dijkstra: 단일 출발, 양수</text>
+        <text x="570" y="200" text-anchor="middle" fill="#94a3b8" font-size="10">FW: 전체 쌍, 음수 가능</text>
+
+        <!-- BFS uses in Dijkstra arrow -->
+        <path d="M 193 80 Q 330 30 479 80" fill="none" stroke="#bfdbfe" stroke-width="1.5" stroke-dasharray="4"/>
+        <text x="335" y="28" text-anchor="middle" fill="#93c5fd" font-size="9">BFS 기반 탐색 응용</text>
+      </svg>
+    </div>
+  </div>
+</div>
+
+<!-- ===== BFS ===== -->
+<div class="algo-section" id="tab-bfs">
+  <div class="sec-head">
+    <div class="sec-icon">🌊</div>
+    <div>
+      <h2>BFS — 너비 우선 탐색</h2>
+      <p>Breadth-First Search — 가까운 노드부터 레벨 단위로 탐색</p>
+      <div class="complexity-badges">
+        <span class="cb time">Time: O(V + E)</span>
+        <span class="cb space">Space: O(V)</span>
+        <span class="cb type">Queue 기반</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="split-card">
+    <div class="split-side py-side">
+      <div class="lang-label py"><span class="lang-dot"></span>Python</div>
+      <div class="ds-title">collections.deque</div>
+      <div class="ds-sub">deque의 popleft() 로 O(1) dequeue</div>
+<pre><span class="kw">from</span> collections <span class="kw">import</span> deque
+
+<span class="kw">def</span> <span class="fn">bfs</span>(graph, start):
+    visited = <span class="fn">set</span>()
+    queue = <span class="fn">deque</span>([start])
+    visited.<span class="fn">add</span>(start)
+    order = []
+
+    <span class="kw">while</span> queue:
+        node = queue.<span class="fn">popleft</span>()   <span class="cm"># O(1)</span>
+        order.<span class="fn">append</span>(node)
+
+        <span class="kw">for</span> neighbor <span class="kw">in</span> graph[node]:
+            <span class="kw">if</span> neighbor <span class="kw">not in</span> visited:
+                visited.<span class="fn">add</span>(neighbor)
+                queue.<span class="fn">append</span>(neighbor)
+
+    <span class="kw">return</span> order
+
+<span class="cm"># 최단 거리 BFS</span>
+<span class="kw">def</span> <span class="fn">bfs_dist</span>(graph, start):
+    dist = {start: <span class="num">0</span>}
+    queue = <span class="fn">deque</span>([start])
+
+    <span class="kw">while</span> queue:
+        node = queue.<span class="fn">popleft</span>()
+        <span class="kw">for</span> nb <span class="kw">in</span> graph[node]:
+            <span class="kw">if</span> nb <span class="kw">not in</span> dist:
+                dist[nb] = dist[node] + <span class="num">1</span>
+                queue.<span class="fn">append</span>(nb)
+    <span class="kw">return</span> dist
+
+<span class="cm"># 사용 예시</span>
+graph = {
+    <span class="num">0</span>: [<span class="num">1</span>, <span class="num">2</span>], <span class="num">1</span>: [<span class="num">0</span>, <span class="num">3</span>, <span class="num">4</span>],
+    <span class="num">2</span>: [<span class="num">0</span>, <span class="num">5</span>], <span class="num">3</span>: [<span class="num">1</span>],
+    <span class="num">4</span>: [<span class="num">1</span>], <span class="num">5</span>: [<span class="num">2</span>]
+}
+<span class="fn">print</span>(<span class="fn">bfs</span>(graph, <span class="num">0</span>))  <span class="cm"># [0,1,2,3,4,5]</span></pre>
+      <div class="tag-row">
+        <span class="tag py">deque</span><span class="tag py">set visited</span><span class="tag py">defaultdict</span>
+      </div>
+    </div>
+    <div class="split-side java-side">
+      <div class="lang-label java"><span class="lang-dot"></span>Java</div>
+      <div class="ds-title">Queue / ArrayDeque</div>
+      <div class="ds-sub">boolean[] visited 배열로 메모리 효율 확보</div>
+<pre><span class="kw">import</span> java.util.*;
+
+<span class="kw">public static</span> List&lt;<span class="ty">Integer</span>&gt; <span class="fn">bfs</span>(
+        List&lt;List&lt;<span class="ty">Integer</span>&gt;&gt; graph,
+        <span class="ty">int</span> start, <span class="ty">int</span> n) {
+
+    <span class="ty">boolean</span>[] visited = <span class="kw">new</span> <span class="ty">boolean</span>[n];
+    Queue&lt;<span class="ty">Integer</span>&gt; queue = <span class="kw">new</span> <span class="ty">ArrayDeque</span>&lt;&gt;();
+    List&lt;<span class="ty">Integer</span>&gt; order = <span class="kw">new</span> <span class="ty">ArrayList</span>&lt;&gt;();
+
+    queue.<span class="fn">offer</span>(start);
+    visited[start] = <span class="kw">true</span>;
+
+    <span class="kw">while</span> (!queue.<span class="fn">isEmpty</span>()) {
+        <span class="ty">int</span> node = queue.<span class="fn">poll</span>();
+        order.<span class="fn">add</span>(node);
+
+        <span class="kw">for</span> (<span class="ty">int</span> nb : graph.<span class="fn">get</span>(node)) {
+            <span class="kw">if</span> (!visited[nb]) {
+                visited[nb] = <span class="kw">true</span>;
+                queue.<span class="fn">offer</span>(nb);
+            }
+        }
+    }
+    <span class="kw">return</span> order;
+}
+
+<span class="cm">// 최단 거리 BFS</span>
+<span class="kw">public static</span> <span class="ty">int</span>[] <span class="fn">bfsDist</span>(
+        List&lt;List&lt;<span class="ty">Integer</span>&gt;&gt; graph,
+        <span class="ty">int</span> start, <span class="ty">int</span> n) {
+
+    <span class="ty">int</span>[] dist = <span class="kw">new</span> <span class="ty">int</span>[n];
+    Arrays.<span class="fn">fill</span>(dist, -<span class="num">1</span>);
+    dist[start] = <span class="num">0</span>;
+    Queue&lt;<span class="ty">Integer</span>&gt; q = <span class="kw">new</span> <span class="ty">ArrayDeque</span>&lt;&gt;();
+    q.<span class="fn">offer</span>(start);
+    <span class="kw">while</span> (!q.<span class="fn">isEmpty</span>()) {
+        <span class="ty">int</span> u = q.<span class="fn">poll</span>();
+        <span class="kw">for</span> (<span class="ty">int</span> v : graph.<span class="fn">get</span>(u))
+            <span class="kw">if</span> (dist[v] == -<span class="num">1</span>) {
+                dist[v] = dist[u] + <span class="num">1</span>;
+                q.<span class="fn">offer</span>(v);
+            }
+    }
+    <span class="kw">return</span> dist;
+}</pre>
+      <div class="tag-row">
+        <span class="tag java">ArrayDeque</span><span class="tag java">boolean[]</span><span class="tag java">int[]</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- BFS 시각화 -->
+  <div class="viz">
+    <div class="viz-title">// BFS 탐색 순서 시각화 (시작: 노드 0)</div>
+    <div class="graph-wrap">
+      <svg width="680" height="260" viewBox="0 0 680 260" style="max-width:100%;">
+        <defs>
+          <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#cbd5e1"/>
+          </marker>
+        </defs>
+        <!-- 간선 -->
+        <line x1="120" y1="80" x2="240" y2="80" stroke="#e2e8f0" stroke-width="2"/>
+        <line x1="120" y1="80" x2="120" y2="180" stroke="#e2e8f0" stroke-width="2"/>
+        <line x1="240" y1="80" x2="360" y2="80" stroke="#e2e8f0" stroke-width="2"/>
+        <line x1="240" y1="80" x2="240" y2="180" stroke="#e2e8f0" stroke-width="2"/>
+        <line x1="360" y1="80" x2="480" y2="80" stroke="#e2e8f0" stroke-width="2"/>
+        <line x1="120" y1="180" x2="240" y2="180" stroke="#e2e8f0" stroke-width="2"/>
+        <line x1="360" y1="80" x2="360" y2="180" stroke="#e2e8f0" stroke-width="2"/>
+
+        <!-- Level 0 -->
+        <circle cx="120" cy="80" r="28" fill="#2563eb" stroke="white" stroke-width="2"/>
+        <text x="120" y="75" text-anchor="middle" fill="white" font-size="13" font-weight="700">0</text>
+        <text x="120" y="91" text-anchor="middle" fill="#bfdbfe" font-size="9">L0</text>
+
+        <!-- Level 1 -->
+        <circle cx="240" cy="80" r="28" fill="#3b82f6" stroke="white" stroke-width="2"/>
+        <text x="240" y="75" text-anchor="middle" fill="white" font-size="13" font-weight="700">1</text>
+        <text x="240" y="91" text-anchor="middle" fill="#bfdbfe" font-size="9">L1</text>
+
+        <circle cx="120" cy="180" r="28" fill="#3b82f6" stroke="white" stroke-width="2"/>
+        <text x="120" y="175" text-anchor="middle" fill="white" font-size="13" font-weight="700">2</text>
+        <text x="120" y="191" text-anchor="middle" fill="#bfdbfe" font-size="9">L1</text>
+
+        <!-- Level 2 -->
+        <circle cx="360" cy="80" r="28" fill="#60a5fa" stroke="white" stroke-width="2"/>
+        <text x="360" y="75" text-anchor="middle" fill="white" font-size="13" font-weight="700">3</text>
+        <text x="360" y="91" text-anchor="middle" fill="white" font-size="9">L2</text>
+
+        <circle cx="240" cy="180" r="28" fill="#60a5fa" stroke="white" stroke-width="2"/>
+        <text x="240" y="175" text-anchor="middle" fill="white" font-size="13" font-weight="700">4</text>
+        <text x="240" y="191" text-anchor="middle" fill="white" font-size="9">L2</text>
+
+        <!-- Level 3 -->
+        <circle cx="480" cy="80" r="28" fill="#93c5fd" stroke="white" stroke-width="2"/>
+        <text x="480" y="75" text-anchor="middle" fill="#1d4ed8" font-size="13" font-weight="700">5</text>
+        <text x="480" y="91" text-anchor="middle" fill="#1d4ed8" font-size="9">L3</text>
+
+        <circle cx="360" cy="180" r="28" fill="#93c5fd" stroke="white" stroke-width="2"/>
+        <text x="360" y="175" text-anchor="middle" fill="#1d4ed8" font-size="13" font-weight="700">6</text>
+        <text x="360" y="191" text-anchor="middle" fill="#1d4ed8" font-size="9">L3</text>
+
+        <!-- 탐색 순서 -->
+        <text x="580" y="60" fill="#64748b" font-size="11" font-weight="700">탐색 순서:</text>
+        <text x="580" y="80" fill="#2563eb" font-size="13" font-weight="700">0</text>
+        <text x="600" y="80" fill="#64748b" font-size="11">→</text>
+        <text x="616" y="80" fill="#3b82f6" font-size="13" font-weight="700">1,2</text>
+        <text x="580" y="100" fill="#64748b" font-size="11">→</text>
+        <text x="596" y="100" fill="#60a5fa" font-size="13" font-weight="700">3,4</text>
+        <text x="580" y="120" fill="#64748b" font-size="11">→</text>
+        <text x="596" y="120" fill="#93c5fd" font-size="13" font-weight="700">5,6</text>
+
+        <rect x="570" y="140" width="100" height="22" rx="4" fill="#eff6ff" stroke="#bfdbfe"/>
+        <text x="620" y="155" text-anchor="middle" fill="#2563eb" font-size="10">Queue 기반</text>
+
+        <!-- 범례 -->
+        <circle cx="580" cy="200" r="8" fill="#2563eb"/>
+        <text x="595" y="204" fill="#64748b" font-size="10">Level 0</text>
+        <circle cx="580" cy="220" r="8" fill="#60a5fa"/>
+        <text x="595" y="224" fill="#64748b" font-size="10">Level 1-2</text>
+        <circle cx="580" cy="240" r="8" fill="#93c5fd"/>
+        <text x="595" y="244" fill="#64748b" font-size="10">Level 3+</text>
+      </svg>
+    </div>
+  </div>
+
+  <table class="ctbl">
+    <thead><tr><th>항목</th><th class="py">Python</th><th class="java">Java</th></tr></thead>
+    <tbody>
+      <tr><td>Queue 구현</td><td>collections.deque</td><td>ArrayDeque (Queue 인터페이스)</td></tr>
+      <tr><td>방문 체크</td><td>set() — 해시 기반 O(1)</td><td>boolean[] — 배열 기반 O(1)</td></tr>
+      <tr><td>거리 저장</td><td>dict {node: dist}</td><td>int[] dist</td></tr>
+      <tr><td>그래프 표현</td><td>dict / defaultdict(list)</td><td>List&lt;List&lt;Integer&gt;&gt;</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ===== DFS ===== -->
+<div class="algo-section" id="tab-dfs">
+  <div class="sec-head">
+    <div class="sec-icon">🌲</div>
+    <div>
+      <h2>DFS — 깊이 우선 탐색</h2>
+      <p>Depth-First Search — 한 방향으로 끝까지 탐색 후 백트래킹</p>
+      <div class="complexity-badges">
+        <span class="cb time">Time: O(V + E)</span>
+        <span class="cb space">Space: O(V)</span>
+        <span class="cb type">Stack / Recursion</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="split-card">
+    <div class="split-side py-side">
+      <div class="lang-label py"><span class="lang-dot"></span>Python</div>
+      <div class="ds-title">재귀 & 반복 (Stack)</div>
+      <div class="ds-sub">재귀가 간결하지만 깊은 그래프엔 sys.setrecursionlimit</div>
+<pre><span class="cm"># 재귀 DFS</span>
+<span class="kw">def</span> <span class="fn">dfs_recursive</span>(graph, node, visited=<span class="kw">None</span>):
+    <span class="kw">if</span> visited <span class="kw">is None</span>:
+        visited = <span class="fn">set</span>()
+    visited.<span class="fn">add</span>(node)
+    <span class="fn">print</span>(node, end=<span class="st">" "</span>)
+
+    <span class="kw">for</span> nb <span class="kw">in</span> graph[node]:
+        <span class="kw">if</span> nb <span class="kw">not in</span> visited:
+            <span class="fn">dfs_recursive</span>(graph, nb, visited)
+    <span class="kw">return</span> visited
+
+<span class="cm"># 반복 DFS (Stack 명시)</span>
+<span class="kw">def</span> <span class="fn">dfs_iterative</span>(graph, start):
+    visited = <span class="fn">set</span>()
+    stack = [start]
+    order = []
+
+    <span class="kw">while</span> stack:
+        node = stack.<span class="fn">pop</span>()
+        <span class="kw">if</span> node <span class="kw">in</span> visited:
+            <span class="kw">continue</span>
+        visited.<span class="fn">add</span>(node)
+        order.<span class="fn">append</span>(node)
+
+        <span class="kw">for</span> nb <span class="kw">in</span> <span class="fn">reversed</span>(graph[node]):
+            <span class="kw">if</span> nb <span class="kw">not in</span> visited:
+                stack.<span class="fn">append</span>(nb)
+    <span class="kw">return</span> order
+
+<span class="cm"># 위상 정렬 (DFS 기반)</span>
+<span class="kw">def</span> <span class="fn">topological_sort</span>(graph, n):
+    visited = <span class="fn">set</span>()
+    result = []
+    <span class="kw">def</span> <span class="fn">dfs</span>(v):
+        visited.<span class="fn">add</span>(v)
+        <span class="kw">for</span> nb <span class="kw">in</span> graph[v]:
+            <span class="kw">if</span> nb <span class="kw">not in</span> visited:
+                <span class="fn">dfs</span>(nb)
+        result.<span class="fn">append</span>(v)
+    <span class="kw">for</span> v <span class="kw">in</span> <span class="fn">range</span>(n):
+        <span class="kw">if</span> v <span class="kw">not in</span> visited: <span class="fn">dfs</span>(v)
+    <span class="kw">return</span> result[::-<span class="num">1</span>]</pre>
+      <div class="tag-row">
+        <span class="tag py">재귀</span><span class="tag py">stack(list)</span><span class="tag py">set visited</span>
+      </div>
+    </div>
+    <div class="split-side java-side">
+      <div class="lang-label java"><span class="lang-dot"></span>Java</div>
+      <div class="ds-title">재귀 & Deque Stack</div>
+      <div class="ds-sub">Stack 클래스보단 ArrayDeque 권장</div>
+<pre><span class="cm">// 재귀 DFS</span>
+<span class="kw">static</span> <span class="ty">boolean</span>[] visited;
+
+<span class="kw">static void</span> <span class="fn">dfsRecursive</span>(
+        List&lt;List&lt;<span class="ty">Integer</span>&gt;&gt; graph, <span class="ty">int</span> v) {
+    visited[v] = <span class="kw">true</span>;
+    System.out.<span class="fn">print</span>(v + <span class="st">" "</span>);
+
+    <span class="kw">for</span> (<span class="ty">int</span> nb : graph.<span class="fn">get</span>(v)) {
+        <span class="kw">if</span> (!visited[nb])
+            <span class="fn">dfsRecursive</span>(graph, nb);
+    }
+}
+
+<span class="cm">// 반복 DFS</span>
+<span class="kw">static</span> List&lt;<span class="ty">Integer</span>&gt; <span class="fn">dfsIterative</span>(
+        List&lt;List&lt;<span class="ty">Integer</span>&gt;&gt; graph,
+        <span class="ty">int</span> start, <span class="ty">int</span> n) {
+
+    <span class="ty">boolean</span>[] vis = <span class="kw">new</span> <span class="ty">boolean</span>[n];
+    Deque&lt;<span class="ty">Integer</span>&gt; stack = <span class="kw">new</span> <span class="ty">ArrayDeque</span>&lt;&gt;();
+    List&lt;<span class="ty">Integer</span>&gt; order = <span class="kw">new</span> <span class="ty">ArrayList</span>&lt;&gt;();
+    stack.<span class="fn">push</span>(start);
+
+    <span class="kw">while</span> (!stack.<span class="fn">isEmpty</span>()) {
+        <span class="ty">int</span> v = stack.<span class="fn">pop</span>();
+        <span class="kw">if</span> (vis[v]) <span class="kw">continue</span>;
+        vis[v] = <span class="kw">true</span>;
+        order.<span class="fn">add</span>(v);
+        List&lt;<span class="ty">Integer</span>&gt; nb = graph.<span class="fn">get</span>(v);
+        <span class="kw">for</span> (<span class="ty">int</span> i = nb.<span class="fn">size</span>()-<span class="num">1</span>; i &gt;= <span class="num">0</span>; i--)
+            <span class="kw">if</span> (!vis[nb.<span class="fn">get</span>(i)])
+                stack.<span class="fn">push</span>(nb.<span class="fn">get</span>(i));
+    }
+    <span class="kw">return</span> order;
+}</pre>
+      <div class="tag-row">
+        <span class="tag java">재귀</span><span class="tag java">ArrayDeque</span><span class="tag java">boolean[]</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="viz">
+    <div class="viz-title">// DFS vs BFS 탐색 경로 비교</div>
+    <div class="graph-wrap">
+      <svg width="680" height="240" viewBox="0 0 680 240" style="max-width:100%;">
+        <!-- DFS 트리 (왼쪽) -->
+        <text x="160" y="22" text-anchor="middle" fill="#2563eb" font-size="12" font-weight="700">DFS 탐색 경로</text>
+        <line x1="100" y1="55" x2="60" y2="115" stroke="#bfdbfe" stroke-width="2"/>
+        <line x1="100" y1="55" x2="160" y2="115" stroke="#e2e8f0" stroke-width="2"/>
+        <line x1="60" y1="115" x2="40" y2="175" stroke="#bfdbfe" stroke-width="2"/>
+        <line x1="60" y1="115" x2="90" y2="175" stroke="#e2e8f0" stroke-width="2"/>
+        <line x1="160" y1="115" x2="220" y2="175" stroke="#e2e8f0" stroke-width="2"/>
+        <!-- DFS nodes -->
+        <circle cx="100" cy="55" r="22" fill="#2563eb"/><text x="100" y="61" text-anchor="middle" fill="white" font-size="12" font-weight="700">A</text>
+        <text x="106" y="40" fill="#ea580c" font-size="10" font-weight="700">①</text>
+        <circle cx="60" cy="115" r="22" fill="#3b82f6"/><text x="60" y="121" text-anchor="middle" fill="white" font-size="12" font-weight="700">B</text>
+        <text x="66" y="100" fill="#ea580c" font-size="10" font-weight="700">②</text>
+        <circle cx="160" cy="115" r="22" fill="#bfdbfe" stroke="#93c5fd"/><text x="160" y="121" text-anchor="middle" fill="#1d4ed8" font-size="12" font-weight="700">E</text>
+        <text x="166" y="100" fill="#94a3b8" font-size="10" font-weight="700">⑤</text>
+        <circle cx="40" cy="175" r="22" fill="#3b82f6"/><text x="40" y="181" text-anchor="middle" fill="white" font-size="12" font-weight="700">C</text>
+        <text x="46" y="160" fill="#ea580c" font-size="10" font-weight="700">③</text>
+        <circle cx="90" cy="175" r="22" fill="#60a5fa"/><text x="90" y="181" text-anchor="middle" fill="white" font-size="12" font-weight="700">D</text>
+        <text x="96" y="160" fill="#ea580c" font-size="10" font-weight="700">④</text>
+        <circle cx="220" cy="175" r="22" fill="#bfdbfe" stroke="#93c5fd"/><text x="220" y="181" text-anchor="middle" fill="#1d4ed8" font-size="12" font-weight="700">F</text>
+        <text x="226" y="160" fill="#94a3b8" font-size="10" font-weight="700">⑥</text>
+
+        <text x="160" y="225" text-anchor="middle" fill="#2563eb" font-size="11">A→B→C→D→E→F</text>
+
+        <!-- 구분선 -->
+        <line x1="340" y1="20" x2="340" y2="220" stroke="#e2e8f0" stroke-width="1.5" stroke-dasharray="5"/>
+
+        <!-- BFS 트리 (오른쪽) -->
+        <text x="510" y="22" text-anchor="middle" fill="#16a34a" font-size="12" font-weight="700">BFS 탐색 경로</text>
+        <line x1="450" y1="55" x2="400" y2="115" stroke="#bbf7d0" stroke-width="2"/>
+        <line x1="450" y1="55" x2="510" y2="115" stroke="#bbf7d0" stroke-width="2"/>
+        <line x1="400" y1="115" x2="370" y2="175" stroke="#bbf7d0" stroke-width="2"/>
+        <line x1="400" y1="115" x2="430" y2="175" stroke="#e2e8f0" stroke-width="2"/>
+        <line x1="510" y1="115" x2="560" y2="175" stroke="#e2e8f0" stroke-width="2"/>
+        <circle cx="450" cy="55" r="22" fill="#16a34a"/><text x="450" y="61" text-anchor="middle" fill="white" font-size="12" font-weight="700">A</text>
+        <text x="456" y="40" fill="#ea580c" font-size="10" font-weight="700">①</text>
+        <circle cx="400" cy="115" r="22" fill="#22c55e"/><text x="400" y="121" text-anchor="middle" fill="white" font-size="12" font-weight="700">B</text>
+        <text x="406" y="100" fill="#ea580c" font-size="10" font-weight="700">②</text>
+        <circle cx="510" cy="115" r="22" fill="#22c55e"/><text x="510" y="121" text-anchor="middle" fill="white" font-size="12" font-weight="700">E</text>
+        <text x="516" y="100" fill="#ea580c" font-size="10" font-weight="700">③</text>
+        <circle cx="370" cy="175" r="22" fill="#86efac" stroke="#4ade80"/><text x="370" y="181" text-anchor="middle" fill="#15803d" font-size="12" font-weight="700">C</text>
+        <text x="376" y="160" fill="#ea580c" font-size="10" font-weight="700">④</text>
+        <circle cx="430" cy="175" r="22" fill="#dcfce7" stroke="#86efac"/><text x="430" y="181" text-anchor="middle" fill="#15803d" font-size="12" font-weight="700">D</text>
+        <text x="436" y="160" fill="#94a3b8" font-size="10" font-weight="700">⑤</text>
+        <circle cx="560" cy="175" r="22" fill="#dcfce7" stroke="#86efac"/><text x="560" y="181" text-anchor="middle" fill="#15803d" font-size="12" font-weight="700">F</text>
+        <text x="566" y="160" fill="#94a3b8" font-size="10" font-weight="700">⑥</text>
+
+        <text x="510" y="225" text-anchor="middle" fill="#16a34a" font-size="11">A→B→E→C→D→F</text>
+      </svg>
+    </div>
+  </div>
+
+  <table class="ctbl">
+    <thead><tr><th>항목</th><th class="py">Python</th><th class="java">Java</th></tr></thead>
+    <tbody>
+      <tr><td>재귀 한계</td><td>sys.setrecursionlimit 필요 (기본 1000)</td><td>JVM 스택 크기 제한 (-Xss 옵션)</td></tr>
+      <tr><td>반복 스택</td><td>list.append / pop</td><td>ArrayDeque.push / pop</td></tr>
+      <tr><td>위상 정렬</td><td>재귀 DFS + 역순 결과</td><td>재귀 DFS + Collections.reverse</td></tr>
+      <tr><td>사이클 감지</td><td>color 배열 (WHITE/GRAY/BLACK)</td><td>int[] state (0/1/2)</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ===== FLOOD FILL ===== -->
+<div class="algo-section" id="tab-ff">
+  <div class="sec-head">
+    <div class="sec-icon">🎨</div>
+    <div>
+      <h2>Flood Fill — 영역 채우기</h2>
+      <p>2D 그리드에서 시작점과 같은 색(값)의 연결된 영역을 새 색으로 채우기 (BFS/DFS)</p>
+      <div class="complexity-badges">
+        <span class="cb time">Time: O(M × N)</span>
+        <span class="cb space">Space: O(M × N)</span>
+        <span class="cb type">BFS / DFS / Recursion</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="split-card">
+    <div class="split-side py-side">
+      <div class="lang-label py"><span class="lang-dot"></span>Python</div>
+      <div class="ds-title">재귀 DFS & BFS (deque)</div>
+      <div class="ds-sub">4방향 또는 8방향 탐색 선택 가능</div>
+<pre><span class="kw">from</span> collections <span class="kw">import</span> deque
+
+<span class="cm"># ── 재귀 DFS 방식 ──</span>
+<span class="kw">def</span> <span class="fn">flood_fill_dfs</span>(grid, r, c, new_color):
+    rows, cols = <span class="fn">len</span>(grid), <span class="fn">len</span>(grid[<span class="num">0</span>])
+    old_color = grid[r][c]
+    <span class="kw">if</span> old_color == new_color:
+        <span class="kw">return</span> grid
+
+    <span class="kw">def</span> <span class="fn">dfs</span>(r, c):
+        <span class="kw">if not</span> (<span class="num">0</span> &lt;= r &lt; rows <span class="kw">and</span>
+                <span class="num">0</span> &lt;= c &lt; cols): <span class="kw">return</span>
+        <span class="kw">if</span> grid[r][c] != old_color: <span class="kw">return</span>
+        grid[r][c] = new_color
+        <span class="kw">for</span> dr, dc <span class="kw">in</span> [(-<span class="num">1</span>,<span class="num">0</span>),(<span class="num">1</span>,<span class="num">0</span>),
+                        (<span class="num">0</span>,-<span class="num">1</span>),(<span class="num">0</span>,<span class="num">1</span>)]:
+            <span class="fn">dfs</span>(r+dr, c+dc)
+
+    <span class="fn">dfs</span>(r, c)
+    <span class="kw">return</span> grid
+
+<span class="cm"># ── BFS 방식 ──</span>
+<span class="kw">def</span> <span class="fn">flood_fill_bfs</span>(grid, r, c, new_color):
+    rows, cols = <span class="fn">len</span>(grid), <span class="fn">len</span>(grid[<span class="num">0</span>])
+    old_color = grid[r][c]
+    <span class="kw">if</span> old_color == new_color:
+        <span class="kw">return</span> grid
+
+    queue = <span class="fn">deque</span>([(r, c)])
+    grid[r][c] = new_color
+
+    <span class="kw">while</span> queue:
+        cr, cc = queue.<span class="fn">popleft</span>()
+        <span class="kw">for</span> dr, dc <span class="kw">in</span> [(-<span class="num">1</span>,<span class="num">0</span>),(<span class="num">1</span>,<span class="num">0</span>),
+                        (<span class="num">0</span>,-<span class="num">1</span>),(<span class="num">0</span>,<span class="num">1</span>)]:
+            nr, nc = cr+dr, cc+dc
+            <span class="kw">if</span> (<span class="num">0</span> &lt;= nr &lt; rows <span class="kw">and</span>
+                <span class="num">0</span> &lt;= nc &lt; cols <span class="kw">and</span>
+                grid[nr][nc] == old_color):
+                grid[nr][nc] = new_color
+                queue.<span class="fn">append</span>((nr, nc))
+    <span class="kw">return</span> grid
+
+<span class="cm"># 사용 예시</span>
+grid = [
+    [<span class="num">1</span>, <span class="num">1</span>, <span class="num">1</span>, <span class="num">0</span>],
+    [<span class="num">1</span>, <span class="num">1</span>, <span class="num">0</span>, <span class="num">0</span>],
+    [<span class="num">0</span>, <span class="num">0</span>, <span class="num">1</span>, <span class="num">1</span>],
+]
+<span class="fn">flood_fill_bfs</span>(grid, <span class="num">0</span>, <span class="num">0</span>, <span class="num">2</span>)
+<span class="cm"># (0,0)에서 연결된 1 → 전부 2로 변경</span></pre>
+      <div class="tag-row">
+        <span class="tag py">재귀 DFS</span><span class="tag py">deque BFS</span><span class="tag py">4방향</span><span class="tag py">2D 리스트</span>
+      </div>
+    </div>
+    <div class="split-side java-side">
+      <div class="lang-label java"><span class="lang-dot"></span>Java</div>
+      <div class="ds-title">재귀 DFS & BFS (ArrayDeque)</div>
+      <div class="ds-sub">int[][] 그리드, 4방향 델타 배열 패턴</div>
+<pre><span class="kw">import</span> java.util.*;
+
+<span class="cm">// ── 재귀 DFS 방식 ──</span>
+<span class="kw">static void</span> <span class="fn">floodFillDFS</span>(
+        <span class="ty">int</span>[][] grid, <span class="ty">int</span> r, <span class="ty">int</span> c,
+        <span class="ty">int</span> oldColor, <span class="ty">int</span> newColor) {
+
+    <span class="ty">int</span> rows = grid.length, cols = grid[<span class="num">0</span>].length;
+    <span class="kw">if</span> (r &lt; <span class="num">0</span> || r &gt;= rows ||
+        c &lt; <span class="num">0</span> || c &gt;= cols) <span class="kw">return</span>;
+    <span class="kw">if</span> (grid[r][c] != oldColor) <span class="kw">return</span>;
+
+    grid[r][c] = newColor;
+    <span class="ty">int</span>[] dr = {-<span class="num">1</span>, <span class="num">1</span>,  <span class="num">0</span>, <span class="num">0</span>};
+    <span class="ty">int</span>[] dc = { <span class="num">0</span>, <span class="num">0</span>, -<span class="num">1</span>, <span class="num">1</span>};
+    <span class="kw">for</span> (<span class="ty">int</span> i = <span class="num">0</span>; i &lt; <span class="num">4</span>; i++)
+        <span class="fn">floodFillDFS</span>(grid,
+            r+dr[i], c+dc[i], oldColor, newColor);
+}
+
+<span class="cm">// ── BFS 방식 ──</span>
+<span class="kw">static void</span> <span class="fn">floodFillBFS</span>(
+        <span class="ty">int</span>[][] grid, <span class="ty">int</span> sr, <span class="ty">int</span> sc,
+        <span class="ty">int</span> newColor) {
+
+    <span class="ty">int</span> rows = grid.length, cols = grid[<span class="num">0</span>].length;
+    <span class="ty">int</span> oldColor = grid[sr][sc];
+    <span class="kw">if</span> (oldColor == newColor) <span class="kw">return</span>;
+
+    Queue&lt;<span class="ty">int</span>[]&gt; q = <span class="kw">new</span> <span class="ty">ArrayDeque</span>&lt;&gt;();
+    q.<span class="fn">offer</span>(<span class="kw">new</span> <span class="ty">int</span>[]{sr, sc});
+    grid[sr][sc] = newColor;
+
+    <span class="ty">int</span>[] dr = {-<span class="num">1</span>, <span class="num">1</span>,  <span class="num">0</span>, <span class="num">0</span>};
+    <span class="ty">int</span>[] dc = { <span class="num">0</span>, <span class="num">0</span>, -<span class="num">1</span>, <span class="num">1</span>};
+
+    <span class="kw">while</span> (!q.<span class="fn">isEmpty</span>()) {
+        <span class="ty">int</span>[] cur = q.<span class="fn">poll</span>();
+        <span class="kw">for</span> (<span class="ty">int</span> i = <span class="num">0</span>; i &lt; <span class="num">4</span>; i++) {
+            <span class="ty">int</span> nr = cur[<span class="num">0</span>]+dr[i];
+            <span class="ty">int</span> nc = cur[<span class="num">1</span>]+dc[i];
+            <span class="kw">if</span> (nr &gt;= <span class="num">0</span> &amp;&amp; nr &lt; rows &amp;&amp;
+                nc &gt;= <span class="num">0</span> &amp;&amp; nc &lt; cols &amp;&amp;
+                grid[nr][nc] == oldColor) {
+                grid[nr][nc] = newColor;
+                q.<span class="fn">offer</span>(<span class="kw">new</span> <span class="ty">int</span>[]{nr, nc});
+            }
+        }
+    }
+}</pre>
+      <div class="tag-row">
+        <span class="tag java">int[][]</span><span class="tag java">ArrayDeque</span><span class="tag java">dr/dc 델타</span><span class="tag java">4방향</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Flood Fill 시각화 -->
+  <div class="viz">
+    <div class="viz-title">// Flood Fill 동작 시각화 — (0,0) 시작, 1→2 채우기</div>
+    <div class="graph-wrap">
+      <svg width="660" height="260" viewBox="0 0 660 260" style="max-width:100%;">
+        <!-- 원본 그리드 -->
+        <text x="100" y="18" text-anchor="middle" fill="#64748b" font-size="11" font-weight="700">원본 그리드</text>
+        <!-- 행0 -->
+        <rect x="20"  y="26" width="44" height="44" fill="#dbeafe" stroke="white" stroke-width="2" rx="3"/><text x="42"  y="52" text-anchor="middle" fill="#2563eb" font-size="14" font-weight="700">1</text>
+        <rect x="64"  y="26" width="44" height="44" fill="#dbeafe" stroke="white" stroke-width="2" rx="3"/><text x="86"  y="52" text-anchor="middle" fill="#2563eb" font-size="14" font-weight="700">1</text>
+        <rect x="108" y="26" width="44" height="44" fill="#dbeafe" stroke="white" stroke-width="2" rx="3"/><text x="130" y="52" text-anchor="middle" fill="#2563eb" font-size="14" font-weight="700">1</text>
+        <rect x="152" y="26" width="44" height="44" fill="#f1f5f9" stroke="white" stroke-width="2" rx="3"/><text x="174" y="52" text-anchor="middle" fill="#94a3b8" font-size="14" font-weight="700">0</text>
+        <!-- 행1 -->
+        <rect x="20"  y="70" width="44" height="44" fill="#dbeafe" stroke="white" stroke-width="2" rx="3"/><text x="42"  y="96" text-anchor="middle" fill="#2563eb" font-size="14" font-weight="700">1</text>
+        <rect x="64"  y="70" width="44" height="44" fill="#dbeafe" stroke="white" stroke-width="2" rx="3"/><text x="86"  y="96" text-anchor="middle" fill="#2563eb" font-size="14" font-weight="700">1</text>
+        <rect x="108" y="70" width="44" height="44" fill="#f1f5f9" stroke="white" stroke-width="2" rx="3"/><text x="130" y="96" text-anchor="middle" fill="#94a3b8" font-size="14" font-weight="700">0</text>
+        <rect x="152" y="70" width="44" height="44" fill="#f1f5f9" stroke="white" stroke-width="2" rx="3"/><text x="174" y="96" text-anchor="middle" fill="#94a3b8" font-size="14" font-weight="700">0</text>
+        <!-- 행2 -->
+        <rect x="20"  y="114" width="44" height="44" fill="#f1f5f9" stroke="white" stroke-width="2" rx="3"/><text x="42"  y="140" text-anchor="middle" fill="#94a3b8" font-size="14" font-weight="700">0</text>
+        <rect x="64"  y="114" width="44" height="44" fill="#f1f5f9" stroke="white" stroke-width="2" rx="3"/><text x="86"  y="140" text-anchor="middle" fill="#94a3b8" font-size="14" font-weight="700">0</text>
+        <rect x="108" y="114" width="44" height="44" fill="#dbeafe" stroke="white" stroke-width="2" rx="3"/><text x="130" y="140" text-anchor="middle" fill="#2563eb" font-size="14" font-weight="700">1</text>
+        <rect x="152" y="114" width="44" height="44" fill="#dbeafe" stroke="white" stroke-width="2" rx="3"/><text x="174" y="140" text-anchor="middle" fill="#2563eb" font-size="14" font-weight="700">1</text>
+        <!-- 시작점 표시 -->
+        <circle cx="42" cy="48" r="6" fill="none" stroke="#ea580c" stroke-width="2.5"/>
+        <text x="42" y="185" text-anchor="middle" fill="#ea580c" font-size="10">시작점 (0,0)</text>
+        <!-- 분리된 영역 표시 -->
+        <text x="130" y="185" text-anchor="middle" fill="#94a3b8" font-size="9">별도 영역</text>
+        <text x="130" y="197" text-anchor="middle" fill="#94a3b8" font-size="9">(연결 안됨)</text>
+
+        <!-- 화살표 -->
+        <text x="220" y="105" fill="#64748b" font-size="24">→</text>
+        <text x="213" y="125" fill="#ea580c" font-size="9">Fill(2)</text>
+
+        <!-- 결과 그리드 -->
+        <text x="380" y="18" text-anchor="middle" fill="#64748b" font-size="11" font-weight="700">Fill 후 결과</text>
+        <!-- 행0 -->
+        <rect x="300" y="26" width="44" height="44" fill="#bbf7d0" stroke="white" stroke-width="2" rx="3"/><text x="322" y="52" text-anchor="middle" fill="#15803d" font-size="14" font-weight="700">2</text>
+        <rect x="344" y="26" width="44" height="44" fill="#bbf7d0" stroke="white" stroke-width="2" rx="3"/><text x="366" y="52" text-anchor="middle" fill="#15803d" font-size="14" font-weight="700">2</text>
+        <rect x="388" y="26" width="44" height="44" fill="#bbf7d0" stroke="white" stroke-width="2" rx="3"/><text x="410" y="52" text-anchor="middle" fill="#15803d" font-size="14" font-weight="700">2</text>
+        <rect x="432" y="26" width="44" height="44" fill="#f1f5f9" stroke="white" stroke-width="2" rx="3"/><text x="454" y="52" text-anchor="middle" fill="#94a3b8" font-size="14" font-weight="700">0</text>
+        <!-- 행1 -->
+        <rect x="300" y="70" width="44" height="44" fill="#bbf7d0" stroke="white" stroke-width="2" rx="3"/><text x="322" y="96" text-anchor="middle" fill="#15803d" font-size="14" font-weight="700">2</text>
+        <rect x="344" y="70" width="44" height="44" fill="#bbf7d0" stroke="white" stroke-width="2" rx="3"/><text x="366" y="96" text-anchor="middle" fill="#15803d" font-size="14" font-weight="700">2</text>
+        <rect x="388" y="70" width="44" height="44" fill="#f1f5f9" stroke="white" stroke-width="2" rx="3"/><text x="410" y="96" text-anchor="middle" fill="#94a3b8" font-size="14" font-weight="700">0</text>
+        <rect x="432" y="70" width="44" height="44" fill="#f1f5f9" stroke="white" stroke-width="2" rx="3"/><text x="454" y="96" text-anchor="middle" fill="#94a3b8" font-size="14" font-weight="700">0</text>
+        <!-- 행2 -->
+        <rect x="300" y="114" width="44" height="44" fill="#f1f5f9" stroke="white" stroke-width="2" rx="3"/><text x="322" y="140" text-anchor="middle" fill="#94a3b8" font-size="14" font-weight="700">0</text>
+        <rect x="344" y="114" width="44" height="44" fill="#f1f5f9" stroke="white" stroke-width="2" rx="3"/><text x="366" y="140" text-anchor="middle" fill="#94a3b8" font-size="14" font-weight="700">0</text>
+        <rect x="388" y="114" width="44" height="44" fill="#dbeafe" stroke="white" stroke-width="2" rx="3"/><text x="410" y="140" text-anchor="middle" fill="#2563eb" font-size="14" font-weight="700">1</text>
+        <rect x="432" y="114" width="44" height="44" fill="#dbeafe" stroke="white" stroke-width="2" rx="3"/><text x="454" y="140" text-anchor="middle" fill="#2563eb" font-size="14" font-weight="700">1</text>
+        <text x="380" y="185" text-anchor="middle" fill="#16a34a" font-size="10">연결된 1 → 모두 2로 변경</text>
+        <text x="410" y="197" text-anchor="middle" fill="#94a3b8" font-size="9">연결 안 된 1은 그대로</text>
+
+        <!-- BFS 탐색 순서 -->
+        <rect x="520" y="26" width="130" height="175" rx="6" fill="#f8fafc" stroke="#e2e8f0"/>
+        <text x="585" y="44" text-anchor="middle" fill="#64748b" font-size="10" font-weight="700">BFS 큐 순서</text>
+        <text x="528" y="62"  fill="#ea580c"  font-size="9">① (0,0) → 색 변경</text>
+        <text x="528" y="78"  fill="#2563eb"  font-size="9">② (1,0) (0,1) 큐에 추가</text>
+        <text x="528" y="94"  fill="#16a34a"  font-size="9">③ (1,0) 처리 → (1,1) 추가</text>
+        <text x="528" y="110" fill="#16a34a"  font-size="9">④ (0,1) 처리 → (0,2) 추가</text>
+        <text x="528" y="126" fill="#7c3aed"  font-size="9">⑤ (1,1) 처리 → 추가 없음</text>
+        <text x="528" y="142" fill="#7c3aed"  font-size="9">⑥ (0,2) 처리 → 추가 없음</text>
+        <text x="528" y="162" fill="#64748b"  font-size="9">큐 비었음 → 종료</text>
+        <rect x="528" y="172" width="114" height="20" rx="3" fill="#f0fdf4" stroke="#86efac"/>
+        <text x="585" y="185" text-anchor="middle" fill="#16a34a" font-size="9" font-weight="700">채운 셀: 5개</text>
+      </svg>
+    </div>
+  </div>
+
+  <!-- 응용: 섬의 개수 -->
+  <div class="viz">
+    <div class="viz-title">// 응용 예제 — 섬의 개수 세기 (Number of Islands)</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+      <div>
+        <div class="lang-label py" style="margin-bottom:8px;"><span class="lang-dot"></span>Python</div>
+<pre style="font-size:11px;"><span class="kw">def</span> <span class="fn">num_islands</span>(grid):
+    rows, cols = <span class="fn">len</span>(grid), <span class="fn">len</span>(grid[<span class="num">0</span>])
+    count = <span class="num">0</span>
+
+    <span class="kw">def</span> <span class="fn">dfs</span>(r, c):
+        <span class="kw">if not</span> (<span class="num">0</span> &lt;= r &lt; rows <span class="kw">and</span>
+                <span class="num">0</span> &lt;= c &lt; cols): <span class="kw">return</span>
+        <span class="kw">if</span> grid[r][c] != <span class="st">'1'</span>: <span class="kw">return</span>
+        grid[r][c] = <span class="st">'#'</span>  <span class="cm"># 방문 처리</span>
+        <span class="kw">for</span> dr, dc <span class="kw">in</span> [(-<span class="num">1</span>,<span class="num">0</span>),(<span class="num">1</span>,<span class="num">0</span>),
+                        (<span class="num">0</span>,-<span class="num">1</span>),(<span class="num">0</span>,<span class="num">1</span>)]:
+            <span class="fn">dfs</span>(r+dr, c+dc)
+
+    <span class="kw">for</span> r <span class="kw">in</span> <span class="fn">range</span>(rows):
+        <span class="kw">for</span> c <span class="kw">in</span> <span class="fn">range</span>(cols):
+            <span class="kw">if</span> grid[r][c] == <span class="st">'1'</span>:
+                <span class="fn">dfs</span>(r, c)
+                count += <span class="num">1</span>
+    <span class="kw">return</span> count</pre>
+      </div>
+      <div>
+        <div class="lang-label java" style="margin-bottom:8px;"><span class="lang-dot"></span>Java</div>
+<pre style="font-size:11px;"><span class="kw">static int</span> <span class="fn">numIslands</span>(<span class="ty">char</span>[][] grid) {
+    <span class="ty">int</span> rows = grid.length;
+    <span class="ty">int</span> cols = grid[<span class="num">0</span>].length;
+    <span class="ty">int</span> count = <span class="num">0</span>;
+
+    <span class="kw">for</span> (<span class="ty">int</span> r = <span class="num">0</span>; r &lt; rows; r++) {
+        <span class="kw">for</span> (<span class="ty">int</span> c = <span class="num">0</span>; c &lt; cols; c++) {
+            <span class="kw">if</span> (grid[r][c] == <span class="st">'1'</span>) {
+                <span class="fn">dfs</span>(grid, r, c, rows, cols);
+                count++;
+            }
+        }
+    }
+    <span class="kw">return</span> count;
+}
+<span class="kw">static void</span> <span class="fn">dfs</span>(<span class="ty">char</span>[][] g, <span class="ty">int</span> r,
+        <span class="ty">int</span> c, <span class="ty">int</span> rows, <span class="ty">int</span> cols) {
+    <span class="kw">if</span> (r&lt;<span class="num">0</span>||r&gt;=rows||c&lt;<span class="num">0</span>||c&gt;=cols) <span class="kw">return</span>;
+    <span class="kw">if</span> (g[r][c] != <span class="st">'1'</span>) <span class="kw">return</span>;
+    g[r][c] = <span class="st">'#'</span>;
+    <span class="ty">int</span>[] dr={-<span class="num">1</span>,<span class="num">1</span>,<span class="num">0</span>,<span class="num">0</span>}, dc={<span class="num">0</span>,<span class="num">0</span>,-<span class="num">1</span>,<span class="num">1</span>};
+    <span class="kw">for</span> (<span class="ty">int</span> i=<span class="num">0</span>; i&lt;<span class="num">4</span>; i++)
+        <span class="fn">dfs</span>(g, r+dr[i], c+dc[i], rows, cols);
+}</pre>
+      </div>
+    </div>
+  </div>
+
+  <table class="ctbl">
+    <thead><tr><th>항목</th><th class="py">Python</th><th class="java">Java</th></tr></thead>
+    <tbody>
+      <tr><td>구현 방식</td><td>재귀 DFS 또는 deque BFS</td><td>재귀 DFS 또는 ArrayDeque BFS</td></tr>
+      <tr><td>경계 조건</td><td>0 &lt;= r &lt; rows and 0 &lt;= c &lt; cols</td><td>r &lt; 0 || r &gt;= rows || c &lt; 0 || c &gt;= cols</td></tr>
+      <tr><td>방향 표현</td><td>[(-1,0),(1,0),(0,-1),(0,1)] 리스트</td><td>int[] dr, dc 배열 (델타 패턴)</td></tr>
+      <tr><td>8방향 확장</td><td>대각선 4방향 추가 (튜플 8개)</td><td>dr/dc 배열에 4개 추가</td></tr>
+      <tr><td>방문 처리</td><td>값 변경 또는 별도 visited 집합</td><td>값 변경 또는 boolean[][] visited</td></tr>
+      <tr><td>주요 응용</td><td>섬의 개수, 색 채우기, 미로 탈출, 연결 요소</td><td>동일</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ===== UNION FIND ===== -->
+<div class="algo-section" id="tab-uf">
+  <div class="sec-head">
+    <div class="sec-icon">🔗</div>
+    <div>
+      <h2>Union Find — 분리 집합</h2>
+      <p>경로 압축 + 랭크 합치기로 거의 O(1)에 집합 연산</p>
+      <div class="complexity-badges">
+        <span class="cb time">Time: O(α(n)) ≈ O(1)</span>
+        <span class="cb space">Space: O(n)</span>
+        <span class="cb type">Path Compression + Union by Rank</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="split-card">
+    <div class="split-side py-side">
+      <div class="lang-label py"><span class="lang-dot"></span>Python</div>
+<pre><span class="kw">class</span> <span class="ty">UnionFind</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="kw">self</span>, n):
+        <span class="kw">self</span>.parent = <span class="fn">list</span>(<span class="fn">range</span>(n))
+        <span class="kw">self</span>.rank = [<span class="num">0</span>] * n
+        <span class="kw">self</span>.size = [<span class="num">1</span>] * n
+
+    <span class="kw">def</span> <span class="fn">find</span>(<span class="kw">self</span>, x):
+        <span class="cm"># 경로 압축 (Path Compression)</span>
+        <span class="kw">if</span> <span class="kw">self</span>.parent[x] != x:
+            <span class="kw">self</span>.parent[x] = <span class="kw">self</span>.<span class="fn">find</span>(
+                <span class="kw">self</span>.parent[x])
+        <span class="kw">return</span> <span class="kw">self</span>.parent[x]
+
+    <span class="kw">def</span> <span class="fn">union</span>(<span class="kw">self</span>, x, y):
+        <span class="cm"># 랭크 기반 합치기 (Union by Rank)</span>
+        rx, ry = <span class="kw">self</span>.<span class="fn">find</span>(x), <span class="kw">self</span>.<span class="fn">find</span>(y)
+        <span class="kw">if</span> rx == ry: <span class="kw">return False</span>  <span class="cm"># 이미 같은 집합</span>
+        <span class="kw">if</span> <span class="kw">self</span>.rank[rx] &lt; <span class="kw">self</span>.rank[ry]:
+            rx, ry = ry, rx
+        <span class="kw">self</span>.parent[ry] = rx
+        <span class="kw">self</span>.size[rx] += <span class="kw">self</span>.size[ry]
+        <span class="kw">if</span> <span class="kw">self</span>.rank[rx] == <span class="kw">self</span>.rank[ry]:
+            <span class="kw">self</span>.rank[rx] += <span class="num">1</span>
+        <span class="kw">return True</span>
+
+    <span class="kw">def</span> <span class="fn">connected</span>(<span class="kw">self</span>, x, y):
+        <span class="kw">return self</span>.<span class="fn">find</span>(x) == <span class="kw">self</span>.<span class="fn">find</span>(y)
+
+    <span class="kw">def</span> <span class="fn">get_size</span>(<span class="kw">self</span>, x):
+        <span class="kw">return self</span>.size[<span class="kw">self</span>.<span class="fn">find</span>(x)]
+
+<span class="cm"># 사용 예시</span>
+uf = <span class="ty">UnionFind</span>(<span class="num">5</span>)
+uf.<span class="fn">union</span>(<span class="num">0</span>, <span class="num">1</span>)
+uf.<span class="fn">union</span>(<span class="num">1</span>, <span class="num">2</span>)
+<span class="fn">print</span>(uf.<span class="fn">connected</span>(<span class="num">0</span>, <span class="num">2</span>))  <span class="cm"># True</span>
+<span class="fn">print</span>(uf.<span class="fn">connected</span>(<span class="num">0</span>, <span class="num">3</span>))  <span class="cm"># False</span></pre>
+      <div class="tag-row"><span class="tag py">경로 압축</span><span class="tag py">랭크 합치기</span><span class="tag py">O(α(n))</span></div>
+    </div>
+    <div class="split-side java-side">
+      <div class="lang-label java"><span class="lang-dot"></span>Java</div>
+<pre><span class="kw">class</span> <span class="ty">UnionFind</span> {
+    <span class="ty">int</span>[] parent, rank, size;
+
+    <span class="ty">UnionFind</span>(<span class="ty">int</span> n) {
+        parent = <span class="kw">new</span> <span class="ty">int</span>[n];
+        rank   = <span class="kw">new</span> <span class="ty">int</span>[n];
+        size   = <span class="kw">new</span> <span class="ty">int</span>[n];
+        <span class="kw">for</span> (<span class="ty">int</span> i = <span class="num">0</span>; i &lt; n; i++) {
+            parent[i] = i;
+            size[i]   = <span class="num">1</span>;
+        }
+    }
+
+    <span class="cm">// 경로 압축</span>
+    <span class="ty">int</span> <span class="fn">find</span>(<span class="ty">int</span> x) {
+        <span class="kw">if</span> (parent[x] != x)
+            parent[x] = <span class="fn">find</span>(parent[x]);
+        <span class="kw">return</span> parent[x];
+    }
+
+    <span class="cm">// 랭크 기반 합치기</span>
+    <span class="ty">boolean</span> <span class="fn">union</span>(<span class="ty">int</span> x, <span class="ty">int</span> y) {
+        <span class="ty">int</span> rx = <span class="fn">find</span>(x), ry = <span class="fn">find</span>(y);
+        <span class="kw">if</span> (rx == ry) <span class="kw">return false</span>;
+        <span class="kw">if</span> (rank[rx] &lt; rank[ry]) {
+            <span class="ty">int</span> tmp = rx; rx = ry; ry = tmp;
+        }
+        parent[ry] = rx;
+        size[rx] += size[ry];
+        <span class="kw">if</span> (rank[rx] == rank[ry]) rank[rx]++;
+        <span class="kw">return true</span>;
+    }
+
+    <span class="ty">boolean</span> <span class="fn">connected</span>(<span class="ty">int</span> x, <span class="ty">int</span> y) {
+        <span class="kw">return</span> <span class="fn">find</span>(x) == <span class="fn">find</span>(y);
+    }
+    <span class="ty">int</span> <span class="fn">getSize</span>(<span class="ty">int</span> x) {
+        <span class="kw">return</span> size[<span class="fn">find</span>(x)];
+    }
+}</pre>
+      <div class="tag-row"><span class="tag java">int[]</span><span class="tag java">경로 압축</span><span class="tag java">rank 합치기</span></div>
+    </div>
+  </div>
+
+  <div class="viz">
+    <div class="viz-title">// Union Find 동작 시각화</div>
+    <div class="graph-wrap">
+      <svg width="660" height="200" viewBox="0 0 660 200" style="max-width:100%;">
+        <!-- 초기 상태 -->
+        <text x="75" y="20" text-anchor="middle" fill="#64748b" font-size="11" font-weight="700">초기: 5개 독립 집합</text>
+        <circle cx="20" cy="70" r="18" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/><text x="20" y="75" text-anchor="middle" fill="#2563eb" font-size="11">0</text>
+        <circle cx="60" cy="70" r="18" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/><text x="60" y="75" text-anchor="middle" fill="#2563eb" font-size="11">1</text>
+        <circle cx="100" cy="70" r="18" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/><text x="100" y="75" text-anchor="middle" fill="#2563eb" font-size="11">2</text>
+        <circle cx="20" cy="130" r="18" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/><text x="20" y="135" text-anchor="middle" fill="#2563eb" font-size="11">3</text>
+        <circle cx="60" cy="130" r="18" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/><text x="60" y="135" text-anchor="middle" fill="#2563eb" font-size="11">4</text>
+        <!-- parent 표시 -->
+        <text x="20" y="158" text-anchor="middle" fill="#94a3b8" font-size="8">p=0</text>
+        <text x="60" y="100" text-anchor="middle" fill="#94a3b8" font-size="8">p=1</text>
+        <text x="100" y="100" text-anchor="middle" fill="#94a3b8" font-size="8">p=2</text>
+        <text x="20" y="158" text-anchor="middle" fill="#94a3b8" font-size="8">p=3</text>
+        <text x="60" y="158" text-anchor="middle" fill="#94a3b8" font-size="8">p=4</text>
+
+        <!-- 화살표 -->
+        <text x="160" y="100" fill="#64748b" font-size="22">→</text>
+
+        <!-- union(0,1) 후 -->
+        <text x="275" y="20" text-anchor="middle" fill="#64748b" font-size="11" font-weight="700">union(0,1), union(1,2)</text>
+        <circle cx="275" cy="60" r="18" fill="#16a34a" stroke="white" stroke-width="2"/><text x="275" y="65" text-anchor="middle" fill="white" font-size="11">0</text>
+        <text x="275" y="43" text-anchor="middle" fill="#94a3b8" font-size="8">root</text>
+        <line x1="255" y1="105" x2="268" y2="78" stroke="#86efac" stroke-width="1.5"/>
+        <circle cx="245" cy="115" r="18" fill="#22c55e" stroke="white" stroke-width="2"/><text x="245" y="120" text-anchor="middle" fill="white" font-size="11">1</text>
+        <line x1="295" y1="105" x2="283" y2="78" stroke="#86efac" stroke-width="1.5"/>
+        <circle cx="305" cy="115" r="18" fill="#22c55e" stroke="white" stroke-width="2"/><text x="305" y="120" text-anchor="middle" fill="white" font-size="11">2</text>
+        <circle cx="230" cy="160" r="18" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/><text x="230" y="165" text-anchor="middle" fill="#2563eb" font-size="11">3</text>
+        <circle cx="270" cy="160" r="18" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/><text x="270" y="165" text-anchor="middle" fill="#2563eb" font-size="11">4</text>
+
+        <!-- 화살표 2 -->
+        <text x="370" y="100" fill="#64748b" font-size="22">→</text>
+
+        <!-- 경로 압축 -->
+        <text x="510" y="20" text-anchor="middle" fill="#64748b" font-size="11" font-weight="700">경로 압축 후 find(2)</text>
+        <circle cx="510" cy="60" r="18" fill="#16a34a" stroke="white" stroke-width="2"/><text x="510" y="65" text-anchor="middle" fill="white" font-size="11">0</text>
+        <line x1="468" y1="105" x2="494" y2="78" stroke="#86efac" stroke-width="1.5"/>
+        <line x1="510" y1="105" x2="510" y2="78" stroke="#86efac" stroke-width="1.5"/>
+        <line x1="552" y1="105" x2="526" y2="78" stroke="#f97316" stroke-width="2" stroke-dasharray="4"/>
+        <circle cx="460" cy="115" r="18" fill="#22c55e" stroke="white" stroke-width="2"/><text x="460" y="120" text-anchor="middle" fill="white" font-size="11">1</text>
+        <circle cx="510" cy="115" r="18" fill="#22c55e" stroke="white" stroke-width="2"/><text x="510" y="120" text-anchor="middle" fill="white" font-size="11">3</text>
+        <circle cx="560" cy="115" r="18" fill="#fef3c7" stroke="#f97316" stroke-width="2"/><text x="560" y="120" text-anchor="middle" fill="#d97706" font-size="11">2</text>
+        <text x="560" y="145" text-anchor="middle" fill="#f97316" font-size="8">압축됨!</text>
+        <text x="560" y="155" text-anchor="middle" fill="#94a3b8" font-size="8">parent=0</text>
+      </svg>
+    </div>
+  </div>
+
+  <table class="ctbl">
+    <thead><tr><th>항목</th><th class="py">Python</th><th class="java">Java</th></tr></thead>
+    <tbody>
+      <tr><td>구현 방식</td><td>클래스 + list</td><td>클래스 + int[]</td></tr>
+      <tr><td>경로 압축</td><td>재귀 (간결)</td><td>재귀 동일</td></tr>
+      <tr><td>swap 패턴</td><td>rx, ry = ry, rx</td><td>tmp 변수 필요</td></tr>
+      <tr><td>응용</td><td>Kruskal, 연결 요소 수, 네트워크 연결</td><td>동일</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ===== KRUSKAL ===== -->
+<div class="algo-section" id="tab-kruskal">
+  <div class="sec-head">
+    <div class="sec-icon">🌿</div>
+    <div>
+      <h2>Kruskal — 최소 신장 트리</h2>
+      <p>간선을 가중치 순 정렬 후 사이클 없이 추가 (Union Find 활용)</p>
+      <div class="complexity-badges">
+        <span class="cb time">Time: O(E log E)</span>
+        <span class="cb space">Space: O(V + E)</span>
+        <span class="cb type">Union Find + Sort</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="split-card">
+    <div class="split-side py-side">
+      <div class="lang-label py"><span class="lang-dot"></span>Python</div>
+<pre><span class="kw">def</span> <span class="fn">kruskal</span>(n, edges):
+    <span class="cm">"""
+    n: 정점 수
+    edges: [(weight, u, v), ...]
+    """</span>
+    edges.<span class="fn">sort</span>()        <span class="cm"># 가중치 오름차순</span>
+    uf = <span class="ty">UnionFind</span>(n)
+    mst = []
+    total_cost = <span class="num">0</span>
+
+    <span class="kw">for</span> w, u, v <span class="kw">in</span> edges:
+        <span class="kw">if</span> uf.<span class="fn">union</span>(u, v):  <span class="cm"># 사이클 없으면 추가</span>
+            mst.<span class="fn">append</span>((u, v, w))
+            total_cost += w
+            <span class="kw">if</span> <span class="fn">len</span>(mst) == n - <span class="num">1</span>:
+                <span class="kw">break</span>   <span class="cm"># MST 완성</span>
+
+    <span class="kw">return</span> mst, total_cost
+
+<span class="cm"># 사용 예시</span>
+edges = [
+    (<span class="num">4</span>, <span class="num">0</span>, <span class="num">1</span>), (<span class="num">8</span>, <span class="num">0</span>, <span class="num">2</span>),
+    (<span class="num">7</span>, <span class="num">1</span>, <span class="num">2</span>), (<span class="num">9</span>, <span class="num">1</span>, <span class="num">3</span>),
+    (<span class="num">10</span>, <span class="num">2</span>, <span class="num">3</span>), (<span class="num">2</span>, <span class="num">2</span>, <span class="num">4</span>),
+    (<span class="num">14</span>, <span class="num">3</span>, <span class="num">4</span>)
+]
+mst, cost = <span class="fn">kruskal</span>(<span class="num">5</span>, edges)
+<span class="fn">print</span>(<span class="st">f"MST 비용: </span>{cost}<span class="st">"</span>)  <span class="cm"># 22</span></pre>
+      <div class="tag-row"><span class="tag py">sort()</span><span class="tag py">UnionFind</span><span class="tag py">간선 기준</span></div>
+    </div>
+    <div class="split-side java-side">
+      <div class="lang-label java"><span class="lang-dot"></span>Java</div>
+<pre><span class="kw">import</span> java.util.*;
+
+<span class="kw">static</span> <span class="ty">int</span> <span class="fn">kruskal</span>(<span class="ty">int</span> n, <span class="ty">int</span>[][] edges) {
+    <span class="cm">// edges[i] = {weight, u, v}</span>
+    Arrays.<span class="fn">sort</span>(edges, (a, b) -&gt; a[<span class="num">0</span>] - b[<span class="num">0</span>]);
+
+    <span class="ty">UnionFind</span> uf = <span class="kw">new</span> <span class="ty">UnionFind</span>(n);
+    <span class="ty">int</span> totalCost = <span class="num">0</span>, edgeCount = <span class="num">0</span>;
+    List&lt;<span class="ty">int</span>[]&gt; mst = <span class="kw">new</span> <span class="ty">ArrayList</span>&lt;&gt;();
+
+    <span class="kw">for</span> (<span class="ty">int</span>[] e : edges) {
+        <span class="ty">int</span> w = e[<span class="num">0</span>], u = e[<span class="num">1</span>], v = e[<span class="num">2</span>];
+        <span class="kw">if</span> (uf.<span class="fn">union</span>(u, v)) {
+            mst.<span class="fn">add</span>(e);
+            totalCost += w;
+            edgeCount++;
+            <span class="kw">if</span> (edgeCount == n - <span class="num">1</span>) <span class="kw">break</span>;
+        }
+    }
+    <span class="kw">return</span> totalCost;
+}
+
+<span class="cm">// Comparator 람다로 정렬 (Java 8+)</span>
+<span class="cm">// Arrays.sort(edges, Comparator.comparingInt(a -> a[0]))</span>
+
+<span class="cm">// PriorityQueue 방식도 가능</span>
+PriorityQueue&lt;<span class="ty">int</span>[]&gt; pq =
+    <span class="kw">new</span> PriorityQueue&lt;&gt;((a,b) -&gt; a[<span class="num">0</span>]-b[<span class="num">0</span>]);
+<span class="kw">for</span> (<span class="ty">int</span>[] e : edges) pq.<span class="fn">offer</span>(e);
+<span class="kw">while</span> (!pq.<span class="fn">isEmpty</span>()) {
+    <span class="ty">int</span>[] e = pq.<span class="fn">poll</span>();
+    <span class="cm">// ... same logic</span>
+}</pre>
+      <div class="tag-row"><span class="tag java">Arrays.sort</span><span class="tag java">람다 Comparator</span><span class="tag java">UnionFind</span></div>
+    </div>
+  </div>
+
+  <div class="viz">
+    <div class="viz-title">// Kruskal MST 구성 과정</div>
+    <div class="graph-wrap">
+      <svg width="660" height="220" viewBox="0 0 660 220" style="max-width:100%;">
+        <!-- 원본 그래프 -->
+        <text x="100" y="18" text-anchor="middle" fill="#64748b" font-size="11" font-weight="700">원본 그래프</text>
+        <line x1="40" y1="80" x2="130" y2="80" stroke="#e2e8f0" stroke-width="2"/>
+        <text x="85" y="72" text-anchor="middle" fill="#64748b" font-size="10">4</text>
+        <line x1="40" y1="80" x2="85" y2="160" stroke="#e2e8f0" stroke-width="2"/>
+        <text x="52" y="128" fill="#64748b" font-size="10">8</text>
+        <line x1="130" y1="80" x2="85" y2="160" stroke="#e2e8f0" stroke-width="2"/>
+        <text x="120" y="128" fill="#64748b" font-size="10">7</text>
+        <line x1="130" y1="80" x2="160" y2="160" stroke="#e2e8f0" stroke-width="2"/>
+        <text x="155" y="118" fill="#64748b" font-size="10">9</text>
+        <line x1="85" y1="160" x2="160" y2="160" stroke="#e2e8f0" stroke-width="2"/>
+        <text x="122" y="178" fill="#64748b" font-size="10">2</text>
+
+        <circle cx="40" cy="80" r="18" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/><text x="40" y="86" text-anchor="middle" fill="#2563eb" font-size="11" font-weight="700">A</text>
+        <circle cx="130" cy="80" r="18" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/><text x="130" y="86" text-anchor="middle" fill="#2563eb" font-size="11" font-weight="700">B</text>
+        <circle cx="85" cy="160" r="18" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/><text x="85" y="166" text-anchor="middle" fill="#2563eb" font-size="11" font-weight="700">C</text>
+        <circle cx="160" cy="160" r="18" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/><text x="160" y="166" text-anchor="middle" fill="#2563eb" font-size="11" font-weight="700">D</text>
+
+        <!-- 화살표 -->
+        <text x="200" y="120" fill="#64748b" font-size="24">→</text>
+
+        <!-- MST 결과 -->
+        <text x="400" y="18" text-anchor="middle" fill="#16a34a" font-size="11" font-weight="700">MST 결과 (비용=13)</text>
+        <!-- MST 간선 -->
+        <line x1="310" y1="80" x2="400" y2="80" stroke="#16a34a" stroke-width="3"/>
+        <text x="355" y="70" text-anchor="middle" fill="#16a34a" font-size="11" font-weight="700">4 ✓</text>
+        <line x1="400" y1="80" x2="355" y2="160" stroke="#16a34a" stroke-width="3"/>
+        <text x="390" y="128" fill="#16a34a" font-size="11" font-weight="700">7 ✓</text>
+        <line x1="355" y1="160" x2="430" y2="160" stroke="#16a34a" stroke-width="3"/>
+        <text x="392" y="180" text-anchor="middle" fill="#16a34a" font-size="11" font-weight="700">2 ✓</text>
+        <!-- 제거된 간선 -->
+        <line x1="310" y1="80" x2="355" y2="160" stroke="#fca5a5" stroke-width="1.5" stroke-dasharray="4"/>
+        <text x="318" y="135" fill="#dc2626" font-size="10">8 ✗</text>
+        <line x1="400" y1="80" x2="430" y2="160" stroke="#fca5a5" stroke-width="1.5" stroke-dasharray="4"/>
+        <text x="430" y="118" fill="#dc2626" font-size="10">9 ✗</text>
+
+        <circle cx="310" cy="80" r="18" fill="#f0fdf4" stroke="#16a34a" stroke-width="2"/><text x="310" y="86" text-anchor="middle" fill="#16a34a" font-size="11" font-weight="700">A</text>
+        <circle cx="400" cy="80" r="18" fill="#f0fdf4" stroke="#16a34a" stroke-width="2"/><text x="400" y="86" text-anchor="middle" fill="#16a34a" font-size="11" font-weight="700">B</text>
+        <circle cx="355" cy="160" r="18" fill="#f0fdf4" stroke="#16a34a" stroke-width="2"/><text x="355" y="166" text-anchor="middle" fill="#16a34a" font-size="11" font-weight="700">C</text>
+        <circle cx="430" cy="160" r="18" fill="#f0fdf4" stroke="#16a34a" stroke-width="2"/><text x="430" y="166" text-anchor="middle" fill="#16a34a" font-size="11" font-weight="700">D</text>
+
+        <!-- 정렬된 간선 목록 -->
+        <text x="560" y="18" text-anchor="middle" fill="#64748b" font-size="11" font-weight="700">간선 정렬 순서</text>
+        <rect x="500" y="28" width="120" height="24" rx="3" fill="#f0fdf4" stroke="#86efac"/>
+        <text x="560" y="44" text-anchor="middle" fill="#16a34a" font-size="10">① (C-D, 2) ✓ 추가</text>
+        <rect x="500" y="56" width="120" height="24" rx="3" fill="#f0fdf4" stroke="#86efac"/>
+        <text x="560" y="72" text-anchor="middle" fill="#16a34a" font-size="10">② (A-B, 4) ✓ 추가</text>
+        <rect x="500" y="84" width="120" height="24" rx="3" fill="#f0fdf4" stroke="#86efac"/>
+        <text x="560" y="100" text-anchor="middle" fill="#16a34a" font-size="10">③ (B-C, 7) ✓ 추가</text>
+        <rect x="500" y="112" width="120" height="24" rx="3" fill="#fef2f2" stroke="#fca5a5"/>
+        <text x="560" y="128" text-anchor="middle" fill="#dc2626" font-size="10">④ (A-C, 8) ✗ 사이클</text>
+        <rect x="500" y="140" width="120" height="24" rx="3" fill="#fef2f2" stroke="#fca5a5"/>
+        <text x="560" y="156" text-anchor="middle" fill="#dc2626" font-size="10">⑤ (B-D, 9) ✗ 사이클</text>
+        <text x="560" y="185" text-anchor="middle" fill="#16a34a" font-size="11" font-weight="700">총 비용: 2+4+7 = 13</text>
+      </svg>
+    </div>
+  </div>
+
+  <table class="ctbl">
+    <thead><tr><th>항목</th><th class="py">Python</th><th class="java">Java</th></tr></thead>
+    <tbody>
+      <tr><td>정렬</td><td>edges.sort() — 튜플 자동 첫 요소 비교</td><td>Arrays.sort(edges, (a,b)->a[0]-b[0])</td></tr>
+      <tr><td>Union Find</td><td>별도 클래스 또는 함수로 구현</td><td>별도 클래스로 구현</td></tr>
+      <tr><td>간선 표현</td><td>(weight, u, v) 튜플 리스트</td><td>int[][] edges — 행렬 방식</td></tr>
+      <tr><td>vs Prim</td><td>희소 그래프에 유리 (E log E)</td><td>동일</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ===== PRIM ===== -->
+<div class="algo-section" id="tab-prim">
+  <div class="sec-head">
+    <div class="sec-icon">🌱</div>
+    <div>
+      <h2>Prim — 최소 신장 트리</h2>
+      <p>현재 MST에서 가장 가까운 정점을 Priority Queue로 확장</p>
+      <div class="complexity-badges">
+        <span class="cb time">Time: O(E log V)</span>
+        <span class="cb space">Space: O(V + E)</span>
+        <span class="cb type">Priority Queue + 인접 리스트</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="split-card">
+    <div class="split-side py-side">
+      <div class="lang-label py"><span class="lang-dot"></span>Python</div>
+<pre><span class="kw">import</span> heapq
+<span class="kw">from</span> collections <span class="kw">import</span> defaultdict
+
+<span class="kw">def</span> <span class="fn">prim</span>(graph, start=<span class="num">0</span>):
+    <span class="cm">"""
+    graph[u] = [(weight, v), ...]
+    """</span>
+    visited = <span class="fn">set</span>()
+    mst = []
+    total = <span class="num">0</span>
+
+    <span class="cm"># (cost, 현재노드, 부모노드)</span>
+    heap = [(<span class="num">0</span>, start, -<span class="num">1</span>)]
+
+    <span class="kw">while</span> heap:
+        cost, u, parent = heapq.<span class="fn">heappop</span>(heap)
+        <span class="kw">if</span> u <span class="kw">in</span> visited:
+            <span class="kw">continue</span>
+        visited.<span class="fn">add</span>(u)
+        total += cost
+
+        <span class="kw">if</span> parent != -<span class="num">1</span>:
+            mst.<span class="fn">append</span>((parent, u, cost))
+
+        <span class="kw">for</span> w, v <span class="kw">in</span> graph[u]:
+            <span class="kw">if</span> v <span class="kw">not in</span> visited:
+                heapq.<span class="fn">heappush</span>(heap, (w, v, u))
+
+    <span class="kw">return</span> mst, total
+
+<span class="cm"># 사용 예시</span>
+g = defaultdict(<span class="fn">list</span>)
+g[<span class="num">0</span>] += [(<span class="num">4</span>,<span class="num">1</span>), (<span class="num">8</span>,<span class="num">2</span>)]
+g[<span class="num">1</span>] += [(<span class="num">4</span>,<span class="num">0</span>), (<span class="num">7</span>,<span class="num">2</span>), (<span class="num">9</span>,<span class="num">3</span>)]
+g[<span class="num">2</span>] += [(<span class="num">8</span>,<span class="num">0</span>), (<span class="num">7</span>,<span class="num">1</span>), (<span class="num">2</span>,<span class="num">4</span>)]
+g[<span class="num">3</span>] += [(<span class="num">9</span>,<span class="num">1</span>)]
+g[<span class="num">4</span>] += [(<span class="num">2</span>,<span class="num">2</span>)]
+
+mst, cost = <span class="fn">prim</span>(g)
+<span class="fn">print</span>(<span class="st">f"총 비용: </span>{cost}<span class="st">"</span>)</pre>
+      <div class="tag-row"><span class="tag py">heapq</span><span class="tag py">인접 리스트</span><span class="tag py">정점 확장</span></div>
+    </div>
+    <div class="split-side java-side">
+      <div class="lang-label java"><span class="lang-dot"></span>Java</div>
+<pre><span class="kw">import</span> java.util.*;
+
+<span class="kw">static</span> <span class="ty">int</span> <span class="fn">prim</span>(List&lt;List&lt;<span class="ty">int</span>[]&gt;&gt; graph, <span class="ty">int</span> n) {
+    <span class="ty">boolean</span>[] inMST = <span class="kw">new</span> <span class="ty">boolean</span>[n];
+    <span class="cm">// {cost, node, parent}</span>
+    PriorityQueue&lt;<span class="ty">int</span>[]&gt; pq =
+        <span class="kw">new</span> PriorityQueue&lt;&gt;((a,b) -&gt; a[<span class="num">0</span>]-b[<span class="num">0</span>]);
+    pq.<span class="fn">offer</span>(<span class="kw">new</span> <span class="ty">int</span>[]{<span class="num">0</span>, <span class="num">0</span>, -<span class="num">1</span>});
+
+    <span class="ty">int</span> total = <span class="num">0</span>;
+    List&lt;<span class="ty">int</span>[]&gt; mst = <span class="kw">new</span> <span class="ty">ArrayList</span>&lt;&gt;();
+
+    <span class="kw">while</span> (!pq.<span class="fn">isEmpty</span>()) {
+        <span class="ty">int</span>[] cur = pq.<span class="fn">poll</span>();
+        <span class="ty">int</span> cost = cur[<span class="num">0</span>], u = cur[<span class="num">1</span>], par = cur[<span class="num">2</span>];
+
+        <span class="kw">if</span> (inMST[u]) <span class="kw">continue</span>;
+        inMST[u] = <span class="kw">true</span>;
+        total += cost;
+        <span class="kw">if</span> (par != -<span class="num">1</span>)
+            mst.<span class="fn">add</span>(<span class="kw">new</span> <span class="ty">int</span>[]{par, u, cost});
+
+        <span class="kw">for</span> (<span class="ty">int</span>[] nb : graph.<span class="fn">get</span>(u)) {
+            <span class="ty">int</span> w = nb[<span class="num">0</span>], v = nb[<span class="num">1</span>];
+            <span class="kw">if</span> (!inMST[v])
+                pq.<span class="fn">offer</span>(<span class="kw">new</span> <span class="ty">int</span>[]{w, v, u});
+        }
+    }
+    <span class="kw">return</span> total;
+}
+
+<span class="cm">// 그래프 구성</span>
+List&lt;List&lt;<span class="ty">int</span>[]&gt;&gt; g = <span class="kw">new</span> <span class="ty">ArrayList</span>&lt;&gt;();
+<span class="kw">for</span> (<span class="ty">int</span> i = <span class="num">0</span>; i &lt; n; i++)
+    g.<span class="fn">add</span>(<span class="kw">new</span> <span class="ty">ArrayList</span>&lt;&gt;());
+<span class="cm">// g.get(0).add(new int[]{4,1});</span></pre>
+      <div class="tag-row"><span class="tag java">PriorityQueue</span><span class="tag java">boolean[]</span><span class="tag java">int[]</span></div>
+    </div>
+  </div>
+
+  <div class="viz">
+    <div class="viz-title">// Prim vs Kruskal 비교</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+      <div style="background:var(--py-bg);border:1px solid var(--py-border);border-radius:8px;padding:14px;font-size:12px;">
+        <div style="font-weight:700;color:var(--py);margin-bottom:8px;font-family:'JetBrains Mono',monospace;">Prim — 정점 기반 확장</div>
+        <div style="line-height:2;">
+          ① 시작 정점을 MST에 추가<br/>
+          ② MST에서 나가는 최소 간선 선택<br/>
+          ③ 연결된 정점을 MST에 추가<br/>
+          ④ V-1개 간선이 될 때까지 반복<br/>
+          <span style="color:var(--muted);">→ 밀집 그래프(Dense)에 유리</span>
+        </div>
+      </div>
+      <div style="background:var(--java-bg);border:1px solid var(--java-border);border-radius:8px;padding:14px;font-size:12px;">
+        <div style="font-weight:700;color:var(--java);margin-bottom:8px;font-family:'JetBrains Mono',monospace;">Kruskal — 간선 기반 선택</div>
+        <div style="line-height:2;">
+          ① 모든 간선을 가중치 순 정렬<br/>
+          ② 사이클을 만들지 않는 간선 선택<br/>
+          ③ Union Find로 사이클 검사<br/>
+          ④ V-1개 간선이 될 때까지 반복<br/>
+          <span style="color:var(--muted);">→ 희소 그래프(Sparse)에 유리</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <table class="ctbl">
+    <thead><tr><th>항목</th><th class="py">Prim (Python/Java)</th><th class="java">Kruskal (Python/Java)</th></tr></thead>
+    <tbody>
+      <tr><td>접근 방식</td><td>정점 기반 (Greedy 확장)</td><td>간선 기반 (정렬 + Union)</td></tr>
+      <tr><td>복잡도</td><td>O(E log V)</td><td>O(E log E)</td></tr>
+      <tr><td>유리한 경우</td><td>밀집 그래프 (E ≈ V²)</td><td>희소 그래프 (E ≈ V)</td></tr>
+      <tr><td>핵심 자료구조</td><td>Priority Queue</td><td>Union Find</td></tr>
+      <tr><td>구현 난이도</td><td>PQ 사용법 숙지 필요</td><td>Union Find 구현 필요</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ===== DIJKSTRA ===== -->
+<div class="algo-section" id="tab-dijkstra">
+  <div class="sec-head">
+    <div class="sec-icon">🗺️</div>
+    <div>
+      <h2>Dijkstra — 단일 출발 최단 경로</h2>
+      <p>음수 가중치 없는 그래프에서 Priority Queue로 최단 거리 탐색</p>
+      <div class="complexity-badges">
+        <span class="cb time">Time: O(E log V)</span>
+        <span class="cb space">Space: O(V + E)</span>
+        <span class="cb type">Priority Queue (Min-Heap)</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="split-card">
+    <div class="split-side py-side">
+      <div class="lang-label py"><span class="lang-dot"></span>Python</div>
+<pre><span class="kw">import</span> heapq
+<span class="kw">from</span> collections <span class="kw">import</span> defaultdict
+
+<span class="kw">def</span> <span class="fn">dijkstra</span>(graph, start, n):
+    <span class="cm">"""
+    graph[u] = [(w, v), ...]  # 인접 리스트
+    """</span>
+    dist = [<span class="fn">float</span>(<span class="st">'inf'</span>)] * n
+    dist[start] = <span class="num">0</span>
+    heap = [(<span class="num">0</span>, start)]   <span class="cm"># (거리, 노드)</span>
+
+    <span class="kw">while</span> heap:
+        d, u = heapq.<span class="fn">heappop</span>(heap)
+
+        <span class="kw">if</span> d > dist[u]:     <span class="cm"># 이미 처리된 노드</span>
+            <span class="kw">continue</span>
+
+        <span class="kw">for</span> w, v <span class="kw">in</span> graph[u]:
+            new_dist = dist[u] + w
+            <span class="kw">if</span> new_dist < dist[v]:
+                dist[v] = new_dist
+                heapq.<span class="fn">heappush</span>(heap,
+                    (new_dist, v))
+    <span class="kw">return</span> dist
+
+<span class="cm"># 경로 복원 포함 버전</span>
+<span class="kw">def</span> <span class="fn">dijkstra_path</span>(graph, start, end, n):
+    dist = [<span class="fn">float</span>(<span class="st">'inf'</span>)] * n
+    prev = [-<span class="num">1</span>] * n
+    dist[start] = <span class="num">0</span>
+    heap = [(<span class="num">0</span>, start)]
+
+    <span class="kw">while</span> heap:
+        d, u = heapq.<span class="fn">heappop</span>(heap)
+        <span class="kw">if</span> d > dist[u]: <span class="kw">continue</span>
+        <span class="kw">for</span> w, v <span class="kw">in</span> graph[u]:
+            <span class="kw">if</span> dist[u] + w < dist[v]:
+                dist[v] = dist[u] + w
+                prev[v] = u
+                heapq.<span class="fn">heappush</span>(heap, (dist[v], v))
+
+    <span class="cm"># 경로 역추적</span>
+    path, node = [], end
+    <span class="kw">while</span> node != -<span class="num">1</span>:
+        path.<span class="fn">append</span>(node)
+        node = prev[node]
+    <span class="kw">return</span> dist[end], path[::-<span class="num">1</span>]</pre>
+      <div class="tag-row"><span class="tag py">heapq</span><span class="tag py">float('inf')</span><span class="tag py">prev 배열</span></div>
+    </div>
+    <div class="split-side java-side">
+      <div class="lang-label java"><span class="lang-dot"></span>Java</div>
+<pre><span class="kw">import</span> java.util.*;
+
+<span class="kw">static</span> <span class="ty">int</span>[] <span class="fn">dijkstra</span>(
+        List&lt;List&lt;<span class="ty">int</span>[]&gt;&gt; graph,
+        <span class="ty">int</span> start, <span class="ty">int</span> n) {
+
+    <span class="ty">int</span>[] dist = <span class="kw">new</span> <span class="ty">int</span>[n];
+    Arrays.<span class="fn">fill</span>(dist, <span class="ty">Integer</span>.MAX_VALUE);
+    dist[start] = <span class="num">0</span>;
+
+    <span class="cm">// {거리, 노드}</span>
+    PriorityQueue&lt;<span class="ty">int</span>[]&gt; pq =
+        <span class="kw">new</span> PriorityQueue&lt;&gt;((a,b) -&gt; a[<span class="num">0</span>]-b[<span class="num">0</span>]);
+    pq.<span class="fn">offer</span>(<span class="kw">new</span> <span class="ty">int</span>[]{<span class="num">0</span>, start});
+
+    <span class="kw">while</span> (!pq.<span class="fn">isEmpty</span>()) {
+        <span class="ty">int</span>[] cur = pq.<span class="fn">poll</span>();
+        <span class="ty">int</span> d = cur[<span class="num">0</span>], u = cur[<span class="num">1</span>];
+
+        <span class="kw">if</span> (d > dist[u]) <span class="kw">continue</span>;
+
+        <span class="kw">for</span> (<span class="ty">int</span>[] nb : graph.<span class="fn">get</span>(u)) {
+            <span class="ty">int</span> w = nb[<span class="num">0</span>], v = nb[<span class="num">1</span>];
+            <span class="kw">if</span> (dist[u] + w &lt; dist[v]) {
+                dist[v] = dist[u] + w;
+                pq.<span class="fn">offer</span>(<span class="kw">new</span> <span class="ty">int</span>[]{dist[v], v});
+            }
+        }
+    }
+    <span class="kw">return</span> dist;
+}
+
+<span class="cm">// Integer.MAX_VALUE 오버플로 주의!</span>
+<span class="cm">// dist[u] + w 할 때 long 사용 권장</span>
+<span class="cm">// 또는 dist[u] != Integer.MAX_VALUE 체크</span>
+
+<span class="cm">// long 버전 (안전)</span>
+<span class="kw">static</span> <span class="ty">long</span>[] <span class="fn">dijkstraLong</span>(...) {
+    <span class="ty">long</span>[] dist = <span class="kw">new</span> <span class="ty">long</span>[n];
+    Arrays.<span class="fn">fill</span>(dist, <span class="ty">Long</span>.MAX_VALUE / <span class="num">2</span>);
+    <span class="cm">// ...</span>
+}</pre>
+      <div class="tag-row"><span class="tag java">PriorityQueue</span><span class="tag java">Integer.MAX_VALUE</span><span class="tag java">long 주의</span></div>
+    </div>
+  </div>
+
+  <div class="viz">
+    <div class="viz-title">// Dijkstra 최단 경로 탐색 (0→4)</div>
+    <div class="graph-wrap">
+      <svg width="660" height="240" viewBox="0 0 660 240" style="max-width:100%;">
+        <defs>
+          <marker id="ad" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L7,3 z" fill="#94a3b8"/>
+          </marker>
+          <marker id="adg" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L7,3 z" fill="#16a34a"/>
+          </marker>
+        </defs>
+        <!-- 간선 -->
+        <line x1="60" y1="100" x2="190" y2="60" stroke="#e2e8f0" stroke-width="2" marker-end="url(#ad)"/>
+        <text x="115" y="65" text-anchor="middle" fill="#64748b" font-size="10">4</text>
+        <line x1="60" y1="100" x2="190" y2="160" stroke="#e2e8f0" stroke-width="2" marker-end="url(#ad)"/>
+        <text x="110" y="145" text-anchor="middle" fill="#64748b" font-size="10">2</text>
+        <line x1="210" y1="60" x2="340" y2="60" stroke="#e2e8f0" stroke-width="2" marker-end="url(#ad)"/>
+        <text x="275" y="50" text-anchor="middle" fill="#64748b" font-size="10">5</text>
+        <line x1="210" y1="160" x2="340" y2="60" stroke="#e2e8f0" stroke-width="2" marker-end="url(#ad)"/>
+        <text x="290" y="120" text-anchor="middle" fill="#64748b" font-size="10">8</text>
+        <line x1="210" y1="60" x2="340" y2="160" stroke="#e2e8f0" stroke-width="2" marker-end="url(#ad)"/>
+        <text x="260" y="130" text-anchor="middle" fill="#64748b" font-size="10">3</text>
+        <line x1="210" y1="160" x2="340" y2="160" stroke="#e2e8f0" stroke-width="2" marker-end="url(#ad)"/>
+        <text x="275" y="175" text-anchor="middle" fill="#64748b" font-size="10">1</text>
+        <line x1="360" y1="60" x2="490" y2="100" stroke="#e2e8f0" stroke-width="2" marker-end="url(#ad)"/>
+        <text x="430" y="65" text-anchor="middle" fill="#64748b" font-size="10">2</text>
+        <line x1="360" y1="160" x2="490" y2="100" stroke="#e2e8f0" stroke-width="2" marker-end="url(#ad)"/>
+        <text x="430" y="145" text-anchor="middle" fill="#64748b" font-size="10">6</text>
+
+        <!-- 최단 경로 강조 (0→1→2→4) -->
+        <line x1="60" y1="100" x2="190" y2="160" stroke="#16a34a" stroke-width="3" marker-end="url(#adg)"/>
+        <line x1="210" y1="160" x2="340" y2="160" stroke="#16a34a" stroke-width="3" marker-end="url(#adg)"/>
+        <line x1="360" y1="160" x2="490" y2="100" stroke="#f97316" stroke-width="2" stroke-dasharray="4"/>
+        <line x1="210" y1="60" x2="340" y2="160" stroke="#16a34a" stroke-width="3" marker-end="url(#adg)"/>
+
+        <!-- 노드 -->
+        <circle cx="60" cy="100" r="22" fill="#2563eb"/><text x="60" y="96" text-anchor="middle" fill="white" font-size="11" font-weight="700">0</text>
+        <text x="60" y="110" text-anchor="middle" fill="white" font-size="9">d=0</text>
+
+        <circle cx="200" cy="60" r="22" fill="#93c5fd" stroke="#2563eb" stroke-width="2"/><text x="200" y="56" text-anchor="middle" fill="#1d4ed8" font-size="11" font-weight="700">1</text>
+        <text x="200" y="70" text-anchor="middle" fill="#1d4ed8" font-size="9">d=4</text>
+
+        <circle cx="200" cy="160" r="22" fill="#16a34a"/><text x="200" y="156" text-anchor="middle" fill="white" font-size="11" font-weight="700">2</text>
+        <text x="200" y="170" text-anchor="middle" fill="white" font-size="9">d=2</text>
+
+        <circle cx="350" cy="60" r="22" fill="#93c5fd" stroke="#2563eb" stroke-width="2"/><text x="350" y="56" text-anchor="middle" fill="#1d4ed8" font-size="11" font-weight="700">3</text>
+        <text x="350" y="70" text-anchor="middle" fill="#1d4ed8" font-size="9">d=5</text>
+
+        <circle cx="350" cy="160" r="22" fill="#22c55e"/><text x="350" y="156" text-anchor="middle" fill="white" font-size="11" font-weight="700">4</text>
+        <text x="350" y="170" text-anchor="middle" fill="white" font-size="9">d=3</text>
+
+        <circle cx="500" cy="100" r="22" fill="#f0fdf4" stroke="#16a34a" stroke-width="2"/><text x="500" y="96" text-anchor="middle" fill="#16a34a" font-size="11" font-weight="700">5</text>
+        <text x="500" y="110" text-anchor="middle" fill="#16a34a" font-size="9">d=9</text>
+
+        <!-- 범례 -->
+        <line x1="570" y1="60" x2="620" y2="60" stroke="#16a34a" stroke-width="3"/>
+        <text x="630" y="64" fill="#16a34a" font-size="10">최단 경로</text>
+        <rect x="556" y="40" width="100" height="30" rx="4" fill="none" stroke="#e2e8f0"/>
+
+        <!-- 처리 순서 -->
+        <text x="580" y="100" text-anchor="middle" fill="#64748b" font-size="11" font-weight="700">처리 순서</text>
+        <text x="580" y="118" text-anchor="middle" fill="#2563eb" font-size="10">① 0 (d=0)</text>
+        <text x="580" y="133" text-anchor="middle" fill="#16a34a" font-size="10">② 2 (d=2)</text>
+        <text x="580" y="148" text-anchor="middle" fill="#22c55e" font-size="10">③ 4 (d=3)</text>
+        <text x="580" y="163" text-anchor="middle" fill="#60a5fa" font-size="10">④ 1 (d=4)</text>
+        <text x="580" y="178" text-anchor="middle" fill="#60a5fa" font-size="10">⑤ 3 (d=5)</text>
+        <text x="580" y="193" text-anchor="middle" fill="#94a3b8" font-size="10">⑥ 5 (d=9)</text>
+      </svg>
+    </div>
+  </div>
+
+  <table class="ctbl">
+    <thead><tr><th>항목</th><th class="py">Python</th><th class="java">Java</th></tr></thead>
+    <tbody>
+      <tr><td>무한대 표현</td><td>float('inf') — 직관적</td><td>Integer.MAX_VALUE — 덧셈 시 오버플로 주의</td></tr>
+      <tr><td>PQ 원소</td><td>(dist, node) 튜플</td><td>int[] {dist, node}</td></tr>
+      <tr><td>중복 처리</td><td>if d > dist[u]: continue</td><td>if (d > dist[u]) continue</td></tr>
+      <tr><td>음수 간선</td><td>❌ 불가 → Bellman-Ford 사용</td><td>❌ 동일</td></tr>
+      <tr><td>경로 복원</td><td>prev[] 배열로 역추적</td><td>int[] prev 동일</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ===== FLOYD-WARSHALL ===== -->
+<div class="algo-section" id="tab-fw">
+  <div class="sec-head">
+    <div class="sec-icon">🌐</div>
+    <div>
+      <h2>Floyd-Warshall — 전체 쌍 최단 경로</h2>
+      <p>모든 쌍의 최단 경로를 DP로 계산 — 음수 간선 허용</p>
+      <div class="complexity-badges">
+        <span class="cb time">Time: O(V³)</span>
+        <span class="cb space">Space: O(V²)</span>
+        <span class="cb type">DP / 2D 배열</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="split-card">
+    <div class="split-side py-side">
+      <div class="lang-label py"><span class="lang-dot"></span>Python</div>
+<pre><span class="kw">def</span> <span class="fn">floyd_warshall</span>(n, edges):
+    <span class="cm">"""
+    edges: [(u, v, w), ...]
+    반환: dist[i][j] = i→j 최단 거리
+    """</span>
+    INF = <span class="fn">float</span>(<span class="st">'inf'</span>)
+    dist = [[INF] * n <span class="kw">for</span> _ <span class="kw">in</span> <span class="fn">range</span>(n)]
+
+    <span class="cm"># 자기 자신 거리 0</span>
+    <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(n):
+        dist[i][i] = <span class="num">0</span>
+
+    <span class="cm"># 직접 연결 간선</span>
+    <span class="kw">for</span> u, v, w <span class="kw">in</span> edges:
+        dist[u][v] = <span class="fn">min</span>(dist[u][v], w)
+
+    <span class="cm"># 핵심: 중간 정점 k를 통한 완화</span>
+    <span class="kw">for</span> k <span class="kw">in</span> <span class="fn">range</span>(n):
+        <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(n):
+            <span class="kw">for</span> j <span class="kw">in</span> <span class="fn">range</span>(n):
+                <span class="kw">if</span> dist[i][k] + dist[k][j] < dist[i][j]:
+                    dist[i][j] = dist[i][k] + dist[k][j]
+
+    <span class="cm"># 음수 사이클 감지</span>
+    <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(n):
+        <span class="kw">if</span> dist[i][i] < <span class="num">0</span>:
+            <span class="kw">raise</span> <span class="ty">ValueError</span>(<span class="st">"음수 사이클 존재!"</span>)
+
+    <span class="kw">return</span> dist
+
+<span class="cm"># 경로 복원 포함 (next 배열)</span>
+<span class="kw">def</span> <span class="fn">fw_with_path</span>(n, edges):
+    dist = [[<span class="fn">float</span>(<span class="st">'inf'</span>)]*n <span class="kw">for</span> _ <span class="kw">in</span> <span class="fn">range</span>(n)]
+    nxt  = [[<span class="kw">None</span>]*n <span class="kw">for</span> _ <span class="kw">in</span> <span class="fn">range</span>(n)]
+    <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(n): dist[i][i] = <span class="num">0</span>
+    <span class="kw">for</span> u,v,w <span class="kw">in</span> edges:
+        dist[u][v]=w; nxt[u][v]=v
+    <span class="kw">for</span> k <span class="kw">in</span> <span class="fn">range</span>(n):
+        <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(n):
+            <span class="kw">for</span> j <span class="kw">in</span> <span class="fn">range</span>(n):
+                <span class="kw">if</span> dist[i][k]+dist[k][j] &lt; dist[i][j]:
+                    dist[i][j]=dist[i][k]+dist[k][j]
+                    nxt[i][j]=nxt[i][k]
+    <span class="kw">return</span> dist, nxt</pre>
+      <div class="tag-row"><span class="tag py">2D list</span><span class="tag py">float('inf')</span><span class="tag py">음수 사이클 감지</span></div>
+    </div>
+    <div class="split-side java-side">
+      <div class="lang-label java"><span class="lang-dot"></span>Java</div>
+<pre><span class="kw">static</span> <span class="ty">int</span>[][] <span class="fn">floydWarshall</span>(
+        <span class="ty">int</span> n, <span class="ty">int</span>[][] edges) {
+
+    <span class="ty">int</span> INF = <span class="num">1_000_000_000</span>;
+    <span class="ty">int</span>[][] dist = <span class="kw">new</span> <span class="ty">int</span>[n][n];
+
+    <span class="cm">// 초기화</span>
+    <span class="kw">for</span> (<span class="ty">int</span>[] row : dist)
+        Arrays.<span class="fn">fill</span>(row, INF);
+    <span class="kw">for</span> (<span class="ty">int</span> i = <span class="num">0</span>; i &lt; n; i++)
+        dist[i][i] = <span class="num">0</span>;
+    <span class="kw">for</span> (<span class="ty">int</span>[] e : edges)
+        dist[e[<span class="num">0</span>]][e[<span class="num">1</span>]] =
+            Math.<span class="fn">min</span>(dist[e[<span class="num">0</span>]][e[<span class="num">1</span>]], e[<span class="num">2</span>]);
+
+    <span class="cm">// Floyd-Warshall DP</span>
+    <span class="kw">for</span> (<span class="ty">int</span> k = <span class="num">0</span>; k &lt; n; k++)
+        <span class="kw">for</span> (<span class="ty">int</span> i = <span class="num">0</span>; i &lt; n; i++)
+            <span class="kw">for</span> (<span class="ty">int</span> j = <span class="num">0</span>; j &lt; n; j++)
+                <span class="kw">if</span> (dist[i][k] != INF &amp;&amp;
+                    dist[k][j] != INF)
+                    dist[i][j] = Math.<span class="fn">min</span>(
+                        dist[i][j],
+                        dist[i][k] + dist[k][j]);
+
+    <span class="cm">// 음수 사이클 감지</span>
+    <span class="kw">for</span> (<span class="ty">int</span> i = <span class="num">0</span>; i &lt; n; i++)
+        <span class="kw">if</span> (dist[i][i] &lt; <span class="num">0</span>)
+            <span class="kw">throw new</span> RuntimeException(
+                <span class="st">"음수 사이클!"</span>);
+
+    <span class="kw">return</span> dist;
+}
+<span class="cm">// 주의: int 사용 시 INF + w 오버플로
+// → INF != INF 조건 체크 필수
+// → 또는 long 사용 권장</span></pre>
+      <div class="tag-row"><span class="tag java">int[][]</span><span class="tag java">INF = 10^9</span><span class="tag java">오버플로 체크</span></div>
+    </div>
+  </div>
+
+  <div class="viz">
+    <div class="viz-title">// Floyd-Warshall DP 테이블 업데이트</div>
+    <div class="graph-wrap">
+      <svg width="660" height="260" viewBox="0 0 660 260" style="max-width:100%;">
+        <!-- 원본 그래프 -->
+        <text x="100" y="18" text-anchor="middle" fill="#64748b" font-size="11" font-weight="700">입력 그래프 (4 정점)</text>
+        <circle cx="60" cy="80" r="20" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/><text x="60" y="86" text-anchor="middle" fill="#2563eb" font-size="11" font-weight="700">0</text>
+        <circle cx="160" cy="50" r="20" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/><text x="160" y="56" text-anchor="middle" fill="#2563eb" font-size="11" font-weight="700">1</text>
+        <circle cx="160" cy="130" r="20" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/><text x="160" y="136" text-anchor="middle" fill="#2563eb" font-size="11" font-weight="700">2</text>
+        <circle cx="60" cy="160" r="20" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/><text x="60" y="166" text-anchor="middle" fill="#2563eb" font-size="11" font-weight="700">3</text>
+        <line x1="78" y1="68" x2="142" y2="58" stroke="#94a3b8" stroke-width="1.5"/>
+        <text x="108" y="55" text-anchor="middle" fill="#64748b" font-size="9">3</text>
+        <line x1="78" y1="92" x2="142" y2="122" stroke="#94a3b8" stroke-width="1.5"/>
+        <text x="98" y="115" text-anchor="middle" fill="#64748b" font-size="9">6</text>
+        <line x1="60" y1="100" x2="60" y2="140" stroke="#94a3b8" stroke-width="1.5"/>
+        <text x="45" y="125" fill="#64748b" font-size="9">1</text>
+        <line x1="160" y1="70" x2="160" y2="110" stroke="#94a3b8" stroke-width="1.5"/>
+        <text x="167" y="95" fill="#64748b" font-size="9">2</text>
+        <line x1="78" y1="152" x2="142" y2="138" stroke="#dc2626" stroke-width="1.5"/>
+        <text x="110" y="152" text-anchor="middle" fill="#dc2626" font-size="9">-4</text>
+
+        <!-- 거리 행렬 -->
+        <text x="370" y="18" text-anchor="middle" fill="#64748b" font-size="11" font-weight="700">dist 행렬 (k=0,1,2,3 완료 후)</text>
+
+        <!-- 테이블 헤더 -->
+        <rect x="255" y="28" width="36" height="26" fill="#f1f5f9" stroke="#e2e8f0"/>
+        <text x="273" y="45" text-anchor="middle" fill="#64748b" font-size="10" font-weight="700">→</text>
+        <rect x="291" y="28" width="36" height="26" fill="#eff6ff" stroke="#bfdbfe"/>
+        <text x="309" y="45" text-anchor="middle" fill="#2563eb" font-size="10" font-weight="700">0</text>
+        <rect x="327" y="28" width="36" height="26" fill="#eff6ff" stroke="#bfdbfe"/>
+        <text x="345" y="45" text-anchor="middle" fill="#2563eb" font-size="10" font-weight="700">1</text>
+        <rect x="363" y="28" width="36" height="26" fill="#eff6ff" stroke="#bfdbfe"/>
+        <text x="381" y="45" text-anchor="middle" fill="#2563eb" font-size="10" font-weight="700">2</text>
+        <rect x="399" y="28" width="36" height="26" fill="#eff6ff" stroke="#bfdbfe"/>
+        <text x="417" y="45" text-anchor="middle" fill="#2563eb" font-size="10" font-weight="700">3</text>
+
+        <!-- 행 헤더 + 값 -->
+        <g id="fw-table">
+          <!-- 행 0 -->
+          <rect x="255" y="54" width="36" height="26" fill="#eff6ff" stroke="#bfdbfe"/>
+          <text x="273" y="71" text-anchor="middle" fill="#2563eb" font-size="10" font-weight="700">0</text>
+          <rect x="291" y="54" width="36" height="26" fill="white" stroke="#e2e8f0"/>
+          <text x="309" y="71" text-anchor="middle" fill="#0f172a" font-size="10">0</text>
+          <rect x="327" y="54" width="36" height="26" fill="white" stroke="#e2e8f0"/>
+          <text x="345" y="71" text-anchor="middle" fill="#0f172a" font-size="10">3</text>
+          <rect x="363" y="54" width="36" height="26" fill="#f0fdf4" stroke="#86efac"/>
+          <text x="381" y="71" text-anchor="middle" fill="#16a34a" font-size="10" font-weight="700">5</text>
+          <rect x="399" y="54" width="36" height="26" fill="white" stroke="#e2e8f0"/>
+          <text x="417" y="71" text-anchor="middle" fill="#0f172a" font-size="10">1</text>
+          <!-- 행 1 -->
+          <rect x="255" y="80" width="36" height="26" fill="#eff6ff" stroke="#bfdbfe"/>
+          <text x="273" y="97" text-anchor="middle" fill="#2563eb" font-size="10" font-weight="700">1</text>
+          <rect x="291" y="80" width="36" height="26" fill="white" stroke="#e2e8f0"/>
+          <text x="309" y="97" text-anchor="middle" fill="#0f172a" font-size="10">∞</text>
+          <rect x="327" y="80" width="36" height="26" fill="white" stroke="#e2e8f0"/>
+          <text x="345" y="97" text-anchor="middle" fill="#0f172a" font-size="10">0</text>
+          <rect x="363" y="80" width="36" height="26" fill="white" stroke="#e2e8f0"/>
+          <text x="381" y="97" text-anchor="middle" fill="#0f172a" font-size="10">2</text>
+          <rect x="399" y="80" width="36" height="26" fill="#fef2f2" stroke="#fca5a5"/>
+          <text x="417" y="97" text-anchor="middle" fill="#dc2626" font-size="10" font-weight="700">-2</text>
+          <!-- 행 2 -->
+          <rect x="255" y="106" width="36" height="26" fill="#eff6ff" stroke="#bfdbfe"/>
+          <text x="273" y="123" text-anchor="middle" fill="#2563eb" font-size="10" font-weight="700">2</text>
+          <rect x="291" y="106" width="36" height="26" fill="white" stroke="#e2e8f0"/>
+          <text x="309" y="123" text-anchor="middle" fill="#0f172a" font-size="10">∞</text>
+          <rect x="327" y="106" width="36" height="26" fill="white" stroke="#e2e8f0"/>
+          <text x="345" y="123" text-anchor="middle" fill="#0f172a" font-size="10">∞</text>
+          <rect x="363" y="106" width="36" height="26" fill="white" stroke="#e2e8f0"/>
+          <text x="381" y="123" text-anchor="middle" fill="#0f172a" font-size="10">0</text>
+          <rect x="399" y="106" width="36" height="26" fill="#fef2f2" stroke="#fca5a5"/>
+          <text x="417" y="123" text-anchor="middle" fill="#dc2626" font-size="10" font-weight="700">-4</text>
+          <!-- 행 3 -->
+          <rect x="255" y="132" width="36" height="26" fill="#eff6ff" stroke="#bfdbfe"/>
+          <text x="273" y="149" text-anchor="middle" fill="#2563eb" font-size="10" font-weight="700">3</text>
+          <rect x="291" y="132" width="36" height="26" fill="white" stroke="#e2e8f0"/>
+          <text x="309" y="149" text-anchor="middle" fill="#0f172a" font-size="10">∞</text>
+          <rect x="327" y="132" width="36" height="26" fill="white" stroke="#e2e8f0"/>
+          <text x="345" y="149" text-anchor="middle" fill="#0f172a" font-size="10">∞</text>
+          <rect x="363" y="132" width="36" height="26" fill="white" stroke="#e2e8f0"/>
+          <text x="381" y="149" text-anchor="middle" fill="#0f172a" font-size="10">∞</text>
+          <rect x="399" y="132" width="36" height="26" fill="white" stroke="#e2e8f0"/>
+          <text x="417" y="149" text-anchor="middle" fill="#0f172a" font-size="10">0</text>
+        </g>
+
+        <!-- 핵심 점화식 -->
+        <rect x="460" y="50" width="185" height="70" rx="6" fill="#faf5ff" stroke="#ddd6fe"/>
+        <text x="552" y="70" text-anchor="middle" fill="#7c3aed" font-size="11" font-weight="700">점화식</text>
+        <text x="552" y="90" text-anchor="middle" fill="#7c3aed" font-size="11">dist[i][j] = min(</text>
+        <text x="552" y="106" text-anchor="middle" fill="#7c3aed" font-size="11">  dist[i][j],</text>
+        <text x="552" y="120" text-anchor="middle" fill="#7c3aed" font-size="11">  dist[i][k]+dist[k][j])</text>
+
+        <!-- Dijkstra vs FW -->
+        <rect x="460" y="140" width="185" height="100" rx="6" fill="#f8fafc" stroke="#e2e8f0"/>
+        <text x="552" y="160" text-anchor="middle" fill="#64748b" font-size="10" font-weight="700">Dijkstra vs Floyd-Warshall</text>
+        <text x="468" y="178" fill="#2563eb" font-size="10">Dijkstra: 단일 출발, 빠름</text>
+        <text x="468" y="193" fill="#2563eb" font-size="10">            O(E log V)</text>
+        <text x="468" y="211" fill="#16a34a" font-size="10">Floyd-W: 전체 쌍, 음수 OK</text>
+        <text x="468" y="226" fill="#16a34a" font-size="10">              O(V³)</text>
+
+        <!-- 녹색 강조 설명 -->
+        <text x="273" y="180" text-anchor="middle" fill="#16a34a" font-size="9">↑ k=2 통해 1→3 단축됨</text>
+      </svg>
+    </div>
+  </div>
+
+  <table class="ctbl">
+    <thead><tr><th>항목</th><th class="py">Python</th><th class="java">Java</th></tr></thead>
+    <tbody>
+      <tr><td>무한대</td><td>float('inf') — 덧셈 안전</td><td>10^9 — INF+INF 오버플로 주의, long 권장</td></tr>
+      <tr><td>2D 배열</td><td>[[INF]*n for _ in range(n)]</td><td>new int[n][n] + Arrays.fill</td></tr>
+      <tr><td>음수 사이클</td><td>dist[i][i] < 0 체크</td><td>dist[i][i] < 0 동일</td></tr>
+      <tr><td>경로 복원</td><td>nxt[i][j] = nxt[i][k]</td><td>int[][] next 배열 동일</td></tr>
+      <tr><td>vs Dijkstra</td><td>V번 Dijkstra = O(VE log V)</td><td>FW가 간단하지만 V³ 고정</td></tr>
+    </tbody>
+  </table>
+</div>
+
+</div><!-- end main -->
+
+<script>
+function showTab(name, btn) {
+  document.querySelectorAll('.algo-section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
+</body>
+</html>

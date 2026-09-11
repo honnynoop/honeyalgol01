@@ -1,0 +1,1972 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>블랙잭으로 배우는 객체지향 &amp; 디자인 패턴 11선 — Java &amp; Python</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Noto+Sans+KR:wght@300;400;700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --py: #2563eb; --py2: #1d4ed8; --py-bg: rgba(37,99,235,0.07); --py-border: #bfdbfe;
+  --java: #d97706; --java2: #b45309; --java-bg: rgba(217,119,6,0.07); --java-border: #fde68a;
+  --bg: #ffffff; --surface: #f8fafc; --surface2: #f1f5f9; --border: #e2e8f0;
+  --text: #0f172a; --muted: #64748b; --muted2: #94a3b8;
+  --accent: #7c3aed; --green: #16a34a; --red: #dc2626; --orange: #ea580c; --teal: #0891b2;
+  --creational: #16a34a; --structural: #2563eb; --behavioral: #7c3aed;
+  --card-red: #dc2626; --card-black: #0f172a; --felt: #065f46;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:var(--bg); color:var(--text); font-family:'Noto Sans KR',sans-serif; min-height:100vh; }
+
+.hero { padding:52px 24px 36px; text-align:center; border-bottom:1px solid var(--border); background:linear-gradient(to bottom,#f8fafc,#ffffff); }
+.hero-badge { display:inline-block; font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:3px; color:var(--accent); border:1px solid #ddd6fe; background:#faf5ff; padding:4px 14px; border-radius:20px; margin-bottom:18px; text-transform:uppercase; }
+.hero h1 { font-size:clamp(1.5rem,4vw,2.5rem); font-weight:900; line-height:1.15; margin-bottom:10px; }
+.hero h1 .py { color:var(--py); } .hero h1 .java { color:var(--java); } .hero h1 .felt { color:var(--felt); }
+.hero p { color:var(--muted); font-size:13.5px; font-weight:300; max-width:780px; margin:0 auto; line-height:1.6; }
+
+.tab-nav { display:flex; flex-wrap:wrap; gap:4px; padding:14px 20px; background:var(--surface); border-bottom:1px solid var(--border); position:sticky; top:0; z-index:100; }
+.tab-btn { font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.5px; padding:6px 13px; border:1px solid var(--border); background:var(--bg); color:var(--muted); cursor:pointer; border-radius:4px; transition:all .18s; white-space:nowrap; }
+.tab-btn:hover { border-color:var(--felt); color:var(--felt); background:#ecfdf5; }
+.tab-btn.active { background:var(--felt); border-color:var(--felt); color:#fff; }
+
+.main { max-width:1360px; margin:0 auto; padding:0 20px 70px; }
+.algo-section { display:none; animation:fadeIn .25s ease; padding-top:28px; }
+.algo-section.active { display:block; }
+@keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+
+.sec-head { display:flex; align-items:flex-start; gap:14px; margin-bottom:20px; padding-bottom:16px; border-bottom:2px solid var(--border); }
+.sec-icon { width:46px; height:46px; border-radius:10px; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:21px; background:var(--surface2); border:1px solid var(--border); }
+.sec-head h2 { font-size:21px; font-weight:800; }
+.sec-head p { font-size:12.5px; color:var(--muted); margin-top:4px; line-height:1.6; }
+
+.stage-badges { display:flex; gap:6px; margin-top:8px; flex-wrap:wrap; }
+.sbadge { font-family:'JetBrains Mono',monospace; font-size:10px; padding:3px 10px; border-radius:20px; border:1px solid; white-space:nowrap; }
+.sbadge.cre { color:var(--creational); border-color:#bbf7d0; background:#f0fdf4; }
+.sbadge.str { color:var(--structural); border-color:#bfdbfe; background:#eff6ff; }
+.sbadge.beh { color:var(--behavioral); border-color:#ddd6fe; background:#faf5ff; }
+.sbadge.file { color:#0891b2; border-color:#bae6fd; background:#f0f9ff; }
+.sbadge.felt { color:var(--felt); border-color:#a7f3d0; background:#ecfdf5; }
+
+.intent-box { background:var(--surface); border-left:4px solid var(--accent); border-radius:6px; padding:12px 16px; margin-bottom:18px; font-size:12.5px; line-height:1.7; }
+.intent-box b { color:var(--accent); }
+
+.split-card { display:grid; grid-template-columns:1fr 1fr; gap:2px; border:1px solid var(--border); border-radius:10px; overflow:hidden; margin-bottom:20px; background:var(--border); }
+.split-side { background:var(--bg); padding:20px; }
+.split-side.py-side { border-top:3px solid var(--py); }
+.split-side.java-side { border-top:3px solid var(--java); }
+.lang-label { font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; text-transform:uppercase; margin-bottom:8px; display:flex; align-items:center; gap:7px; }
+.lang-label.py { color:var(--py); } .lang-label.java { color:var(--java); }
+.lang-dot { width:7px; height:7px; border-radius:50%; background:currentColor; }
+.ds-title { font-size:15px; font-weight:700; margin-bottom:2px; }
+.ds-sub { font-size:11px; color:var(--muted); margin-bottom:12px; }
+
+pre { background:var(--surface); border:1px solid var(--border); border-radius:7px; padding:14px; font-family:'JetBrains Mono',monospace; font-size:11px; line-height:1.72; overflow-x:auto; tab-size:4; }
+.kw { color:#7c3aed; font-weight:600; } .st { color:#16a34a; } .cm { color:#94a3b8; font-style:italic; }
+.num { color:#ea580c; } .fn { color:#2563eb; } .ty { color:#0891b2; } .op { color:#64748b; } .an { color:#dc2626; }
+
+.ctbl { width:100%; border-collapse:collapse; margin-bottom:20px; font-size:12.5px; }
+.ctbl th { padding:9px 13px; text-align:left; font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:1px; text-transform:uppercase; border-bottom:2px solid var(--border); color:var(--muted); }
+.ctbl th.py { color:var(--py); border-bottom-color:var(--py); }
+.ctbl th.java { color:var(--java); border-bottom-color:var(--java); }
+.ctbl th.acc { color:var(--accent); border-bottom-color:#ddd6fe; }
+.ctbl th.felt { color:var(--felt); border-bottom-color:#a7f3d0; }
+.ctbl td { padding:8px 13px; border-bottom:1px solid var(--border); vertical-align:top; line-height:1.55; }
+.ctbl td:first-child { color:var(--text); font-weight:700; font-size:11.5px; white-space:nowrap; }
+.ctbl tr:hover td { background:#fafafa; }
+
+.viz { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:20px; margin-bottom:20px; }
+.viz-title { font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--accent); margin-bottom:14px; }
+.graph-wrap { overflow-x:auto; display:flex; justify-content:center; }
+svg text { font-family:'JetBrains Mono',monospace; }
+
+.tag-row { display:flex; flex-wrap:wrap; gap:5px; margin-top:10px; }
+.tag { font-size:10px; font-family:'JetBrains Mono',monospace; padding:2px 9px; border-radius:3px; border:1px solid; letter-spacing:.3px; }
+.tag.py { color:#1d4ed8; border-color:#bfdbfe; background:rgba(37,99,235,0.05); }
+.tag.java { color:#b45309; border-color:#fde68a; background:rgba(217,119,6,0.05); }
+.tag.acc { color:#7c3aed; border-color:#ddd6fe; background:rgba(124,58,237,0.05); }
+.tag.felt { color:#047857; border-color:#a7f3d0; background:rgba(6,95,70,0.05); }
+
+::-webkit-scrollbar{width:5px;height:5px} ::-webkit-scrollbar-track{background:var(--bg)} ::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:3px}
+
+.ov-table { width:100%; border-collapse:collapse; font-size:12.5px; }
+.ov-table th { padding:9px 13px; background:var(--surface2); font-weight:700; font-size:10.5px; text-align:left; border:1px solid var(--border); }
+.ov-table td { padding:8px 13px; border:1px solid var(--border); vertical-align:middle; line-height:1.55; }
+.ov-table tr:nth-child(even) td { background:var(--surface); }
+.badge { display:inline-block; font-family:'JetBrains Mono',monospace; font-size:10px; padding:1px 8px; border-radius:3px; }
+.badge.g { background:#dcfce7; color:#15803d; } .badge.y { background:#fef9c3; color:#a16207; }
+.badge.b { background:#dbeafe; color:#1d4ed8; } .badge.p { background:#f3e8ff; color:#7e22ce; }
+.badge.f { background:#d1fae5; color:#047857; }
+
+.note { border-radius:8px; padding:13px 15px; font-size:12px; line-height:1.65; margin:14px 0; border:1px solid var(--java-border); background:var(--java-bg); color:#7c4a03; }
+.note.py { border-color:var(--py-border); background:var(--py-bg); color:#1e3a8a; }
+.note.acc { border-color:#ddd6fe; background:#faf5ff; color:#5b21b6; }
+.note.felt { border-color:#a7f3d0; background:#ecfdf5; color:#065f46; }
+.note b { display:block; margin-bottom:4px; font-size:12.5px; }
+
+.pattern-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:24px; }
+.pcard { border:1px solid var(--border); border-radius:10px; padding:14px; background:var(--bg); text-align:center; cursor:pointer; transition:all .15s; }
+.pcard:hover { border-color:var(--felt); background:#ecfdf5; transform:translateY(-2px); }
+.pcard .pi { font-size:22px; margin-bottom:6px; }
+.pcard .pn { font-size:12px; font-weight:700; }
+.pcard .pc { font-size:9.5px; font-family:'JetBrains Mono',monospace; margin-top:4px; padding:1px 7px; border-radius:10px; display:inline-block; }
+.pcard .pc.cre { color:var(--creational); background:#f0fdf4; }
+.pcard .pc.str { color:var(--structural); background:#eff6ff; }
+.pcard .pc.beh { color:var(--behavioral); background:#faf5ff; }
+
+.uml-legend { display:flex; flex-wrap:wrap; gap:14px; font-size:10.5px; color:var(--muted); margin-top:10px; font-family:'JetBrains Mono',monospace; }
+.uml-legend span.sw { display:inline-block; width:22px; height:0; border-top:2px solid; vertical-align:middle; margin-right:5px; }
+
+.dirtree { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:14px 18px; font-family:'JetBrains Mono',monospace; font-size:12px; line-height:1.9; margin-bottom:18px; color:var(--text); }
+.dirtree .d { color:var(--accent); font-weight:700; }
+.dirtree .f { color:var(--muted); }
+.dirtree .fnew { color:var(--green); font-weight:700; }
+
+/* playing card chip */
+.pcard-face { display:inline-flex; align-items:center; justify-content:center; width:26px; height:36px; border-radius:4px; border:1px solid var(--border); font-size:11px; font-weight:700; margin:0 2px; vertical-align:middle; }
+.pcard-face.red { color:var(--card-red); } .pcard-face.black { color:var(--card-black); }
+
+/* strategy table */
+.strategy-table { width:100%; border-collapse:collapse; font-size:11px; text-align:center; }
+.strategy-table th, .strategy-table td { border:1px solid var(--border); padding:5px; }
+.strategy-table th { background:var(--surface2); font-family:'JetBrains Mono',monospace; font-size:10px; }
+.strategy-table td.H { background:#fef2f2; color:#b91c1c; font-weight:700; }
+.strategy-table td.S { background:#f0fdf4; color:#15803d; font-weight:700; }
+.strategy-table td.D { background:#eff6ff; color:#1d4ed8; font-weight:700; }
+.strategy-table td.P { background:#faf5ff; color:#7e22ce; font-weight:700; }
+
+@media(max-width:900px){ .split-card{grid-template-columns:1fr} .pattern-grid{grid-template-columns:repeat(2,1fr);} }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-badge">Blackjack OOP &amp; GoF Design Patterns</div>
+  <h1><span class="felt">블랙잭</span>으로 배우는 객체지향 기본기와 <span class="java">Java</span> · <span class="py">Python</span> 디자인 패턴 11선</h1>
+  <p>Card·Deck·Hand·Participant(Player/Dealer)·Game으로 이루어진 완전한 블랙잭 기본 소스를 먼저 만들고, 같은 도메인에 싱글턴·팩토리·전략·템플릿 메서드·빌더·프로토타입·데코레이터·퍼사드·옵저버·스테이트·이터레이터까지 11가지 GoF 패턴을 적용합니다. 전략(Strategy) 패턴 탭에서는 실제 블랙잭 베이직 전략표까지 함께 다룹니다.</p>
+</div>
+
+<div class="tab-nav">
+  <button class="tab-btn active" onclick="showTab('overview',this)">전체 개요</button>
+  <button class="tab-btn" onclick="showTab('base',this)">기본 소스</button>
+  <button class="tab-btn" onclick="showTab('singleton',this)">1.싱글턴</button>
+  <button class="tab-btn" onclick="showTab('factory',this)">2.팩토리 메서드</button>
+  <button class="tab-btn" onclick="showTab('strategy',this)">3.전략(Strategy)</button>
+  <button class="tab-btn" onclick="showTab('template',this)">4.템플릿 메서드</button>
+  <button class="tab-btn" onclick="showTab('builder',this)">5.빌더</button>
+  <button class="tab-btn" onclick="showTab('prototype',this)">6.프로토타입</button>
+  <button class="tab-btn" onclick="showTab('decorator',this)">7.데코레이터</button>
+  <button class="tab-btn" onclick="showTab('facade',this)">8.퍼사드</button>
+  <button class="tab-btn" onclick="showTab('observer',this)">9.옵저버</button>
+  <button class="tab-btn" onclick="showTab('state',this)">10.스테이트</button>
+  <button class="tab-btn" onclick="showTab('iterator',this)">11.이터레이터</button>
+  <button class="tab-btn" onclick="showTab('summary',this)">종합 비교</button>
+</div>
+
+<div class="main">
+
+<!-- ============ OVERVIEW ============ -->
+<div class="algo-section active" id="tab-overview">
+  <div class="sec-head">
+    <div class="sec-icon">🃏</div>
+    <div>
+      <h2>왜 블랙잭이 디자인 패턴 학습에 좋은가?</h2>
+      <p>블랙잭은 "카드 뽑기 → 점수 계산 → 히트/스탠드 결정 → 승패 판정"이라는 명확한 흐름과, "딜러 규칙은 고정, 플레이어 전략은 다양"이라는 <b>정책의 다양성</b>을 동시에 갖고 있어서 마방진보다도 훨씬 더 많은 패턴이 자연스럽게 들어맞습니다.</p>
+    </div>
+  </div>
+
+  <div class="pattern-grid">
+    <div class="pcard" onclick="document.querySelector('[onclick*=singleton]').click()"><div class="pi">🔒</div><div class="pn">Singleton</div><span class="pc cre">생성 패턴</span></div>
+    <div class="pcard" onclick="document.querySelector('[onclick*=factory]').click()"><div class="pi">🏭</div><div class="pn">Factory Method</div><span class="pc cre">생성 패턴</span></div>
+    <div class="pcard" onclick="document.querySelector('[onclick*=strategy]').click()"><div class="pi">🎯</div><div class="pn">Strategy</div><span class="pc beh">행동 패턴</span></div>
+    <div class="pcard" onclick="document.querySelector('[onclick*=template]').click()"><div class="pi">📐</div><div class="pn">Template Method</div><span class="pc beh">행동 패턴</span></div>
+    <div class="pcard" onclick="document.querySelector('[onclick*=builder]').click()"><div class="pi">🧱</div><div class="pn">Builder</div><span class="pc cre">생성 패턴</span></div>
+    <div class="pcard" onclick="document.querySelector('[onclick*=prototype]').click()"><div class="pi">🧬</div><div class="pn">Prototype</div><span class="pc cre">생성 패턴</span></div>
+    <div class="pcard" onclick="document.querySelector('[onclick*=decorator]').click()"><div class="pi">🎁</div><div class="pn">Decorator</div><span class="pc str">구조 패턴</span></div>
+    <div class="pcard" onclick="document.querySelector('[onclick*=facade]').click()"><div class="pi">🚪</div><div class="pn">Facade</div><span class="pc str">구조 패턴</span></div>
+    <div class="pcard" onclick="document.querySelector('[onclick*=observer]').click()"><div class="pi">📡</div><div class="pn">Observer</div><span class="pc beh">행동 패턴</span></div>
+    <div class="pcard" onclick="document.querySelector('[onclick*=state]').click()"><div class="pi">🚦</div><div class="pn">State</div><span class="pc beh">행동 패턴</span></div>
+    <div class="pcard" onclick="document.querySelector('[onclick*=iterator]').click()"><div class="pi">🔄</div><div class="pn">Iterator</div><span class="pc beh">행동 패턴</span></div>
+  </div>
+
+  <table class="ov-table" style="margin-bottom:24px;">
+    <thead><tr><th>패턴</th><th>분류</th><th>블랙잭 도메인에서 해결하는 문제</th></tr></thead>
+    <tbody>
+      <tr><td><b>Singleton</b></td><td><span class="badge g">생성</span></td><td>카지노 테이블의 슈(Shoe, 여러 덱을 합친 카드통)는 테이블당 하나만 존재해야 함</td></tr>
+      <tr><td><b>Factory Method</b></td><td><span class="badge g">생성</span></td><td>표준 1덱, 카지노용 6덱 슈, 스페인21용(10 제거 덱) 등 규칙별로 다른 덱 생성</td></tr>
+      <tr><td><b>Strategy</b></td><td><span class="badge p">행동</span></td><td>딜러 규칙, 기본전략, 카드카운팅 등 "히트할지 스탠드할지" 결정 로직을 교체</td></tr>
+      <tr><td><b>Template Method</b></td><td><span class="badge p">행동</span></td><td>모든 참가자(딜러/플레이어)의 "카드 받기→판정" 턴 순서는 고정, 결정 로직만 다름</td></tr>
+      <tr><td><b>Builder</b></td><td><span class="badge g">생성</span></td><td>덱 수, 블랙잭 배당률(3:2/6:5), 소프트17 규칙 등 테이블 규칙을 조립</td></tr>
+      <tr><td><b>Prototype</b></td><td><span class="badge g">생성</span></td><td>같은 게임 상태에서 여러 선택지를 시뮬레이션(몬테카를로)할 때 상태 복제</td></tr>
+      <tr><td><b>Decorator</b></td><td><span class="badge b">구조</span></td><td>더블다운, 스플릿, 인슈어런스 등 베팅 옵션을 원본 Bet 클래스 수정 없이 추가</td></tr>
+      <tr><td><b>Facade</b></td><td><span class="badge b">구조</span></td><td>덱+딜러+플레이어+판정 로직을 감춘 BlackjackFacade.playRound() 제공</td></tr>
+      <tr><td><b>Observer</b></td><td><span class="badge p">행동</span></td><td>카드가 나올 때마다 UI·로그·카운팅 시스템에 동시에 알림</td></tr>
+      <tr><td><b>State</b></td><td><span class="badge p">행동</span></td><td>베팅→딜링→플레이어턴→딜러턴→정산으로 이어지는 라운드 상태를 명시적으로 관리</td></tr>
+      <tr><td><b>Iterator</b></td><td><span class="badge p">행동</span></td><td>손패를 점수 계산 순서, 슈를 셔플 순서 등 다양한 방식으로 순회</td></tr>
+    </tbody>
+  </table>
+
+  <div class="viz">
+    <div class="viz-title">// 블랙잭 한 라운드의 흐름 — 각 화살표가 곧 패턴이 필요한 지점</div>
+    <div class="graph-wrap">
+      <svg width="780" height="150" viewBox="0 0 780 150">
+        <rect x="10" y="50" width="110" height="50" rx="6" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.3"/>
+        <text x="65" y="80" text-anchor="middle" font-size="10.5" font-weight="700" fill="#15803d">베팅(Betting)</text>
+        <rect x="150" y="50" width="110" height="50" rx="6" fill="#eff6ff" stroke="#2563eb" stroke-width="1.3"/>
+        <text x="205" y="80" text-anchor="middle" font-size="10.5" font-weight="700" fill="#1d4ed8">딜링(Dealing)</text>
+        <rect x="290" y="50" width="130" height="50" rx="6" fill="#faf5ff" stroke="#7c3aed" stroke-width="1.3"/>
+        <text x="355" y="80" text-anchor="middle" font-size="10.5" font-weight="700" fill="#6d28d9">플레이어턴</text>
+        <rect x="450" y="50" width="120" height="50" rx="6" fill="#faf5ff" stroke="#7c3aed" stroke-width="1.3"/>
+        <text x="510" y="80" text-anchor="middle" font-size="10.5" font-weight="700" fill="#6d28d9">딜러턴</text>
+        <rect x="600" y="50" width="160" height="50" rx="6" fill="#fef3e2" stroke="#d97706" stroke-width="1.3"/>
+        <text x="680" y="80" text-anchor="middle" font-size="10.5" font-weight="700" fill="#b45309">정산(Payout)</text>
+
+        <line x1="120" y1="75" x2="148" y2="75" stroke="#94a3b8" marker-end="url(#ar)"/>
+        <line x1="260" y1="75" x2="288" y2="75" stroke="#94a3b8" marker-end="url(#ar)"/>
+        <line x1="420" y1="75" x2="448" y2="75" stroke="#94a3b8" marker-end="url(#ar)"/>
+        <line x1="570" y1="75" x2="598" y2="75" stroke="#94a3b8" marker-end="url(#ar)"/>
+        <defs><marker id="ar" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="none" stroke="#94a3b8" stroke-width="1"/></marker></defs>
+
+        <text x="65" y="120" text-anchor="middle" font-size="8.5" fill="#15803d">Builder(규칙)</text>
+        <text x="205" y="120" text-anchor="middle" font-size="8.5" fill="#1d4ed8">Singleton+Factory(슈)</text>
+        <text x="355" y="120" text-anchor="middle" font-size="8.5" fill="#6d28d9">Strategy+Template</text>
+        <text x="510" y="120" text-anchor="middle" font-size="8.5" fill="#6d28d9">Template+State</text>
+        <text x="680" y="120" text-anchor="middle" font-size="8.5" fill="#b45309">Decorator(베팅)+Observer</text>
+      </svg>
+    </div>
+    <div class="uml-legend">전체 라운드 자체는 <b>State</b>로 관리되고, 각 단계 내부는 필요한 패턴이 개별적으로 동작합니다. <b>Facade</b>와 <b>Prototype</b>·<b>Iterator</b>는 흐름을 가로질러 전역적으로 쓰입니다.</div>
+  </div>
+
+  <div class="note felt"><b>읽는 법</b> "기본 소스" 탭에서 Card·Deck·Hand·Participant·Game으로 이루어진 완전히 동작하는 콘솔 블랙잭을 Java와 Python으로 각각 먼저 확인하세요. 이후 11개 패턴 탭은 이 기본 소스를 확장하거나 재구성하는 방식으로 구성되어 있어, 각 패턴이 "무엇을 무엇으로 바꾸는지" 바로 비교할 수 있습니다.</div>
+</div>
+
+<!-- ============ BASE SOURCE ============ -->
+<div class="algo-section" id="tab-base">
+  <div class="sec-head">
+    <div class="sec-icon">🧱</div>
+    <div>
+      <h2>기본 소스 — Card · Deck · Hand · Participant · Game</h2>
+      <p>마방진의 MagicSquare 계층 구조와 동일한 사고방식으로, 카드 게임의 데이터(Card)·모음(Deck, Hand)·행위자(Participant→Player/Dealer)·진행자(Game)를 설계합니다. 상속·다형성·캡슐화가 모두 자연스럽게 들어갑니다.</p>
+      <div class="stage-badges"><span class="sbadge felt">완전히 동작하는 콘솔 블랙잭</span><span class="sbadge file">패키지 kr.co.infopub.blackjack.base</span></div>
+    </div>
+  </div>
+
+  <div class="dirtree">
+<span class="d">blackjack/base/</span>
+├── <span class="f">Suit.java</span>, <span class="f">Rank.java</span>      <span class="cm">// 카드 무늬·숫자 enum</span>
+├── <span class="f">Card.java</span>              <span class="cm">// 카드 한 장 (불변 객체)</span>
+├── <span class="f">Deck.java</span>              <span class="cm">// 52장 카드 더미 + 셔플 + 딜</span>
+├── <span class="f">Hand.java</span>               <span class="cm">// 손패 + 점수 계산(에이스 처리)</span>
+├── <span class="f">Participant.java</span>        <span class="cm">// 추상 부모 — 딜러/플레이어 공통</span>
+├── <span class="f">Player.java</span>              <span class="cm">// 사용자 입력으로 히트/스탠드</span>
+├── <span class="f">Dealer.java</span>              <span class="cm">// 17 이상이면 자동 스탠드(고정 규칙)</span>
+└── <span class="f">BlackjackGame.java</span>       <span class="cm">// 한 라운드 진행(main)</span>
+  </div>
+
+  <div class="split-card">
+    <div class="split-side java-side">
+      <div class="lang-label java"><span class="lang-dot"></span>Java — Suit.java / Rank.java / Card.java</div>
+      <div class="ds-title">enum + 불변 값 객체(Value Object)</div>
+      <pre><span class="kw">public enum</span> Suit {
+    SPADE(<span class="st">"♠"</span>), HEART(<span class="st">"♥"</span>), DIAMOND(<span class="st">"♦"</span>), CLUB(<span class="st">"♣"</span>);
+    <span class="kw">private final</span> String symbol;
+    Suit(String symbol) { <span class="kw">this</span>.symbol = symbol; }
+    <span class="kw">public</span> String getSymbol() { <span class="kw">return</span> symbol; }
+}
+
+<span class="kw">public enum</span> Rank {
+    TWO(<span class="st">"2"</span>,<span class="num">2</span>), THREE(<span class="st">"3"</span>,<span class="num">3</span>), FOUR(<span class="st">"4"</span>,<span class="num">4</span>), FIVE(<span class="st">"5"</span>,<span class="num">5</span>), SIX(<span class="st">"6"</span>,<span class="num">6</span>),
+    SEVEN(<span class="st">"7"</span>,<span class="num">7</span>), EIGHT(<span class="st">"8"</span>,<span class="num">8</span>), NINE(<span class="st">"9"</span>,<span class="num">9</span>),
+    TEN(<span class="st">"10"</span>,<span class="num">10</span>), JACK(<span class="st">"J"</span>,<span class="num">10</span>), QUEEN(<span class="st">"Q"</span>,<span class="num">10</span>), KING(<span class="st">"K"</span>,<span class="num">10</span>),
+    ACE(<span class="st">"A"</span>,<span class="num">11</span>);                    <span class="cm">// 에이스는 일단 11로 두고 Hand에서 보정</span>
+    <span class="kw">private final</span> String label; <span class="kw">private final int</span> baseValue;
+    Rank(String label, <span class="ty">int</span> baseValue) { <span class="kw">this</span>.label = label; <span class="kw">this</span>.baseValue = baseValue; }
+    <span class="kw">public</span> String getLabel() { <span class="kw">return</span> label; }
+    <span class="kw">public int</span> getBaseValue() { <span class="kw">return</span> baseValue; }
+}
+
+<span class="kw">public final class</span> Card {              <span class="cm">// final — 불변 객체(생성 후 상태 변경 불가)</span>
+    <span class="kw">private final</span> Suit suit;
+    <span class="kw">private final</span> Rank rank;
+    <span class="kw">public</span> Card(Suit suit, Rank rank) { <span class="kw">this</span>.suit = suit; <span class="kw">this</span>.rank = rank; }
+    <span class="kw">public int</span> getValue() { <span class="kw">return</span> rank.<span class="fn">getBaseValue</span>(); }
+    <span class="kw">public boolean</span> isAce() { <span class="kw">return</span> rank == Rank.ACE; }
+    <span class="kw">@Override</span>
+    <span class="kw">public</span> String toString() { <span class="kw">return</span> rank.<span class="fn">getLabel</span>() + suit.<span class="fn">getSymbol</span>(); }  <span class="cm">// "A♠" 형태로 출력</span>
+}</pre>
+      <div class="tag-row"><span class="tag java">enum</span><span class="tag java">final 불변 객체</span></div>
+    </div>
+    <div class="split-side java-side" style="border-top-color:var(--muted2);">
+      <div class="lang-label" style="color:var(--muted);"><span class="lang-dot"></span>Java — Deck.java</div>
+      <div class="ds-title">52장 생성 + 셔플 + 캡슐화된 딜링</div>
+      <pre><span class="kw">public class</span> Deck {
+    <span class="kw">private final</span> List&lt;Card&gt; cards = <span class="kw">new</span> ArrayList&lt;&gt;();
+
+    <span class="kw">public</span> Deck() {
+        <span class="kw">for</span> (Suit s : Suit.<span class="fn">values</span>())          <span class="cm">// 4무늬 x 13숫자 = 52장 생성</span>
+            <span class="kw">for</span> (Rank r : Rank.<span class="fn">values</span>())
+                cards.<span class="fn">add</span>(<span class="kw">new</span> Card(s, r));
+    }
+    <span class="kw">public void</span> shuffle() { Collections.<span class="fn">shuffle</span>(cards); }
+
+    <span class="kw">public</span> Card dealCard() {              <span class="cm">// ★ 캡슐화 — 내부 List를 직접 노출하지 않음</span>
+        <span class="kw">if</span> (cards.<span class="fn">isEmpty</span>())
+            <span class="kw">throw new</span> IllegalStateException(<span class="st">"덱에 카드가 없습니다"</span>);
+        <span class="kw">return</span> cards.<span class="fn">remove</span>(cards.<span class="fn">size</span>()-<span class="num">1</span>);  <span class="cm">// 맨 위(리스트의 끝)에서 한 장 뽑기</span>
+    }
+    <span class="kw">public int</span> remaining() { <span class="kw">return</span> cards.<span class="fn">size</span>(); }
+}</pre>
+      <div class="tag-row"><span class="tag java">캡슐화</span><span class="tag java">Collections.shuffle</span></div>
+    </div>
+  </div>
+
+  <div class="split-card">
+    <div class="split-side java-side">
+      <div class="lang-label java"><span class="lang-dot"></span>Java — Hand.java</div>
+      <div class="ds-title">에이스 1/11 자동 보정이 핵심 로직</div>
+      <pre><span class="kw">public class</span> Hand {
+    <span class="kw">private final</span> List&lt;Card&gt; cards = <span class="kw">new</span> ArrayList&lt;&gt;();
+
+    <span class="kw">public void</span> addCard(Card c) { cards.<span class="fn">add</span>(c); }
+
+    <span class="kw">public int</span> getScore() {
+        <span class="ty">int</span> score = <span class="num">0</span>, aceCount = <span class="num">0</span>;
+        <span class="kw">for</span> (Card c : cards) {
+            score += c.<span class="fn">getValue</span>();               <span class="cm">// 일단 에이스=11로 합산</span>
+            <span class="kw">if</span> (c.<span class="fn">isAce</span>()) aceCount++;
+        }
+        <span class="kw">while</span> (score &gt; <span class="num">21</span> &amp;&amp; aceCount &gt; <span class="num">0</span>) {  <span class="cm">// ★ 버스트면 에이스를 11→1로 하나씩 강등</span>
+            score -= <span class="num">10</span>;
+            aceCount--;
+        }
+        <span class="kw">return</span> score;
+    }
+    <span class="kw">public boolean</span> isBust() { <span class="kw">return</span> <span class="fn">getScore</span>() &gt; <span class="num">21</span>; }
+    <span class="kw">public boolean</span> isBlackjack() { <span class="kw">return</span> cards.<span class="fn">size</span>()==<span class="num">2</span> &amp;&amp; <span class="fn">getScore</span>()==<span class="num">21</span>; }
+    <span class="kw">public</span> List&lt;Card&gt; getCards() { <span class="kw">return</span> Collections.<span class="fn">unmodifiableList</span>(cards); }  <span class="cm">// 읽기전용 뷰만 노출</span>
+    <span class="kw">@Override</span>
+    <span class="kw">public</span> String toString() { <span class="kw">return</span> cards.<span class="fn">toString</span>() + <span class="st">" (합계 "</span> + <span class="fn">getScore</span>() + <span class="st">")"</span>; }
+}</pre>
+      <div class="tag-row"><span class="tag java">에이스 소프트/하드 처리</span><span class="tag java">unmodifiableList</span></div>
+    </div>
+    <div class="split-side java-side" style="border-top-color:var(--muted2);">
+      <div class="lang-label" style="color:var(--muted);"><span class="lang-dot"></span>Java — Participant.java / Player.java / Dealer.java</div>
+      <div class="ds-title">상속 + 다형성 — 딜러와 플레이어는 "결정 방식"만 다름</div>
+      <pre><span class="kw">public abstract class</span> Participant {
+    <span class="kw">protected final</span> String name;
+    <span class="kw">protected final</span> Hand hand = <span class="kw">new</span> Hand();
+    <span class="kw">public</span> Participant(String name) { <span class="kw">this</span>.name = name; }
+
+    <span class="kw">public void</span> receiveCard(Card c) { hand.<span class="fn">addCard</span>(c); }
+    <span class="kw">public</span> Hand getHand() { <span class="kw">return</span> hand; }
+    <span class="kw">public</span> String getName() { <span class="kw">return</span> name; }
+
+    <span class="kw">public abstract boolean</span> wantsHit(Card dealerUpCard);  <span class="cm">// ★ 자식마다 다르게 구현(다형성)</span>
+}
+
+<span class="kw">public class</span> Dealer <span class="kw">extends</span> Participant {
+    <span class="kw">public</span> Dealer() { <span class="kw">super</span>(<span class="st">"딜러"</span>); }
+    <span class="kw">@Override</span>
+    <span class="kw">public boolean</span> wantsHit(Card dealerUpCard) {
+        <span class="kw">return</span> hand.<span class="fn">getScore</span>() &lt; <span class="num">17</span>;   <span class="cm">// 딜러는 17 미만이면 무조건 히트(고정 규칙)</span>
+    }
+}
+
+<span class="kw">public class</span> Player <span class="kw">extends</span> Participant {
+    <span class="kw">private final</span> Scanner scanner;
+    <span class="kw">public</span> Player(String name, Scanner scanner) { <span class="kw">super</span>(name); <span class="kw">this</span>.scanner = scanner; }
+    <span class="kw">@Override</span>
+    <span class="kw">public boolean</span> wantsHit(Card dealerUpCard) {
+        System.out.<span class="fn">print</span>(name + <span class="st">" - 현재 "</span> + hand + <span class="st">", 히트(h)/스탠드(s)? "</span>);
+        <span class="kw">return</span> scanner.<span class="fn">next</span>().<span class="fn">equalsIgnoreCase</span>(<span class="st">"h"</span>);  <span class="cm">// 사용자 입력으로 결정</span>
+    }
+}</pre>
+      <div class="tag-row"><span class="tag java">abstract 메서드</span><span class="tag java">다형성으로 딜러/플레이어 통일 처리</span></div>
+    </div>
+  </div>
+
+  <div class="viz">
+    <div class="viz-title">// UML — 기본 소스 클래스 다이어그램</div>
+    <div class="graph-wrap">
+      <svg width="740" height="260" viewBox="0 0 740 260">
+        <rect x="30" y="20" width="140" height="40" rx="4" fill="#fff" stroke="#0f172a" stroke-width="1.3"/>
+        <text x="100" y="44" text-anchor="middle" font-size="11" font-weight="700">Card</text>
+        <rect x="30" y="90" width="140" height="40" rx="4" fill="#fff" stroke="#0f172a" stroke-width="1.3"/>
+        <text x="100" y="114" text-anchor="middle" font-size="11" font-weight="700">Deck</text>
+        <rect x="30" y="160" width="140" height="40" rx="4" fill="#fff" stroke="#0f172a" stroke-width="1.3"/>
+        <text x="100" y="184" text-anchor="middle" font-size="11" font-weight="700">Hand</text>
+
+        <rect x="290" y="90" width="200" height="60" rx="4" fill="#fff" stroke="#0f172a" stroke-width="1.5"/>
+        <text x="390" y="106" text-anchor="middle" font-size="10" font-style="italic" fill="#64748b">&lt;&lt;abstract&gt;&gt;</text>
+        <text x="390" y="122" text-anchor="middle" font-size="11.5" font-weight="700" font-style="italic">Participant</text>
+        <text x="298" y="140" font-size="9">+ wantsHit() abstract</text>
+
+        <rect x="270" y="200" width="110" height="46" rx="4" fill="#fff" stroke="#d97706" stroke-width="1.4"/>
+        <text x="325" y="228" text-anchor="middle" font-size="10.5" font-weight="700" fill="#b45309">Dealer</text>
+        <rect x="400" y="200" width="110" height="46" rx="4" fill="#fff" stroke="#d97706" stroke-width="1.4"/>
+        <text x="455" y="228" text-anchor="middle" font-size="10.5" font-weight="700" fill="#b45309">Player</text>
+
+        <rect x="570" y="90" width="150" height="60" rx="4" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.4"/>
+        <text x="645" y="112" text-anchor="middle" font-size="11.5" font-weight="700" fill="#15803d">BlackjackGame</text>
+        <text x="578" y="132" font-size="9" fill="#166534">+ playRound()</text>
+
+        <line x1="325" y1="200" x2="365" y2="150" stroke="#0f172a" stroke-width="1.2"/>
+        <polygon points="365,150 355,148 358,159" fill="#fff" stroke="#0f172a" stroke-width="1"/>
+        <line x1="455" y1="200" x2="415" y2="150" stroke="#0f172a" stroke-width="1.2"/>
+        <polygon points="415,150 419,140 425,150" fill="#fff" stroke="#0f172a" stroke-width="1"/>
+
+        <line x1="170" y1="180" x2="288" y2="130" stroke="#2563eb" stroke-width="1.1" marker-end="url(#bj1)"/>
+        <text x="185" y="160" font-size="8" fill="#2563eb">has-a</text>
+        <line x1="490" y1="115" x2="568" y2="115" stroke="#16a34a" stroke-width="1.2" marker-end="url(#bj1)"/>
+        <text x="500" y="107" font-size="8" fill="#15803d">조율(orchestrate)</text>
+        <line x1="170" y1="105" x2="288" y2="115" stroke="#2563eb" stroke-width="1.1"/>
+        <defs><marker id="bj1" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="none" stroke="#2563eb" stroke-width="1"/></marker></defs>
+      </svg>
+    </div>
+    <div class="uml-legend">Dealer·Player는 Participant를 <b>상속</b>하고, BlackjackGame이 Deck·Participant들을 조율합니다. wantsHit()의 다형성 덕분에 Game 코드는 딜러인지 플레이어인지 몰라도 됩니다.</div>
+  </div>
+
+  <div class="split-card">
+    <div class="split-side java-side">
+      <div class="lang-label java"><span class="lang-dot"></span>Java — BlackjackGame.java (main)</div>
+      <div class="ds-title">한 라운드 전체 진행</div>
+      <pre><span class="kw">public class</span> BlackjackGame {
+    <span class="kw">public static void</span> main(String[] args) {
+        Scanner scanner = <span class="kw">new</span> Scanner(System.in);
+        Deck deck = <span class="kw">new</span> Deck();
+        deck.<span class="fn">shuffle</span>();
+        Dealer dealer = <span class="kw">new</span> Dealer();
+        Player player = <span class="kw">new</span> Player(<span class="st">"홍길동"</span>, scanner);
+
+        <span class="kw">for</span> (<span class="ty">int</span> i=<span class="num">0</span>; i&lt;<span class="num">2</span>; i++) {           <span class="cm">// 초기 2장씩 배분</span>
+            player.<span class="fn">receiveCard</span>(deck.<span class="fn">dealCard</span>());
+            dealer.<span class="fn">receiveCard</span>(deck.<span class="fn">dealCard</span>());
+        }
+        Card dealerUp = dealer.<span class="fn">getHand</span>().<span class="fn">getCards</span>().<span class="fn">get</span>(<span class="num">0</span>);  <span class="cm">// 딜러의 오픈 카드 한 장만 공개</span>
+        System.out.<span class="fn">println</span>(<span class="st">"딜러 오픈카드: "</span> + dealerUp);
+
+        <span class="kw">while</span> (!player.<span class="fn">getHand</span>().<span class="fn">isBust</span>() &amp;&amp; player.<span class="fn">wantsHit</span>(dealerUp)) {
+            player.<span class="fn">receiveCard</span>(deck.<span class="fn">dealCard</span>());       <span class="cm">// 플레이어 턴 — 다형성으로 wantsHit() 호출</span>
+        }
+        <span class="kw">if</span> (!player.<span class="fn">getHand</span>().<span class="fn">isBust</span>()) {
+            <span class="kw">while</span> (dealer.<span class="fn">wantsHit</span>(dealerUp)) {           <span class="cm">// 딜러 턴 — 같은 메서드, 다른 구현</span>
+                dealer.<span class="fn">receiveCard</span>(deck.<span class="fn">dealCard</span>());
+            }
+        }
+        System.out.<span class="fn">println</span>(<span class="st">"플레이어: "</span> + player.<span class="fn">getHand</span>());
+        System.out.<span class="fn">println</span>(<span class="st">"딜러: "</span> + dealer.<span class="fn">getHand</span>());
+        <span class="fn">judge</span>(player, dealer);
+    }
+
+    <span class="kw">private static void</span> judge(Player player, Dealer dealer) {
+        <span class="kw">boolean</span> pBust = player.<span class="fn">getHand</span>().<span class="fn">isBust</span>(), dBust = dealer.<span class="fn">getHand</span>().<span class="fn">isBust</span>();
+        <span class="ty">int</span> p = player.<span class="fn">getHand</span>().<span class="fn">getScore</span>(), d = dealer.<span class="fn">getHand</span>().<span class="fn">getScore</span>();
+        <span class="kw">if</span> (pBust) System.out.<span class="fn">println</span>(<span class="st">"플레이어 버스트 — 딜러 승"</span>);
+        <span class="kw">else if</span> (dBust || p &gt; d) System.out.<span class="fn">println</span>(<span class="st">"플레이어 승!"</span>);
+        <span class="kw">else if</span> (p &lt; d) System.out.<span class="fn">println</span>(<span class="st">"딜러 승"</span>);
+        <span class="kw">else</span> System.out.<span class="fn">println</span>(<span class="st">"무승부(Push)"</span>);
+    }
+}</pre>
+      <div class="tag-row"><span class="tag java">다형성 활용</span><span class="tag java">Scanner 입력</span></div>
+    </div>
+    <div class="split-side py-side">
+      <div class="lang-label py"><span class="lang-dot"></span>Python — 전체 기본 소스 (한 파일에 압축)</div>
+      <div class="ds-title">동일 구조, 완전히 동작하는 콘솔 블랙잭</div>
+      <pre><span class="kw">import</span> random
+<span class="kw">from</span> abc <span class="kw">import</span> ABC, abstractmethod
+<span class="kw">from</span> dataclasses <span class="kw">import</span> dataclass
+<span class="kw">from</span> enum <span class="kw">import</span> Enum
+
+<span class="kw">class</span> Suit(Enum):
+    SPADE, HEART, DIAMOND, CLUB = <span class="st">"♠"</span>, <span class="st">"♥"</span>, <span class="st">"♦"</span>, <span class="st">"♣"</span>
+
+RANKS = [(<span class="st">"2"</span>,<span class="num">2</span>),(<span class="st">"3"</span>,<span class="num">3</span>),(<span class="st">"4"</span>,<span class="num">4</span>),(<span class="st">"5"</span>,<span class="num">5</span>),(<span class="st">"6"</span>,<span class="num">6</span>),(<span class="st">"7"</span>,<span class="num">7</span>),
+         (<span class="st">"8"</span>,<span class="num">8</span>),(<span class="st">"9"</span>,<span class="num">9</span>),(<span class="st">"10"</span>,<span class="num">10</span>),(<span class="st">"J"</span>,<span class="num">10</span>),(<span class="st">"Q"</span>,<span class="num">10</span>),(<span class="st">"K"</span>,<span class="num">10</span>),(<span class="st">"A"</span>,<span class="num">11</span>)]
+
+<span class="kw">@dataclass</span>(frozen=<span class="kw">True</span>)             <span class="cm"># frozen=True → 불변 객체(Java final Card와 동일 효과)</span>
+<span class="kw">class</span> Card:
+    label: <span class="ty">str</span>
+    value: <span class="ty">int</span>
+    suit: Suit
+    <span class="kw">def</span> <span class="fn">is_ace</span>(self): <span class="kw">return</span> self.label == <span class="st">"A"</span>
+    <span class="kw">def</span> <span class="fn">__str__</span>(self): <span class="kw">return</span> f<span class="st">"{self.label}{self.suit.value}"</span>
+
+
+<span class="kw">class</span> Deck:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self):
+        self._cards = [Card(l, v, s) <span class="kw">for</span> s <span class="kw">in</span> Suit <span class="kw">for</span> l, v <span class="kw">in</span> RANKS]  <span class="cm"># 52장 생성</span>
+
+    <span class="kw">def</span> <span class="fn">shuffle</span>(self):
+        random.shuffle(self._cards)
+
+    <span class="kw">def</span> <span class="fn">deal_card</span>(self):
+        <span class="kw">if</span> <span class="kw">not</span> self._cards:
+            <span class="kw">raise</span> RuntimeError(<span class="st">"덱에 카드가 없습니다"</span>)
+        <span class="kw">return</span> self._cards.pop()          <span class="cm"># 캡슐화 — 내부 리스트 직접 노출 안 함</span>
+
+
+<span class="kw">class</span> Hand:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self):
+        self._cards = []
+
+    <span class="kw">def</span> <span class="fn">add_card</span>(self, card):
+        self._cards.append(card)
+
+    <span class="kw">def</span> <span class="fn">score</span>(self):
+        total = <span class="fn">sum</span>(c.value <span class="kw">for</span> c <span class="kw">in</span> self._cards)
+        aces = <span class="fn">sum</span>(<span class="num">1</span> <span class="kw">for</span> c <span class="kw">in</span> self._cards <span class="kw">if</span> c.is_ace())
+        <span class="kw">while</span> total &gt; <span class="num">21</span> <span class="kw">and</span> aces &gt; <span class="num">0</span>:      <span class="cm"># 에이스 11→1 보정</span>
+            total -= <span class="num">10</span>; aces -= <span class="num">1</span>
+        <span class="kw">return</span> total
+
+    <span class="kw">def</span> <span class="fn">is_bust</span>(self): <span class="kw">return</span> self.score() &gt; <span class="num">21</span>
+    <span class="kw">def</span> <span class="fn">is_blackjack</span>(self): <span class="kw">return</span> <span class="fn">len</span>(self._cards)==<span class="num">2</span> <span class="kw">and</span> self.score()==<span class="num">21</span>
+    <span class="kw">def</span> <span class="fn">__str__</span>(self):
+        <span class="kw">return</span> f<span class="st">"{[str(c) for c in self._cards]} (합계 {self.score()})"</span>
+
+
+<span class="kw">class</span> Participant(ABC):               <span class="cm"># 추상 부모</span>
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, name):
+        self.name = name
+        self.hand = Hand()
+
+    <span class="kw">def</span> <span class="fn">receive_card</span>(self, card):
+        self.hand.add_card(card)
+
+    <span class="kw">@abstractmethod</span>
+    <span class="kw">def</span> <span class="fn">wants_hit</span>(self, dealer_up_card): ...   <span class="cm"># ★ 자식마다 다르게 구현</span>
+
+
+<span class="kw">class</span> Dealer(Participant):
+    <span class="kw">def</span> <span class="fn">__init__</span>(self):
+        <span class="fn">super</span>().<span class="fn">__init__</span>(<span class="st">"딜러"</span>)
+    <span class="kw">def</span> <span class="fn">wants_hit</span>(self, dealer_up_card):
+        <span class="kw">return</span> self.hand.score() &lt; <span class="num">17</span>       <span class="cm"># 고정 규칙</span>
+
+
+<span class="kw">class</span> Player(Participant):
+    <span class="kw">def</span> <span class="fn">wants_hit</span>(self, dealer_up_card):
+        answer = <span class="fn">input</span>(f<span class="st">"{self.name} - 현재 {self.hand}, 히트(h)/스탠드(s)? "</span>)
+        <span class="kw">return</span> answer.strip().lower() == <span class="st">"h"</span>   <span class="cm"># 사용자 입력으로 결정</span>
+
+
+<span class="kw">def</span> <span class="fn">judge</span>(player, dealer):
+    p, d = player.hand.score(), dealer.hand.score()
+    <span class="kw">if</span> player.hand.is_bust():
+        <span class="fn">print</span>(<span class="st">"플레이어 버스트 — 딜러 승"</span>)
+    <span class="kw">elif</span> dealer.hand.is_bust() <span class="kw">or</span> p &gt; d:
+        <span class="fn">print</span>(<span class="st">"플레이어 승!"</span>)
+    <span class="kw">elif</span> p &lt; d:
+        <span class="fn">print</span>(<span class="st">"딜러 승"</span>)
+    <span class="kw">else</span>:
+        <span class="fn">print</span>(<span class="st">"무승부(Push)"</span>)
+
+
+<span class="kw">if</span> __name__ == <span class="st">"__main__"</span>:
+    deck = Deck(); deck.shuffle()
+    dealer, player = Dealer(), Player(<span class="st">"홍길동"</span>)
+    <span class="kw">for</span> _ <span class="kw">in</span> <span class="fn">range</span>(<span class="num">2</span>):
+        player.receive_card(deck.deal_card())
+        dealer.receive_card(deck.deal_card())
+
+    dealer_up = dealer.hand._cards[<span class="num">0</span>]
+    <span class="fn">print</span>(f<span class="st">"딜러 오픈카드: {dealer_up}"</span>)
+
+    <span class="kw">while</span> <span class="kw">not</span> player.hand.is_bust() <span class="kw">and</span> player.wants_hit(dealer_up):
+        player.receive_card(deck.deal_card())     <span class="cm"># 다형성으로 wants_hit() 호출</span>
+
+    <span class="kw">if</span> <span class="kw">not</span> player.hand.is_bust():
+        <span class="kw">while</span> dealer.wants_hit(dealer_up):
+            dealer.receive_card(deck.deal_card())
+
+    <span class="fn">print</span>(f<span class="st">"플레이어: {player.hand}"</span>)
+    <span class="fn">print</span>(f<span class="st">"딜러: {dealer.hand}"</span>)
+    judge(player, dealer)</pre>
+      <div class="tag-row"><span class="tag py">@dataclass(frozen=True)</span><span class="tag py">ABC</span><span class="tag py">완전히 동작하는 단일 파일</span></div>
+    </div>
+  </div>
+
+  <table class="ctbl">
+    <thead><tr><th>OOP 개념</th><th class="java">적용 지점</th></tr></thead>
+    <tbody>
+      <tr><td>캡슐화</td><td>Deck._cards, Hand._cards를 감추고 dealCard()/addCard()로만 접근</td></tr>
+      <tr><td>상속</td><td>Dealer, Player가 Participant를 상속</td></tr>
+      <tr><td>다형성</td><td>wantsHit()를 각자 다르게 구현, Game은 Participant 타입으로만 다룸</td></tr>
+      <tr><td>추상화</td><td>Participant.wantsHit()를 abstract로 선언해 구현을 자식에게 강제</td></tr>
+      <tr><td>불변 객체</td><td>Card를 final(Java) / frozen dataclass(Python)로 만들어 생성 후 변경 불가</td></tr>
+    </tbody>
+  </table>
+
+  <div class="note felt"><b>이 소스가 앞으로의 기준점</b> 아래 11개 패턴 탭은 모두 이 Card/Deck/Hand/Participant/Game 구조를 그대로 사용하거나 확장합니다. 예를 들어 Strategy 탭은 wantsHit()의 결정 로직을 별도 객체로 빼내고, State 탭은 BlackjackGame의 진행 순서를 명시적 상태로 나눕니다.</div>
+</div>
+
+<!-- ============ SINGLETON ============ -->
+<div class="algo-section" id="tab-singleton">
+  <div class="sec-head">
+    <div class="sec-icon">🔒</div>
+    <div>
+      <h2>1. Singleton — 카지노 테이블의 슈(Shoe)는 하나뿐</h2>
+      <p>실제 카지노는 6~8개의 덱을 섞어 하나의 슈(Shoe)에 넣고 여러 라운드에 걸쳐 사용합니다. 한 테이블에 슈가 여러 개 있으면 카드 카운팅 로직도, 잔여 카드 수 추적도 꼬입니다. 슈는 테이블당 <b>하나</b>여야 합니다.</p>
+      <div class="stage-badges"><span class="sbadge cre">생성 패턴</span><span class="sbadge file">Deck 여러 벌을 합친 Shoe에 적용</span></div>
+    </div>
+  </div>
+
+  <div class="intent-box"><b>의도(Intent)</b> 클래스의 인스턴스가 오직 하나만 만들어지도록 보장하고, 전역 접근점을 하나 제공한다. 여기서는 "테이블당 슈 하나"라는 게임 규칙 자체가 싱글턴이 필요한 이유가 된다.</div>
+
+  <div class="viz">
+    <div class="viz-title">// UML — Singleton</div>
+    <div class="graph-wrap">
+      <svg width="480" height="210" viewBox="0 0 480 210">
+        <rect x="140" y="20" width="220" height="150" rx="4" fill="#fff" stroke="#16a34a" stroke-width="1.6"/>
+        <rect x="140" y="20" width="220" height="30" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.6"/>
+        <text x="250" y="40" text-anchor="middle" font-size="12.5" font-weight="700" fill="#15803d">Shoe</text>
+        <line x1="140" y1="50" x2="360" y2="50" stroke="#16a34a"/>
+        <text x="150" y="68" font-size="10" fill="#0f172a">- static instance : Shoe</text>
+        <text x="150" y="84" font-size="10" fill="#0f172a">- cards : List&lt;Card&gt;</text>
+        <line x1="140" y1="94" x2="360" y2="94" stroke="#16a34a"/>
+        <text x="150" y="110" font-size="10" fill="#dc2626">- Shoe(deckCount)  ← private</text>
+        <text x="150" y="126" font-size="10" fill="#15803d">+ static getInstance(deckCount)</text>
+        <text x="150" y="142" font-size="10" fill="#0f172a">+ drawCard() / remaining()</text>
+        <text x="150" y="158" font-size="10" fill="#0f172a">+ needsReshuffle() : boolean</text>
+      </svg>
+    </div>
+    <div class="uml-legend">Deck과의 차이: Deck은 1벌(52장)이지만 Shoe는 <b>여러 벌을 합친 카지노용 카드통</b>이며, 게임 전체에서 하나만 존재해야 합니다.</div>
+  </div>
+
+  <div class="split-card">
+    <div class="split-side java-side">
+      <div class="lang-label java"><span class="lang-dot"></span>Java — Shoe.java</div>
+      <div class="ds-title">여러 Deck을 합쳐 하나의 유일한 슈로 관리</div>
+      <pre><span class="kw">public class</span> Shoe {
+    <span class="kw">private static</span> Shoe instance;          <span class="cm">// ① 유일 인스턴스</span>
+    <span class="kw">private final</span> List&lt;Card&gt; cards = <span class="kw">new</span> ArrayList&lt;&gt;();
+    <span class="kw">private final int</span> totalDecks;
+
+    <span class="kw">private</span> Shoe(<span class="ty">int</span> deckCount) {           <span class="cm">// ② 외부에서 new 차단</span>
+        <span class="kw">this</span>.totalDecks = deckCount;
+        <span class="kw">for</span> (<span class="ty">int</span> i=<span class="num">0</span>; i&lt;deckCount; i++)
+            <span class="kw">for</span> (Suit s : Suit.<span class="fn">values</span>())
+                <span class="kw">for</span> (Rank r : Rank.<span class="fn">values</span>())
+                    cards.<span class="fn">add</span>(<span class="kw">new</span> Card(s, r));    <span class="cm">// deckCount x 52장을 한 통에</span>
+        Collections.<span class="fn">shuffle</span>(cards);
+    }
+    <span class="kw">public static synchronized</span> Shoe getInstance(<span class="ty">int</span> deckCount) {  <span class="cm">// ③ 유일 진입점(스레드 안전)</span>
+        <span class="kw">if</span> (instance == <span class="kw">null</span>) instance = <span class="kw">new</span> Shoe(deckCount);
+        <span class="kw">return</span> instance;
+    }
+    <span class="kw">public</span> Card drawCard() { <span class="kw">return</span> cards.<span class="fn">remove</span>(cards.<span class="fn">size</span>()-<span class="num">1</span>); }
+    <span class="kw">public boolean</span> needsReshuffle() {           <span class="cm">// 카지노 관례: 75% 이상 소진되면 재셔플 권고</span>
+        <span class="kw">return</span> cards.<span class="fn">size</span>() &lt; totalDecks * <span class="num">52</span> * <span class="num">0.25</span>;
+    }
+}
+
+<span class="cm">// 여러 라운드에서 항상 같은 슈를 재사용</span>
+Shoe shoe1 = Shoe.<span class="fn">getInstance</span>(<span class="num">6</span>);
+Shoe shoe2 = Shoe.<span class="fn">getInstance</span>(<span class="num">6</span>);
+System.out.<span class="fn">println</span>(shoe1 == shoe2);  <span class="cm">// true — 같은 슈</span></pre>
+      <div class="tag-row"><span class="tag java">synchronized</span><span class="tag java">멀티 덱 통합</span></div>
+    </div>
+    <div class="split-side py-side">
+      <div class="lang-label py"><span class="lang-dot"></span>Python — shoe.py</div>
+      <pre><span class="kw">import</span> random
+<span class="kw">import</span> threading
+
+<span class="kw">class</span> Shoe:
+    _instance = <span class="kw">None</span>
+    _lock = threading.Lock()               <span class="cm"># 동시성 보호용 락</span>
+
+    <span class="kw">def</span> <span class="fn">__new__</span>(cls, deck_count=<span class="num">6</span>):
+        <span class="kw">with</span> cls._lock:
+            <span class="kw">if</span> cls._instance <span class="kw">is</span> <span class="kw">None</span>:
+                obj = <span class="fn">super</span>().<span class="fn">__new__</span>(cls)
+                obj._cards = [Card(l, v, s) <span class="kw">for</span> _ <span class="kw">in</span> <span class="fn">range</span>(deck_count)
+                                          <span class="kw">for</span> s <span class="kw">in</span> Suit <span class="kw">for</span> l, v <span class="kw">in</span> RANKS]
+                random.shuffle(obj._cards)
+                obj._total = deck_count * <span class="num">52</span>
+                cls._instance = obj
+        <span class="kw">return</span> cls._instance
+
+    <span class="kw">def</span> <span class="fn">draw_card</span>(self):
+        <span class="kw">return</span> self._cards.pop()
+
+    <span class="kw">def</span> <span class="fn">needs_reshuffle</span>(self):
+        <span class="kw">return</span> <span class="fn">len</span>(self._cards) &lt; self._total * <span class="num">0.25</span>
+
+
+<span class="cm"># 검증</span>
+shoe1 = Shoe(<span class="num">6</span>)
+shoe2 = Shoe(<span class="num">6</span>)
+<span class="fn">print</span>(shoe1 <span class="kw">is</span> shoe2)   <span class="cm"># True</span></pre>
+      <div class="tag-row"><span class="tag py">threading.Lock</span><span class="tag py">__new__</span></div>
+    </div>
+  </div>
+
+  <div class="note felt"><b>왜 Deck이 아니라 Shoe에 적용하는가</b> Deck(52장)은 라운드마다 새로 만들어도 되는 "값" 객체에 가깝지만, Shoe는 여러 라운드에 걸쳐 <b>상태(잔여 카드 수, 이미 나온 카드 이력)</b>를 유지해야 하는 진짜 "리소스"입니다. 상태를 오래 유지해야 하는 리소스일수록 Singleton이 자연스럽습니다.</div>
+</div>
+
+<!-- ============ FACTORY METHOD ============ -->
+<div class="algo-section" id="tab-factory">
+  <div class="sec-head">
+    <div class="sec-icon">🏭</div>
+    <div>
+      <h2>2. Factory Method — 게임 변형마다 다른 덱 생성</h2>
+      <p>표준 블랙잭(52장), 유러피언 블랙잭(딜러 홀카드 없음, 규칙만 다름), 스페인21(10을 모두 제거한 48장 덱) 등 변형마다 <b>덱 구성 자체가 다릅니다</b>. 이 생성 로직을 한 곳에 모읍니다.</p>
+      <div class="stage-badges"><span class="sbadge cre">생성 패턴</span><span class="sbadge file">DeckFactory — 게임 변형별 덱 생성 캡슐화</span></div>
+    </div>
+  </div>
+
+  <div class="intent-box"><b>의도(Intent)</b> 어떤 구체적인 덱 구성을 만들지 결정하는 로직을 한 팩토리 뒤에 숨겨서, 클라이언트가 "표준인지 스페인21인지"를 몰라도 게임 종류 이름만으로 알맞은 덱을 받게 한다.</div>
+
+  <div class="viz">
+    <div class="viz-title">// UML — Factory Method</div>
+    <div class="graph-wrap">
+      <svg width="700" height="220" viewBox="0 0 700 220">
+        <rect x="260" y="16" width="200" height="60" rx="4" fill="#fff" stroke="#0f172a" stroke-width="1.5"/>
+        <text x="360" y="36" text-anchor="middle" font-size="12" font-weight="700">DeckFactory</text>
+        <text x="270" y="56" font-size="9.5">+ createDeck(GameType) : List&lt;Card&gt;</text>
+
+        <rect x="20" y="140" width="180" height="46" rx="4" fill="#fff" stroke="#d97706" stroke-width="1.4"/>
+        <text x="110" y="168" text-anchor="middle" font-size="10.5" font-weight="700" fill="#b45309">STANDARD (52장)</text>
+        <rect x="260" y="140" width="180" height="46" rx="4" fill="#fff" stroke="#d97706" stroke-width="1.4"/>
+        <text x="350" y="168" text-anchor="middle" font-size="10.5" font-weight="700" fill="#b45309">SPANISH21 (48장, 10제외)</text>
+        <rect x="500" y="140" width="180" height="46" rx="4" fill="#fff" stroke="#d97706" stroke-width="1.4"/>
+        <text x="590" y="168" text-anchor="middle" font-size="10.5" font-weight="700" fill="#b45309">EUROPEAN (52장, 규칙만 다름)</text>
+
+        <line x1="110" y1="140" x2="330" y2="80" stroke="#16a34a" stroke-width="1.3" stroke-dasharray="4" marker-end="url(#fc2)"/>
+        <line x1="350" y1="140" x2="355" y2="80" stroke="#16a34a" stroke-width="1.3" stroke-dasharray="4" marker-end="url(#fc2)"/>
+        <line x1="590" y1="140" x2="400" y2="80" stroke="#16a34a" stroke-width="1.3" stroke-dasharray="4" marker-end="url(#fc2)"/>
+        <defs><marker id="fc2" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="none" stroke="#16a34a" stroke-width="1"/></marker></defs>
+      </svg>
+    </div>
+  </div>
+
+  <div class="split-card">
+    <div class="split-side java-side">
+      <div class="lang-label java"><span class="lang-dot"></span>Java — DeckFactory.java</div>
+      <pre><span class="kw">public enum</span> GameType { STANDARD, SPANISH21, EUROPEAN }
+
+<span class="kw">public class</span> DeckFactory {
+    <span class="kw">public static</span> List&lt;Card&gt; createDeck(GameType type) {
+        List&lt;Card&gt; deck = <span class="kw">new</span> ArrayList&lt;&gt;();
+        <span class="kw">for</span> (Suit s : Suit.<span class="fn">values</span>())
+            <span class="kw">for</span> (Rank r : Rank.<span class="fn">values</span>()) {
+                <span class="kw">if</span> (type == GameType.SPANISH21 &amp;&amp; r == Rank.TEN)
+                    <span class="kw">continue</span>;                    <span class="cm">// ★ 스페인21은 10을 뺀 48장 덱</span>
+                deck.<span class="fn">add</span>(<span class="kw">new</span> Card(s, r));
+            }
+        Collections.<span class="fn">shuffle</span>(deck);
+        <span class="kw">return</span> deck;                            <span class="cm">// EUROPEAN은 카드 구성은 같고 게임 규칙만 다름</span>
+    }
+}
+
+<span class="cm">// 사용 예 — 클라이언트는 GameType 이름만 알면 됨</span>
+List&lt;Card&gt; deck = DeckFactory.<span class="fn">createDeck</span>(GameType.SPANISH21);
+System.out.<span class="fn">println</span>(deck.<span class="fn">size</span>());  <span class="cm">// 48</span></pre>
+      <div class="tag-row"><span class="tag java">enum 조건 분기</span><span class="tag java">생성 로직 캡슐화</span></div>
+    </div>
+    <div class="split-side py-side">
+      <div class="lang-label py"><span class="lang-dot"></span>Python — deck_factory.py</div>
+      <pre><span class="kw">from</span> enum <span class="kw">import</span> Enum
+<span class="kw">import</span> random
+
+<span class="kw">class</span> GameType(Enum):
+    STANDARD, SPANISH21, EUROPEAN = <span class="st">"standard"</span>, <span class="st">"spanish21"</span>, <span class="st">"european"</span>
+
+<span class="kw">class</span> DeckFactory:
+    <span class="kw">@staticmethod</span>
+    <span class="kw">def</span> <span class="fn">create_deck</span>(game_type: GameType):
+        deck = [
+            Card(l, v, s)
+            <span class="kw">for</span> s <span class="kw">in</span> Suit
+            <span class="kw">for</span> l, v <span class="kw">in</span> RANKS
+            <span class="kw">if</span> <span class="kw">not</span> (game_type == GameType.SPANISH21 <span class="kw">and</span> l == <span class="st">"10"</span>)  <span class="cm"># ★ 조건부 제외</span>
+        ]
+        random.shuffle(deck)
+        <span class="kw">return</span> deck
+
+
+<span class="cm"># 사용 예</span>
+deck = DeckFactory.create_deck(GameType.SPANISH21)
+<span class="fn">print</span>(<span class="fn">len</span>(deck))  <span class="cm"># 48</span>
+
+<span class="cm"># Python다운 대안: 딕셔너리 기반 레지스트리로 새 게임 변형을 등록만 하면 확장</span>
+DECK_RULES = {
+    GameType.STANDARD:  <span class="kw">lambda</span> l: <span class="kw">True</span>,
+    GameType.SPANISH21: <span class="kw">lambda</span> l: l != <span class="st">"10"</span>,
+    GameType.EUROPEAN:  <span class="kw">lambda</span> l: <span class="kw">True</span>,
+}
+<span class="kw">def</span> <span class="fn">create_deck_v2</span>(game_type):
+    rule = DECK_RULES[game_type]
+    deck = [Card(l, v, s) <span class="kw">for</span> s <span class="kw">in</span> Suit <span class="kw">for</span> l, v <span class="kw">in</span> RANKS <span class="kw">if</span> rule(l)]
+    random.shuffle(deck)
+    <span class="kw">return</span> deck</pre>
+      <div class="tag-row"><span class="tag py">@staticmethod</span><span class="tag py">딕셔너리 기반 확장형</span></div>
+    </div>
+  </div>
+
+  <table class="ctbl">
+    <thead><tr><th>게임 변형</th><th>덱 구성</th><th>비고</th></tr></thead>
+    <tbody>
+      <tr><td>STANDARD</td><td>52장 (표준)</td><td>가장 일반적인 블랙잭</td></tr>
+      <tr><td>SPANISH21</td><td>48장 (10 카드 전부 제외)</td><td>대신 플레이어에게 유리한 보너스 규칙이 붙는 경우가 많음</td></tr>
+      <tr><td>EUROPEAN</td><td>52장 (동일)</td><td>덱 구성은 같고 "딜러가 초기에 1장만 받는다" 등 진행 규칙만 다름 → Strategy/Template Method가 담당</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ============ STRATEGY ============ -->
+<div class="algo-section" id="tab-strategy">
+  <div class="sec-head">
+    <div class="sec-icon">🎯</div>
+    <div>
+      <h2>3. Strategy — "히트냐 스탠드냐"를 교체 가능한 객체로 (+ 실전 베이직 전략표)</h2>
+      <p>기본 소스의 <code>wantsHit()</code>는 상속으로 고정되어 있었습니다. Strategy 패턴은 이 결정 로직을 별도 객체로 분리해서, <b>같은 Player가 실행 중에 전략만 바꿔가며</b> 플레이할 수 있게 합니다. 여기서는 실제 카지노에서 쓰이는 <b>베이직 전략표(Basic Strategy Chart)</b>까지 구현합니다.</p>
+      <div class="stage-badges"><span class="sbadge beh">행동 패턴</span><span class="sbadge file">게임의 "전략"과 GoF의 "Strategy"가 만나는 지점</span></div>
+    </div>
+  </div>
+
+  <div class="intent-box"><b>의도(Intent)</b> 여러 알고리즘(고정 규칙, 베이직 전략, 카드카운팅, 보수적 플레이)을 캡슐화해서 서로 교체 가능하게 만든다. Participant는 "어떤 전략을 쓰는지" 몰라도 되고, 실행 중에도 전략을 바꿀 수 있다.</div>
+
+  <div class="viz">
+    <div class="viz-title">// UML — Strategy</div>
+    <div class="graph-wrap">
+      <svg width="700" height="230" viewBox="0 0 700 230">
+        <rect x="30" y="80" width="200" height="70" rx="4" fill="#fff" stroke="#0f172a" stroke-width="1.4"/>
+        <text x="130" y="100" text-anchor="middle" font-size="11.5" font-weight="700">Participant</text>
+        <text x="38" y="120" font-size="9.5">- strategy : PlayingStrategy</text>
+        <text x="38" y="134" font-size="9.5">+ wantsHit() → strategy.decide()</text>
+
+        <rect x="360" y="16" width="220" height="50" rx="4" fill="#fdf4ff" stroke="#7c3aed" stroke-width="1.4"/>
+        <text x="470" y="32" text-anchor="middle" font-size="9.5" fill="#7c3aed">&lt;&lt;interface&gt;&gt;</text>
+        <text x="470" y="50" text-anchor="middle" font-size="11.5" font-weight="700" fill="#5b21b6">PlayingStrategy</text>
+
+        <rect x="290" y="150" width="120" height="46" rx="4" fill="#fff" stroke="#d97706" stroke-width="1.3"/>
+        <text x="350" y="176" text-anchor="middle" font-size="10" font-weight="700" fill="#b45309">DealerStrategy</text>
+        <rect x="420" y="150" width="120" height="46" rx="4" fill="#fff" stroke="#d97706" stroke-width="1.3"/>
+        <text x="480" y="176" text-anchor="middle" font-size="10" font-weight="700" fill="#b45309">BasicStrategy</text>
+        <rect x="550" y="150" width="130" height="46" rx="4" fill="#fff" stroke="#d97706" stroke-width="1.3"/>
+        <text x="615" y="176" text-anchor="middle" font-size="10" font-weight="700" fill="#b45309">CountingStrategy</text>
+
+        <line x1="230" y1="105" x2="358" y2="55" stroke="#2563eb" stroke-width="1.2" marker-end="url(#sg2)"/>
+        <text x="235" y="75" font-size="8.5" fill="#2563eb">has-a (합성)</text>
+        <line x1="350" y1="150" x2="420" y2="70" stroke="#7c3aed" stroke-width="1.1" stroke-dasharray="4"/>
+        <polygon points="420,70 412,66 414,77" fill="#fff" stroke="#7c3aed" stroke-width="1"/>
+        <line x1="480" y1="150" x2="470" y2="68" stroke="#7c3aed" stroke-width="1.1" stroke-dasharray="4"/>
+        <polygon points="470,68 465,58 477,58" fill="#fff" stroke="#7c3aed" stroke-width="1"/>
+        <line x1="615" y1="150" x2="520" y2="70" stroke="#7c3aed" stroke-width="1.1" stroke-dasharray="4"/>
+        <polygon points="520,70 512,66 514,77" fill="#fff" stroke="#7c3aed" stroke-width="1"/>
+        <defs><marker id="sg2" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="none" stroke="#2563eb" stroke-width="1"/></marker></defs>
+      </svg>
+    </div>
+  </div>
+
+  <div class="split-card">
+    <div class="split-side java-side">
+      <div class="lang-label java"><span class="lang-dot"></span>Java — PlayingStrategy.java / 구현체들</div>
+      <pre><span class="kw">public enum</span> Decision { HIT, STAND, DOUBLE, SPLIT }
+
+<span class="kw">public interface</span> PlayingStrategy {
+    Decision decide(Hand myHand, Card dealerUpCard);
+}
+
+<span class="kw">public class</span> DealerStrategy <span class="kw">implements</span> PlayingStrategy {   <span class="cm">// 딜러의 고정 규칙</span>
+    <span class="kw">public</span> Decision decide(Hand myHand, Card dealerUpCard) {
+        <span class="kw">return</span> myHand.<span class="fn">getScore</span>() &lt; <span class="num">17</span> ? Decision.HIT : Decision.STAND;
+    }
+}
+
+<span class="kw">public class</span> BasicStrategy <span class="kw">implements</span> PlayingStrategy {    <span class="cm">// ★ 실전 베이직 전략표 구현</span>
+    <span class="kw">public</span> Decision decide(Hand myHand, Card dealerUpCard) {
+        <span class="ty">int</span> score = myHand.<span class="fn">getScore</span>();
+        <span class="ty">int</span> up = dealerUpCard.<span class="fn">getValue</span>();
+        <span class="kw">boolean</span> soft = <span class="fn">hasSoftAce</span>(myHand);       <span class="cm">// 에이스를 11로 계산 중인지</span>
+        <span class="kw">boolean</span> pair = myHand.<span class="fn">getCards</span>().<span class="fn">size</span>()==<span class="num">2</span>
+                     &amp;&amp; myHand.<span class="fn">getCards</span>().<span class="fn">get</span>(<span class="num">0</span>).<span class="fn">getValue</span>() == myHand.<span class="fn">getCards</span>().<span class="fn">get</span>(<span class="num">1</span>).<span class="fn">getValue</span>();
+
+        <span class="kw">if</span> (pair) <span class="kw">return</span> <span class="fn">pairDecision</span>(myHand.<span class="fn">getCards</span>().<span class="fn">get</span>(<span class="num">0</span>).<span class="fn">getValue</span>(), up);
+        <span class="kw">if</span> (soft)  <span class="kw">return</span> <span class="fn">softDecision</span>(score, up);
+        <span class="kw">return</span> <span class="fn">hardDecision</span>(score, up);      <span class="cm">// 아래 표(하드 토탈)를 그대로 코드화</span>
+    }
+    <span class="kw">private</span> Decision hardDecision(<span class="ty">int</span> score, <span class="ty">int</span> up) {
+        <span class="kw">if</span> (score &gt;= <span class="num">17</span>) <span class="kw">return</span> Decision.STAND;
+        <span class="kw">if</span> (score &lt;= <span class="num">8</span>)  <span class="kw">return</span> Decision.HIT;
+        <span class="kw">if</span> (score == <span class="num">9</span>)  <span class="kw">return</span> (up&gt;=<span class="num">3</span> &amp;&amp; up&lt;=<span class="num">6</span>) ? Decision.DOUBLE : Decision.HIT;
+        <span class="kw">if</span> (score == <span class="num">10</span>) <span class="kw">return</span> (up&lt;=<span class="num">9</span>) ? Decision.DOUBLE : Decision.HIT;
+        <span class="kw">if</span> (score == <span class="num">11</span>) <span class="kw">return</span> Decision.DOUBLE;
+        <span class="cm">// 12~16: 딜러 업카드가 2~6이면 스탠드(딜러 버스트 유도), 7 이상이면 히트</span>
+        <span class="kw">return</span> (up &gt;= <span class="num">2</span> &amp;&amp; up &lt;= <span class="num">6</span>) ? Decision.STAND : Decision.HIT;
+    }
+    <span class="kw">private</span> Decision softDecision(<span class="ty">int</span> score, <span class="ty">int</span> up) { <span class="cm">/* 소프트 토탈 표(아래 참조) */ return</span> Decision.HIT; }
+    <span class="kw">private</span> Decision pairDecision(<span class="ty">int</span> pairValue, <span class="ty">int</span> up) { <span class="cm">/* 페어 스플릿 표 */ return</span> Decision.HIT; }
+    <span class="kw">private boolean</span> hasSoftAce(Hand h) { <span class="cm">/* 에이스가 11로 카운트되는지 검사 */ return false</span>; }
+}
+
+<span class="cm">// Participant는 전략 객체를 "필드"로 갖는다</span>
+<span class="kw">public abstract class</span> Participant {
+    <span class="kw">protected</span> PlayingStrategy strategy;
+    <span class="kw">public void</span> setStrategy(PlayingStrategy s) { <span class="kw">this</span>.strategy = s; }  <span class="cm">// ★ 런타임 교체</span>
+    <span class="kw">public</span> Decision decide(Card dealerUpCard) { <span class="kw">return</span> strategy.<span class="fn">decide</span>(hand, dealerUpCard); }
+}
+
+<span class="cm">// 사용 예 — 같은 Player 객체로 전략만 바꿔서 승률 비교</span>
+Player p = <span class="kw">new</span> Player(<span class="st">"홍길동"</span>);
+p.<span class="fn">setStrategy</span>(<span class="kw">new</span> BasicStrategy());   <span class="cm">// 베이직 전략으로 플레이</span>
+p.<span class="fn">setStrategy</span>(<span class="kw">new</span> DealerStrategy());  <span class="cm">// 딜러와 같은 규칙으로 바꿔서 비교(왜 이게 손해인지 실험)</span></pre>
+      <div class="tag-row"><span class="tag java">전략 위임</span><span class="tag java">실전 베이직 전략표 코드화</span></div>
+    </div>
+    <div class="split-side py-side">
+      <div class="lang-label py"><span class="lang-dot"></span>Python — playing_strategy.py</div>
+      <pre><span class="kw">from</span> abc <span class="kw">import</span> ABC, abstractmethod
+<span class="kw">from</span> enum <span class="kw">import</span> Enum
+
+<span class="kw">class</span> Decision(Enum):
+    HIT, STAND, DOUBLE, SPLIT = <span class="fn">range</span>(<span class="num">4</span>)
+
+<span class="kw">class</span> PlayingStrategy(ABC):
+    <span class="kw">@abstractmethod</span>
+    <span class="kw">def</span> <span class="fn">decide</span>(self, my_hand, dealer_up_card): ...
+
+<span class="kw">class</span> DealerStrategy(PlayingStrategy):
+    <span class="kw">def</span> <span class="fn">decide</span>(self, my_hand, dealer_up_card):
+        <span class="kw">return</span> Decision.HIT <span class="kw">if</span> my_hand.score() &lt; <span class="num">17</span> <span class="kw">else</span> Decision.STAND
+
+<span class="kw">class</span> BasicStrategy(PlayingStrategy):          <span class="cm"># ★ 실전 베이직 전략표</span>
+    <span class="kw">def</span> <span class="fn">decide</span>(self, my_hand, dealer_up_card):
+        score = my_hand.score()
+        up = dealer_up_card.value
+        cards = my_hand._cards
+        is_pair = <span class="fn">len</span>(cards)==<span class="num">2</span> <span class="kw">and</span> cards[<span class="num">0</span>].value == cards[<span class="num">1</span>].value
+        is_soft = <span class="fn">any</span>(c.is_ace() <span class="kw">for</span> c <span class="kw">in</span> cards) <span class="kw">and</span> score &lt;= <span class="num">21</span> <span class="kw">and</span> \
+                  <span class="fn">sum</span>(c.value <span class="kw">for</span> c <span class="kw">in</span> cards) != score  <span class="cm"># 에이스가 아직 11로 카운트 중</span>
+
+        <span class="kw">if</span> is_pair:
+            <span class="kw">return</span> self._pair_decision(cards[<span class="num">0</span>].value, up)
+        <span class="kw">if</span> is_soft:
+            <span class="kw">return</span> self._soft_decision(score, up)
+        <span class="kw">return</span> self._hard_decision(score, up)
+
+    <span class="kw">def</span> <span class="fn">_hard_decision</span>(self, score, up):
+        <span class="kw">if</span> score &gt;= <span class="num">17</span>: <span class="kw">return</span> Decision.STAND
+        <span class="kw">if</span> score &lt;= <span class="num">8</span>:  <span class="kw">return</span> Decision.HIT
+        <span class="kw">if</span> score == <span class="num">9</span>:  <span class="kw">return</span> Decision.DOUBLE <span class="kw">if</span> <span class="num">3</span> &lt;= up &lt;= <span class="num">6</span> <span class="kw">else</span> Decision.HIT
+        <span class="kw">if</span> score == <span class="num">10</span>: <span class="kw">return</span> Decision.DOUBLE <span class="kw">if</span> up &lt;= <span class="num">9</span> <span class="kw">else</span> Decision.HIT
+        <span class="kw">if</span> score == <span class="num">11</span>: <span class="kw">return</span> Decision.DOUBLE
+        <span class="kw">return</span> Decision.STAND <span class="kw">if</span> <span class="num">2</span> &lt;= up &lt;= <span class="num">6</span> <span class="kw">else</span> Decision.HIT   <span class="cm"># 12~16</span>
+
+    <span class="kw">def</span> <span class="fn">_soft_decision</span>(self, score, up): ...   <span class="cm"># 소프트 토탈 표(아래 참조)</span>
+    <span class="kw">def</span> <span class="fn">_pair_decision</span>(self, pair_value, up): ...  <span class="cm"># 페어 스플릿 표</span>
+
+
+<span class="cm"># Participant는 전략 객체를 필드로 보유</span>
+<span class="kw">class</span> Participant(ABC):
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, name, strategy: PlayingStrategy):
+        self.name = name; self.hand = Hand(); self.strategy = strategy
+
+    <span class="kw">def</span> <span class="fn">set_strategy</span>(self, strategy):
+        self.strategy = strategy      <span class="cm"># ★ 런타임 교체</span>
+
+    <span class="kw">def</span> <span class="fn">decide</span>(self, dealer_up_card):
+        <span class="kw">return</span> self.strategy.decide(self.hand, dealer_up_card)
+
+
+<span class="cm"># 사용 예 — 여러 전략의 승률을 시뮬레이션으로 비교하기 좋음</span>
+player = Participant(<span class="st">"홍길동"</span>, BasicStrategy())
+player.set_strategy(DealerStrategy())  <span class="cm"># 전략 교체</span></pre>
+      <div class="tag-row"><span class="tag py">ABC 인터페이스</span><span class="tag py">전략 시뮬레이션에 유리</span></div>
+    </div>
+  </div>
+
+  <div class="viz">
+    <div class="viz-title">// 실전 베이직 전략표 (Hard Totals) — 미국 카지노 표준, 딜러가 소프트17 스탠드 기준</div>
+    <div class="graph-wrap" style="overflow-x:auto;">
+      <table class="strategy-table">
+        <thead><tr><th>내 점수 \ 딜러 업카드</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>9</th><th>10</th><th>A</th></tr></thead>
+        <tbody>
+          <tr><td>17+</td><td class="S">S</td><td class="S">S</td><td class="S">S</td><td class="S">S</td><td class="S">S</td><td class="S">S</td><td class="S">S</td><td class="S">S</td><td class="S">S</td><td class="S">S</td></tr>
+          <tr><td>13~16</td><td class="S">S</td><td class="S">S</td><td class="S">S</td><td class="S">S</td><td class="S">S</td><td class="H">H</td><td class="H">H</td><td class="H">H</td><td class="H">H</td><td class="H">H</td></tr>
+          <tr><td>12</td><td class="H">H</td><td class="H">H</td><td class="S">S</td><td class="S">S</td><td class="S">S</td><td class="H">H</td><td class="H">H</td><td class="H">H</td><td class="H">H</td><td class="H">H</td></tr>
+          <tr><td>11</td><td class="D">D</td><td class="D">D</td><td class="D">D</td><td class="D">D</td><td class="D">D</td><td class="D">D</td><td class="D">D</td><td class="D">D</td><td class="D">D</td><td class="H">H</td></tr>
+          <tr><td>10</td><td class="D">D</td><td class="D">D</td><td class="D">D</td><td class="D">D</td><td class="D">D</td><td class="D">D</td><td class="D">D</td><td class="D">D</td><td class="H">H</td><td class="H">H</td></tr>
+          <tr><td>9</td><td class="H">H</td><td class="D">D</td><td class="D">D</td><td class="D">D</td><td class="D">D</td><td class="H">H</td><td class="H">H</td><td class="H">H</td><td class="H">H</td><td class="H">H</td></tr>
+          <tr><td>8 이하</td><td class="H">H</td><td class="H">H</td><td class="H">H</td><td class="H">H</td><td class="H">H</td><td class="H">H</td><td class="H">H</td><td class="H">H</td><td class="H">H</td><td class="H">H</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="uml-legend" style="margin-top:12px;">
+      <span><span style="display:inline-block;width:12px;height:12px;background:#fef2f2;border:1px solid #b91c1c;"></span> H = Hit(추가로 받기)</span>
+      <span><span style="display:inline-block;width:12px;height:12px;background:#f0fdf4;border:1px solid #15803d;"></span> S = Stand(멈추기)</span>
+      <span><span style="display:inline-block;width:12px;height:12px;background:#eff6ff;border:1px solid #1d4ed8;"></span> D = Double Down(배팅 2배+카드 1장만 더)</span>
+      <span><span style="display:inline-block;width:12px;height:12px;background:#faf5ff;border:1px solid #7e22ce;"></span> P = Split(페어를 두 손패로 분리)</span>
+    </div>
+  </div>
+
+  <table class="ctbl">
+    <thead><tr><th>전략 핵심 원리</th><th>설명</th></tr></thead>
+    <tbody>
+      <tr><td>딜러 업카드 2~6 (약한 카드)</td><td>딜러가 버스트할 확률이 높으므로 내 손패는 보수적으로(낮은 점수도 스탠드)</td></tr>
+      <tr><td>딜러 업카드 7~A (강한 카드)</td><td>딜러가 버스트할 확률이 낮으므로 내 점수를 최대한 끌어올려야 함(적극적으로 히트)</td></tr>
+      <tr><td>11점 더블다운</td><td>다음 카드가 10에 가까울 확률이 가장 높은 시점 — 배팅을 2배로 걸고 승부</td></tr>
+      <tr><td>소프트 핸드(에이스 포함)</td><td>버스트 위험이 없으므로(에이스를 1로 낮출 수 있음) 하드 핸드보다 더 공격적으로 플레이</td></tr>
+    </tbody>
+  </table>
+
+  <div class="note acc"><b>Strategy 패턴이 왜 딱 맞는가</b> 베이직 전략표는 수백 개의 규칙이 있지만, 이를 하나의 <code>if-else</code> 덩어리로 Participant 안에 넣으면 클래스가 비대해집니다. Strategy로 분리하면 <b>표 자체가 하나의 교체 가능한 객체</b>가 되어, 카드카운팅 전략·보수적 전략 등을 별도 클래스로 추가하며 실험할 수 있습니다 — 마방진의 Strategy 탭과 동일한 사고방식이 여기서는 실제 확률 계산까지 이어집니다.</div>
+</div>
+
+<!-- ============ TEMPLATE METHOD ============ -->
+<div class="algo-section" id="tab-template">
+  <div class="sec-head">
+    <div class="sec-icon">📐</div>
+    <div>
+      <h2>4. Template Method — 턴 진행 골격은 고정, 결정만 다르게</h2>
+      <p>딜러든 플레이어든 "카드를 받는다 → 점수를 확인한다 → 버스트가 아니면 계속할지 묻는다"라는 <b>턴의 순서</b>는 동일합니다. 이 순서를 부모가 고정하고 "계속할지 묻는 방법(decide)"만 자식이 다르게 구현합니다.</p>
+      <div class="stage-badges"><span class="sbadge beh">행동 패턴</span><span class="sbadge file">Participant.playTurn() 골격화</span></div>
+    </div>
+  </div>
+
+  <div class="intent-box"><b>의도(Intent)</b> "턴을 진행한다"는 알고리즘의 뼈대를 부모가 정의하고, 그 안의 한 단계(결정 방식)만 자식이 오버라이딩하게 한다.</div>
+
+  <div class="split-card">
+    <div class="split-side java-side">
+      <div class="lang-label java"><span class="lang-dot"></span>Java — Participant.java (템플릿 메서드로 재구성)</div>
+      <pre><span class="kw">public abstract class</span> Participant {
+    <span class="kw">protected final</span> Hand hand = <span class="kw">new</span> Hand();
+    <span class="kw">protected final</span> String name;
+    <span class="kw">public</span> Participant(String name) { <span class="kw">this</span>.name = name; }
+
+    <span class="kw">public final void</span> playTurn(Deck deck, Card dealerUpCard) {  <span class="cm">// ★ final — 순서 고정</span>
+        <span class="kw">while</span> (<span class="kw">true</span>) {
+            <span class="kw">if</span> (hand.<span class="fn">isBust</span>()) {              <span class="cm">// 1단계: 버스트 확인 (공통)</span>
+                System.out.<span class="fn">println</span>(name + <span class="st">" 버스트!"</span>);
+                <span class="kw">return</span>;
+            }
+            <span class="kw">if</span> (!<span class="fn">decide</span>(dealerUpCard)) {     <span class="cm">// 2단계: 결정 — ★ 자식마다 다름(추상)</span>
+                <span class="fn">onStand</span>();                  <span class="cm">// 3단계: 스탠드 후처리 — 훅(선택적 오버라이딩)</span>
+                <span class="kw">return</span>;
+            }
+            hand.<span class="fn">addCard</span>(deck.<span class="fn">dealCard</span>());   <span class="cm">// 4단계: 카드 받기 (공통)</span>
+            <span class="fn">onCardReceived</span>();               <span class="cm">// 5단계: 카드 받은 후처리 — 훅</span>
+        }
+    }
+    <span class="kw">protected abstract boolean</span> decide(Card dealerUpCard);   <span class="cm">// 반드시 구현</span>
+    <span class="kw">protected void</span> onCardReceived() { }    <span class="cm">// 기본은 아무 것도 안 함(훅)</span>
+    <span class="kw">protected void</span> onStand() { }
+}
+
+<span class="kw">public class</span> Dealer <span class="kw">extends</span> Participant {
+    <span class="kw">public</span> Dealer() { <span class="kw">super</span>(<span class="st">"딜러"</span>); }
+    <span class="kw">@Override</span>
+    <span class="kw">protected boolean</span> decide(Card dealerUpCard) { <span class="kw">return</span> hand.<span class="fn">getScore</span>() &lt; <span class="num">17</span>; }
+    <span class="kw">@Override</span>
+    <span class="kw">protected void</span> onCardReceived() {          <span class="cm">// 딜러만 카드 받을 때마다 카드를 공개</span>
+        System.out.<span class="fn">println</span>(<span class="st">"딜러가 카드를 받았습니다: "</span> + hand);
+    }
+}
+
+<span class="kw">public class</span> Player <span class="kw">extends</span> Participant {
+    <span class="kw">private final</span> PlayingStrategy strategy;
+    <span class="kw">public</span> Player(String name, PlayingStrategy strategy) { <span class="kw">super</span>(name); <span class="kw">this</span>.strategy = strategy; }
+    <span class="kw">@Override</span>
+    <span class="kw">protected boolean</span> decide(Card dealerUpCard) {
+        <span class="kw">return</span> strategy.<span class="fn">decide</span>(hand, dealerUpCard) == Decision.HIT;  <span class="cm">// Strategy 패턴과 조합!</span>
+    }
+}</pre>
+      <div class="tag-row"><span class="tag java">final 템플릿 메서드</span><span class="tag java">hook 메서드</span><span class="tag java">Strategy와 조합</span></div>
+    </div>
+    <div class="split-side py-side">
+      <div class="lang-label py"><span class="lang-dot"></span>Python — participant.py</div>
+      <pre><span class="kw">from</span> abc <span class="kw">import</span> ABC, abstractmethod
+
+<span class="kw">class</span> Participant(ABC):
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, name):
+        self.name = name
+        self.hand = Hand()
+
+    <span class="kw">def</span> <span class="fn">play_turn</span>(self, deck, dealer_up_card):  <span class="cm"># 템플릿 메서드 (문서화로 "재정의 금지" 표시)</span>
+        <span class="kw">while</span> <span class="kw">True</span>:
+            <span class="kw">if</span> self.hand.is_bust():          <span class="cm"># 1단계: 공통</span>
+                <span class="fn">print</span>(f<span class="st">"{self.name} 버스트!"</span>)
+                <span class="kw">return</span>
+            <span class="kw">if</span> <span class="kw">not</span> self._decide(dealer_up_card):  <span class="cm"># 2단계: 추상(자식마다 다름)</span>
+                self._on_stand()               <span class="cm"># 3단계: 훅</span>
+                <span class="kw">return</span>
+            self.hand.add_card(deck.deal_card())  <span class="cm"># 4단계: 공통</span>
+            self._on_card_received()           <span class="cm"># 5단계: 훅</span>
+
+    <span class="kw">@abstractmethod</span>
+    <span class="kw">def</span> <span class="fn">_decide</span>(self, dealer_up_card): ...
+    <span class="kw">def</span> <span class="fn">_on_card_received</span>(self): <span class="kw">pass</span>       <span class="cm"># 기본 구현이 있는 훅</span>
+    <span class="kw">def</span> <span class="fn">_on_stand</span>(self): <span class="kw">pass</span>
+
+
+<span class="kw">class</span> Dealer(Participant):
+    <span class="kw">def</span> <span class="fn">__init__</span>(self):
+        <span class="fn">super</span>().<span class="fn">__init__</span>(<span class="st">"딜러"</span>)
+    <span class="kw">def</span> <span class="fn">_decide</span>(self, dealer_up_card):
+        <span class="kw">return</span> self.hand.score() &lt; <span class="num">17</span>
+    <span class="kw">def</span> <span class="fn">_on_card_received</span>(self):        <span class="cm"># 딜러만 카드 공개</span>
+        <span class="fn">print</span>(f<span class="st">"딜러가 카드를 받았습니다: {self.hand}"</span>)
+
+
+<span class="kw">class</span> Player(Participant):
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, name, strategy):
+        <span class="fn">super</span>().<span class="fn">__init__</span>(name)
+        self.strategy = strategy
+    <span class="kw">def</span> <span class="fn">_decide</span>(self, dealer_up_card):
+        <span class="kw">return</span> self.strategy.decide(self.hand, dealer_up_card) == Decision.HIT  <span class="cm"># Strategy와 조합</span>
+
+
+<span class="cm"># 사용 예</span>
+dealer, player = Dealer(), Player(<span class="st">"홍길동"</span>, BasicStrategy())
+player.play_turn(deck, dealer_up_card)
+dealer.play_turn(deck, dealer_up_card)</pre>
+      <div class="tag-row"><span class="tag py">hook 메서드</span><span class="tag py">Strategy 조합</span></div>
+    </div>
+  </div>
+
+  <div class="note acc"><b>Template Method + Strategy 조합</b> 이 예제가 잘 보여주듯, <code>decide()</code>라는 <b>한 단계</b>는 Template Method 구조 안에 있지만 그 구현 자체를 다시 Strategy 객체에 위임합니다. 실무에서는 이렇게 여러 패턴이 한 클래스 안에서 자연스럽게 겹쳐 쓰입니다.</div>
+</div>
+
+<!-- ============ BUILDER ============ -->
+<div class="algo-section" id="tab-builder">
+  <div class="sec-head">
+    <div class="sec-icon">🧱</div>
+    <div>
+      <h2>5. Builder — 테이블 규칙을 체이닝으로 조립</h2>
+      <p>덱 수, 블랙잭 배당률(3:2 vs 6:5), 딜러가 소프트17에서 히트하는지, 더블다운 허용 시점, 스플릿 최대 횟수 등 <b>테이블마다 다른 규칙</b>이 많습니다. 생성자 하나로 감당하기 어려운 대표적인 상황입니다.</p>
+      <div class="stage-badges"><span class="sbadge cre">생성 패턴</span><span class="sbadge file">TableRules 조립</span></div>
+    </div>
+  </div>
+
+  <div class="intent-box"><b>의도(Intent)</b> 옵션이 많은 규칙 객체를 단계별 메서드 체이닝으로 조립해서, 매개변수 순서를 외우지 않고도 가독성 있게 설정한다.</div>
+
+  <div class="split-card">
+    <div class="split-side java-side">
+      <div class="lang-label java"><span class="lang-dot"></span>Java — TableRulesBuilder.java</div>
+      <pre><span class="kw">public class</span> TableRules {
+    <span class="kw">final int</span> deckCount; <span class="kw">final double</span> blackjackPayout; <span class="kw">final boolean</span> dealerHitsSoft17;
+    <span class="kw">final int</span> maxSplits; <span class="kw">final boolean</span> doubleAfterSplit;
+
+    <span class="kw">public</span> TableRules(TableRulesBuilder b) {   <span class="cm">// private 생성자로도 가능하나 예시상 패키지-private</span>
+        <span class="kw">this</span>.deckCount = b.deckCount;
+        <span class="kw">this</span>.blackjackPayout = b.blackjackPayout;
+        <span class="kw">this</span>.dealerHitsSoft17 = b.dealerHitsSoft17;
+        <span class="kw">this</span>.maxSplits = b.maxSplits;
+        <span class="kw">this</span>.doubleAfterSplit = b.doubleAfterSplit;
+    }
+}
+
+<span class="kw">public class</span> TableRulesBuilder {
+    <span class="kw">private int</span> deckCount = <span class="num">6</span>;                 <span class="cm">// 합리적 기본값들</span>
+    <span class="kw">private double</span> blackjackPayout = <span class="num">1.5</span>;      <span class="cm">// 3:2</span>
+    <span class="kw">private boolean</span> dealerHitsSoft17 = <span class="kw">false</span>;
+    <span class="kw">private int</span> maxSplits = <span class="num">3</span>;
+    <span class="kw">private boolean</span> doubleAfterSplit = <span class="kw">true</span>;
+
+    <span class="kw">public</span> TableRulesBuilder deckCount(<span class="ty">int</span> n) { <span class="kw">this</span>.deckCount = n; <span class="kw">return this</span>; }
+    <span class="kw">public</span> TableRulesBuilder blackjackPayout(<span class="ty">double</span> ratio) { <span class="kw">this</span>.blackjackPayout = ratio; <span class="kw">return this</span>; }
+    <span class="kw">public</span> TableRulesBuilder dealerHitsSoft17(<span class="kw">boolean</span> v) { <span class="kw">this</span>.dealerHitsSoft17 = v; <span class="kw">return this</span>; }
+    <span class="kw">public</span> TableRulesBuilder maxSplits(<span class="ty">int</span> n) { <span class="kw">this</span>.maxSplits = n; <span class="kw">return this</span>; }
+    <span class="kw">public</span> TableRulesBuilder doubleAfterSplit(<span class="kw">boolean</span> v) { <span class="kw">this</span>.doubleAfterSplit = v; <span class="kw">return this</span>; }
+
+    <span class="kw">public</span> TableRules build() { <span class="kw">return new</span> TableRules(<span class="kw">this</span>); }
+}
+
+<span class="cm">// 사용 예 — 베가스식 후한 규칙 테이블</span>
+TableRules vegas = <span class="kw">new</span> TableRulesBuilder()
+        .<span class="fn">deckCount</span>(<span class="num">6</span>)
+        .<span class="fn">blackjackPayout</span>(<span class="num">1.5</span>)          <span class="cm">// 3:2 배당</span>
+        .<span class="fn">dealerHitsSoft17</span>(<span class="kw">false</span>)     <span class="cm">// 딜러가 소프트17에서 멈춤(플레이어에게 유리)</span>
+        .<span class="fn">build</span>();
+
+<span class="cm">// 짠 규칙 테이블(카지노에 유리)</span>
+TableRules stingy = <span class="kw">new</span> TableRulesBuilder()
+        .<span class="fn">blackjackPayout</span>(<span class="num">1.2</span>)          <span class="cm">// 6:5 배당(플레이어 기댓값 하락)</span>
+        .<span class="fn">dealerHitsSoft17</span>(<span class="kw">true</span>)
+        .<span class="fn">build</span>();</pre>
+      <div class="tag-row"><span class="tag java">fluent 체이닝</span><span class="tag java">불변 규칙 객체 생성</span></div>
+    </div>
+    <div class="split-side py-side">
+      <div class="lang-label py"><span class="lang-dot"></span>Python — table_rules.py</div>
+      <pre><span class="kw">class</span> TableRules:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, builder):
+        self.deck_count = builder._deck_count
+        self.blackjack_payout = builder._blackjack_payout
+        self.dealer_hits_soft17 = builder._dealer_hits_soft17
+        self.max_splits = builder._max_splits
+
+
+<span class="kw">class</span> TableRulesBuilder:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self):
+        self._deck_count = <span class="num">6</span>
+        self._blackjack_payout = <span class="num">1.5</span>
+        self._dealer_hits_soft17 = <span class="kw">False</span>
+        self._max_splits = <span class="num">3</span>
+
+    <span class="kw">def</span> <span class="fn">deck_count</span>(self, n):
+        self._deck_count = n; <span class="kw">return</span> self
+
+    <span class="kw">def</span> <span class="fn">blackjack_payout</span>(self, ratio):
+        self._blackjack_payout = ratio; <span class="kw">return</span> self
+
+    <span class="kw">def</span> <span class="fn">dealer_hits_soft17</span>(self, v):
+        self._dealer_hits_soft17 = v; <span class="kw">return</span> self
+
+    <span class="kw">def</span> <span class="fn">max_splits</span>(self, n):
+        self._max_splits = n; <span class="kw">return</span> self
+
+    <span class="kw">def</span> <span class="fn">build</span>(self):
+        <span class="kw">return</span> TableRules(self)
+
+
+<span class="cm"># 사용 예</span>
+vegas = (TableRulesBuilder()
+         .deck_count(<span class="num">6</span>)
+         .blackjack_payout(<span class="num">1.5</span>)
+         .dealer_hits_soft17(<span class="kw">False</span>)
+         .build())
+
+<span class="cm"># Python다운 대안: dataclass + 기본값으로 훨씬 짧게 표현 가능
+# (Builder의 필요성은 옵션 조합 검증/조건부 로직이 있을 때 커짐)</span>
+<span class="kw">from</span> dataclasses <span class="kw">import</span> dataclass
+
+<span class="kw">@dataclass</span>
+<span class="kw">class</span> SimpleTableRules:
+    deck_count: <span class="ty">int</span> = <span class="num">6</span>
+    blackjack_payout: <span class="ty">float</span> = <span class="num">1.5</span>
+    dealer_hits_soft17: <span class="ty">bool</span> = <span class="kw">False</span>
+
+vegas2 = SimpleTableRules(deck_count=<span class="num">6</span>, blackjack_payout=<span class="num">1.5</span>)  <span class="cm"># 키워드 인자로도 충분</span></pre>
+      <div class="tag-row"><span class="tag py">self 반환 체이닝</span><span class="tag py">dataclass 대안</span></div>
+    </div>
+  </div>
+
+  <table class="ctbl">
+    <thead><tr><th>규칙</th><th>플레이어에게 유리한 값</th><th>카지노에 유리한 값</th></tr></thead>
+    <tbody>
+      <tr><td>블랙잭 배당률</td><td>3:2 (1.5배)</td><td>6:5 (1.2배) — 기댓값이 크게 나빠짐</td></tr>
+      <tr><td>딜러 소프트17</td><td>스탠드(멈춤)</td><td>히트(계속 뽑음) — 딜러가 더 유리해짐</td></tr>
+      <tr><td>더블다운 시점</td><td>아무 두 장에서나 가능</td><td>9~11점에서만 가능 등으로 제한</td></tr>
+    </tbody>
+  </table>
+  <div class="note felt"><b>Builder가 특히 유용한 이유</b> 이런 규칙들은 대부분 boolean/숫자라서 생성자 하나로 넘기면 <code>new TableRules(6, 1.5, false, 3, true)</code>처럼 각 값이 무엇을 의미하는지 호출부만 봐서는 알 수 없습니다. Builder의 메서드 이름 자체가 문서가 됩니다.</div>
+</div>
+
+<!-- ============ PROTOTYPE ============ -->
+<div class="algo-section" id="tab-prototype">
+  <div class="sec-head">
+    <div class="sec-icon">🧬</div>
+    <div>
+      <h2>6. Prototype — 같은 상황에서 여러 선택지를 시뮬레이션</h2>
+      <p>"지금 16점, 딜러 업카드 10 — 히트할까 스탠드할까?"를 시험해보려면, <b>현재 게임 상태를 복제</b>해서 각 선택지를 독립적으로 시뮬레이션(몬테카를로)해야 합니다. 매번 처음부터 카드를 다시 섞고 딜링하면 비교 자체가 무의미해집니다.</p>
+      <div class="stage-badges"><span class="sbadge cre">생성 패턴</span><span class="sbadge file">GameState 깊은 복사로 시뮬레이션 분기</span></div>
+    </div>
+  </div>
+
+  <div class="intent-box"><b>의도(Intent)</b> 현재 상태를 그대로 복제해서, 원본에 영향을 주지 않고 여러 "만약에(what-if)" 시나리오를 실험한다.</div>
+
+  <div class="split-card">
+    <div class="split-side java-side">
+      <div class="lang-label java"><span class="lang-dot"></span>Java — GameState.java (Cloneable)</div>
+      <pre><span class="kw">public class</span> GameState <span class="kw">implements</span> Cloneable {
+    <span class="kw">private</span> Hand playerHand;
+    <span class="kw">private</span> List&lt;Card&gt; remainingDeck;   <span class="cm">// 남은 카드 목록도 함께 복제해야 정확한 시뮬레이션</span>
+
+    <span class="kw">public</span> GameState(Hand playerHand, List&lt;Card&gt; remainingDeck) {
+        <span class="kw">this</span>.playerHand = playerHand;
+        <span class="kw">this</span>.remainingDeck = remainingDeck;
+    }
+    <span class="kw">@Override</span>
+    <span class="kw">public</span> GameState clone() {
+        <span class="kw">try</span> {
+            GameState copy = (GameState) <span class="kw">super</span>.<span class="fn">clone</span>();   <span class="cm">// 얕은 복사</span>
+            copy.playerHand = playerHand.<span class="fn">deepCopy</span>();        <span class="cm">// ★ Hand도 직접 깊은 복사 필요</span>
+            copy.remainingDeck = <span class="kw">new</span> ArrayList&lt;&gt;(remainingDeck); <span class="cm">// 리스트 자체를 새로 생성</span>
+            <span class="kw">return</span> copy;
+        } <span class="kw">catch</span> (CloneNotSupportedException e) { <span class="kw">throw new</span> AssertionError(e); }
+    }
+}
+
+<span class="cm">// 사용 예 — 같은 시점에서 "히트"와 "스탠드" 두 시나리오를 각각 시뮬레이션</span>
+GameState current = <span class="kw">new</span> GameState(playerHand, deck.<span class="fn">remainingCards</span>());
+
+GameState ifHit = current.<span class="fn">clone</span>();          <span class="cm">// 원본에 영향 없이 복제</span>
+ifHit.<span class="fn">simulateHit</span>();
+<span class="ty">double</span> winRateIfHit = ifHit.<span class="fn">estimateWinRate</span>(<span class="num">10000</span>);   <span class="cm">// 1만 회 몬테카를로</span>
+
+GameState ifStand = current.<span class="fn">clone</span>();        <span class="cm">// 또 다른 독립된 복제본</span>
+<span class="ty">double</span> winRateIfStand = ifStand.<span class="fn">estimateWinRate</span>(<span class="num">10000</span>);
+
+System.out.<span class="fn">println</span>(winRateIfHit &gt; winRateIfStand ? <span class="st">"히트가 유리"</span> : <span class="st">"스탠드가 유리"</span>);</pre>
+      <div class="tag-row"><span class="tag java">Cloneable</span><span class="tag java">몬테카를로 시뮬레이션</span></div>
+    </div>
+    <div class="split-side py-side">
+      <div class="lang-label py"><span class="lang-dot"></span>Python — game_state.py</div>
+      <pre><span class="kw">import</span> copy, random
+
+<span class="kw">class</span> GameState:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, player_hand, remaining_deck):
+        self.player_hand = player_hand
+        self.remaining_deck = remaining_deck
+
+    <span class="kw">def</span> <span class="fn">clone</span>(self):
+        <span class="kw">return</span> copy.deepcopy(self)     <span class="cm"># ★ 손패 + 남은 덱까지 재귀적으로 복사</span>
+
+    <span class="kw">def</span> <span class="fn">simulate_hit</span>(self):
+        card = self.remaining_deck.pop()
+        self.player_hand.add_card(card)
+
+    <span class="kw">def</span> <span class="fn">estimate_win_rate</span>(self, trials=<span class="num">10000</span>):
+        wins = <span class="num">0</span>
+        <span class="kw">for</span> _ <span class="kw">in</span> <span class="fn">range</span>(trials):
+            trial = self.clone()             <span class="cm"># 매 시행마다 독립된 복제본에서 실험</span>
+            random.shuffle(trial.remaining_deck)
+            <span class="cm"># ... 딜러 턴까지 시뮬레이션 후 승패 집계 ...</span>
+            <span class="kw">if</span> trial._simulate_dealer_and_judge():
+                wins += <span class="num">1</span>
+        <span class="kw">return</span> wins / trials
+
+
+<span class="cm"># 사용 예</span>
+current = GameState(player_hand, deck.remaining_cards())
+
+if_hit = current.clone()          <span class="cm"># 원본과 완전히 독립</span>
+if_hit.simulate_hit()
+win_rate_if_hit = if_hit.estimate_win_rate()
+
+if_stand = current.clone()        <span class="cm"># 또 다른 독립 복제본</span>
+win_rate_if_stand = if_stand.estimate_win_rate()
+
+<span class="fn">print</span>(<span class="st">"히트가 유리"</span> <span class="kw">if</span> win_rate_if_hit &gt; win_rate_if_stand <span class="kw">else</span> <span class="st">"스탠드가 유리"</span>)</pre>
+      <div class="tag-row"><span class="tag py">copy.deepcopy</span><span class="tag py">시뮬레이션마다 독립 복제</span></div>
+    </div>
+  </div>
+
+  <div class="note felt"><b>Strategy(전략표)와 Prototype(시뮬레이션)의 관계</b> 앞서 본 베이직 전략표는 사실 이런 몬테카를로 시뮬레이션을 수백만 번 돌려서 "어느 선택이 기댓값이 높은지" 미리 계산해둔 결과표입니다. Prototype 패턴은 바로 이런 시뮬레이션을 구현하는 핵심 도구입니다.</div>
+</div>
+
+<!-- ============ DECORATOR ============ -->
+<div class="algo-section" id="tab-decorator">
+  <div class="sec-head">
+    <div class="sec-icon">🎁</div>
+    <div>
+      <h2>7. Decorator — 더블다운·스플릿·인슈어런스를 베팅에 자유롭게 덧씌우기</h2>
+      <p>기본 베팅(Bet)에 더블다운(배팅 2배), 인슈어런스(딜러 블랙잭 대비 보험), 스플릿(페어를 두 판으로 분리) 같은 옵션이 조합됩니다. 상속으로 만들면 조합마다 클래스가 폭증하므로, 원본 Bet을 <b>감싸는 방식</b>으로 옵션을 조립합니다.</p>
+      <div class="stage-badges"><span class="sbadge str">구조 패턴</span><span class="sbadge file">Bet 클래스를 겹겹이 감싸는 옵션들</span></div>
+    </div>
+  </div>
+
+  <div class="split-card">
+    <div class="split-side java-side">
+      <div class="lang-label java"><span class="lang-dot"></span>Java — Bet 계층</div>
+      <pre><span class="kw">public interface</span> Bet {
+    <span class="ty">double</span> getAmount();
+    String describe();
+}
+
+<span class="kw">public class</span> BaseBet <span class="kw">implements</span> Bet {
+    <span class="kw">private final double</span> amount;
+    <span class="kw">public</span> BaseBet(<span class="ty">double</span> amount) { <span class="kw">this</span>.amount = amount; }
+    <span class="kw">public double</span> getAmount() { <span class="kw">return</span> amount; }
+    <span class="kw">public</span> String describe() { <span class="kw">return</span> <span class="st">"기본 베팅 "</span> + amount; }
+}
+
+<span class="kw">public abstract class</span> BetDecorator <span class="kw">implements</span> Bet {
+    <span class="kw">protected final</span> Bet wrapped;             <span class="cm">// ★ 자기 자신과 같은 타입을 감싼다</span>
+    <span class="kw">public</span> BetDecorator(Bet wrapped) { <span class="kw">this</span>.wrapped = wrapped; }
+}
+
+<span class="kw">public class</span> DoubleDownDecorator <span class="kw">extends</span> BetDecorator {
+    <span class="kw">public</span> DoubleDownDecorator(Bet wrapped) { <span class="kw">super</span>(wrapped); }
+    <span class="kw">public double</span> getAmount() { <span class="kw">return</span> wrapped.<span class="fn">getAmount</span>() * <span class="num">2</span>; }   <span class="cm">// 원본 금액을 2배로</span>
+    <span class="kw">public</span> String describe() { <span class="kw">return</span> wrapped.<span class="fn">describe</span>() + <span class="st">" + 더블다운"</span>; }
+}
+
+<span class="kw">public class</span> InsuranceDecorator <span class="kw">extends</span> BetDecorator {
+    <span class="kw">private final double</span> insuranceAmount;
+    <span class="kw">public</span> InsuranceDecorator(Bet wrapped) {
+        <span class="kw">super</span>(wrapped);
+        <span class="kw">this</span>.insuranceAmount = wrapped.<span class="fn">getAmount</span>() * <span class="num">0.5</span>;  <span class="cm">// 인슈어런스는 원 베팅의 절반까지</span>
+    }
+    <span class="kw">public double</span> getAmount() { <span class="kw">return</span> wrapped.<span class="fn">getAmount</span>() + insuranceAmount; }
+    <span class="kw">public</span> String describe() { <span class="kw">return</span> wrapped.<span class="fn">describe</span>() + <span class="st">" + 인슈어런스("</span>+insuranceAmount+<span class="st">")"</span>; }
+}
+
+<span class="cm">// 사용 예 — 기본 베팅에 더블다운만 추가</span>
+Bet bet = <span class="kw">new</span> DoubleDownDecorator(<span class="kw">new</span> BaseBet(<span class="num">10</span>));
+System.out.<span class="fn">println</span>(bet.<span class="fn">describe</span>() + <span class="st">" = "</span> + bet.<span class="fn">getAmount</span>());  <span class="cm">// 기본 베팅 10 + 더블다운 = 20</span>
+
+<span class="cm">// 인슈어런스까지 추가로 겹치기(딜러 업카드가 A일 때만 가능한 규칙은 게임 로직에서 체크)</span>
+Bet betWithIns = <span class="kw">new</span> InsuranceDecorator(<span class="kw">new</span> BaseBet(<span class="num">10</span>));</pre>
+      <div class="tag-row"><span class="tag java">동일 인터페이스로 감싸기</span><span class="tag java">조합 자유</span></div>
+    </div>
+    <div class="split-side py-side">
+      <div class="lang-label py"><span class="lang-dot"></span>Python — bet.py</div>
+      <pre><span class="kw">class</span> Bet:
+    <span class="kw">def</span> <span class="fn">amount</span>(self): <span class="kw">raise</span> NotImplementedError
+    <span class="kw">def</span> <span class="fn">describe</span>(self): <span class="kw">raise</span> NotImplementedError
+
+<span class="kw">class</span> BaseBet(Bet):
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, value):
+        self._value = value
+    <span class="kw">def</span> <span class="fn">amount</span>(self): <span class="kw">return</span> self._value
+    <span class="kw">def</span> <span class="fn">describe</span>(self): <span class="kw">return</span> f<span class="st">"기본 베팅 {self._value}"</span>
+
+
+<span class="kw">class</span> BetDecorator(Bet):
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, wrapped):
+        self._wrapped = wrapped        <span class="cm"># ★ 같은 역할의 객체를 감싼다</span>
+
+
+<span class="kw">class</span> DoubleDownDecorator(BetDecorator):
+    <span class="kw">def</span> <span class="fn">amount</span>(self): <span class="kw">return</span> self._wrapped.amount() * <span class="num">2</span>
+    <span class="kw">def</span> <span class="fn">describe</span>(self): <span class="kw">return</span> f<span class="st">"{self._wrapped.describe()} + 더블다운"</span>
+
+
+<span class="kw">class</span> InsuranceDecorator(BetDecorator):
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, wrapped):
+        <span class="fn">super</span>().<span class="fn">__init__</span>(wrapped)
+        self._insurance = wrapped.amount() * <span class="num">0.5</span>
+    <span class="kw">def</span> <span class="fn">amount</span>(self): <span class="kw">return</span> self._wrapped.amount() + self._insurance
+    <span class="kw">def</span> <span class="fn">describe</span>(self): <span class="kw">return</span> f<span class="st">"{self._wrapped.describe()} + 인슈어런스({self._insurance})"</span>
+
+
+<span class="cm"># 사용 예 — 필요한 옵션만 원하는 순서로 겹치기</span>
+bet = DoubleDownDecorator(BaseBet(<span class="num">10</span>))
+<span class="fn">print</span>(f<span class="st">"{bet.describe()} = {bet.amount()}"</span>)  <span class="cm"># 기본 베팅 10 + 더블다운 = 20</span>
+
+bet_with_ins = InsuranceDecorator(BaseBet(<span class="num">10</span>))</pre>
+      <div class="tag-row"><span class="tag py">wrapping</span></div>
+    </div>
+  </div>
+
+  <table class="ctbl">
+    <thead><tr><th>베팅 옵션</th><th>규칙</th><th>구현</th></tr></thead>
+    <tbody>
+      <tr><td>더블다운(Double Down)</td><td>베팅을 2배로 걸고 카드 1장만 추가로 받음</td><td>DoubleDownDecorator — 금액을 2배로 반환</td></tr>
+      <tr><td>인슈어런스(Insurance)</td><td>딜러 업카드가 A일 때, 딜러 블랙잭에 대비해 원 베팅의 절반까지 추가 베팅</td><td>InsuranceDecorator — 절반 금액을 추가</td></tr>
+      <tr><td>스플릿(Split)</td><td>페어를 두 개의 독립된 손패로 분리, 각각 원래 베팅만큼 추가 베팅</td><td>SplitDecorator — Hand 자체를 두 개로 나누고 베팅도 복제(연습 과제로 남겨둠)</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ============ FACADE ============ -->
+<div class="algo-section" id="tab-facade">
+  <div class="sec-head">
+    <div class="sec-icon">🚪</div>
+    <div>
+      <h2>8. Facade — 한 줄로 한 라운드 전체를 진행</h2>
+      <p>Shoe(싱글턴)·DeckFactory·PlayingStrategy·TableRules(Builder)·Bet(Decorator)·Participant(Template Method)를 전부 알아야 라운드 하나를 돌릴 수 있다면 진입장벽이 너무 높습니다. Facade는 이걸 <b>한 번의 호출</b>로 감춥니다.</p>
+      <div class="stage-badges"><span class="sbadge str">구조 패턴</span><span class="sbadge file">BlackjackFacade.playRound()</span></div>
+    </div>
+  </div>
+
+  <div class="split-card">
+    <div class="split-side java-side">
+      <div class="lang-label java"><span class="lang-dot"></span>Java — BlackjackFacade.java</div>
+      <pre><span class="kw">public class</span> BlackjackFacade {
+    <span class="kw">private final</span> Shoe shoe;
+    <span class="kw">private final</span> TableRules rules;
+
+    <span class="kw">public</span> BlackjackFacade(TableRules rules) {
+        <span class="kw">this</span>.rules = rules;
+        <span class="kw">this</span>.shoe = Shoe.<span class="fn">getInstance</span>(rules.deckCount);   <span class="cm">// ① Singleton</span>
+    }
+
+    <span class="kw">public</span> RoundResult playRound(String playerName, PlayingStrategy strategy, <span class="ty">double</span> betAmount) {
+        <span class="kw">if</span> (shoe.<span class="fn">needsReshuffle</span>()) shoe.<span class="fn">reshuffle</span>();   <span class="cm">// 잔여 카드 자동 관리</span>
+
+        Dealer dealer = <span class="kw">new</span> Dealer();
+        Player player = <span class="kw">new</span> Player(playerName, strategy);       <span class="cm">// ③ Strategy</span>
+        Bet bet = <span class="kw">new</span> BaseBet(betAmount);                    <span class="cm">// ⑦ Decorator (필요시 추가로 감쌈)</span>
+
+        <span class="kw">for</span> (<span class="ty">int</span> i=<span class="num">0</span>;i&lt;<span class="num">2</span>;i++) { player.<span class="fn">receiveCard</span>(shoe.<span class="fn">drawCard</span>()); dealer.<span class="fn">receiveCard</span>(shoe.<span class="fn">drawCard</span>()); }
+        Card dealerUp = dealer.<span class="fn">getHand</span>().<span class="fn">getCards</span>().<span class="fn">get</span>(<span class="num">0</span>);
+
+        player.<span class="fn">playTurn</span>(shoe, dealerUp);                    <span class="cm">// ④ Template Method</span>
+        <span class="kw">if</span> (!player.<span class="fn">getHand</span>().<span class="fn">isBust</span>()) dealer.<span class="fn">playTurn</span>(shoe, dealerUp);
+
+        <span class="kw">return new</span> RoundResult(player, dealer, bet, <span class="fn">judge</span>(player, dealer));
+    }
+    <span class="kw">private</span> Outcome judge(Player p, Dealer d) { <span class="cm">/* 승패 판정 로직 */ return</span> Outcome.WIN; }
+}
+
+<span class="cm">// 사용 예 — 클라이언트는 이 4줄만 알면 됨</span>
+TableRules rules = <span class="kw">new</span> TableRulesBuilder().<span class="fn">deckCount</span>(<span class="num">6</span>).<span class="fn">build</span>();     <span class="cm">// ⑤ Builder</span>
+BlackjackFacade table = <span class="kw">new</span> BlackjackFacade(rules);
+RoundResult result = table.<span class="fn">playRound</span>(<span class="st">"홍길동"</span>, <span class="kw">new</span> BasicStrategy(), <span class="num">10</span>);
+System.out.<span class="fn">println</span>(result);</pre>
+      <div class="tag-row"><span class="tag java">6개 패턴을 내부에서 조합</span></div>
+    </div>
+    <div class="split-side py-side">
+      <div class="lang-label py"><span class="lang-dot"></span>Python — blackjack_facade.py</div>
+      <pre><span class="kw">class</span> BlackjackFacade:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, rules: TableRules):
+        self.rules = rules
+        self.shoe = Shoe(rules.deck_count)      <span class="cm"># ① Singleton</span>
+
+    <span class="kw">def</span> <span class="fn">play_round</span>(self, player_name, strategy, bet_amount):
+        <span class="kw">if</span> self.shoe.needs_reshuffle():
+            self.shoe.reshuffle()
+
+        dealer = Dealer()
+        player = Player(player_name, strategy)   <span class="cm"># ③ Strategy</span>
+        bet = BaseBet(bet_amount)                 <span class="cm"># ⑦ Decorator (필요시 감쌈)</span>
+
+        <span class="kw">for</span> _ <span class="kw">in</span> <span class="fn">range</span>(<span class="num">2</span>):
+            player.receive_card(self.shoe.draw_card())
+            dealer.receive_card(self.shoe.draw_card())
+        dealer_up = dealer.hand._cards[<span class="num">0</span>]
+
+        player.play_turn(self.shoe, dealer_up)    <span class="cm"># ④ Template Method</span>
+        <span class="kw">if</span> <span class="kw">not</span> player.hand.is_bust():
+            dealer.play_turn(self.shoe, dealer_up)
+
+        <span class="kw">return</span> RoundResult(player, dealer, bet, self._judge(player, dealer))
+
+    <span class="kw">def</span> <span class="fn">_judge</span>(self, player, dealer): ...
+
+
+<span class="cm"># 사용 예 — 클라이언트는 4줄로 끝</span>
+rules = TableRulesBuilder().deck_count(<span class="num">6</span>).build()   <span class="cm"># ⑤ Builder</span>
+table = BlackjackFacade(rules)
+result = table.play_round(<span class="st">"홍길동"</span>, BasicStrategy(), <span class="num">10</span>)
+<span class="fn">print</span>(result)</pre>
+      <div class="tag-row"><span class="tag py">단일 진입점</span></div>
+    </div>
+  </div>
+
+  <div class="note acc"><b>Facade는 "패턴들의 패턴"</b> 이 예제 하나가 Singleton(①)·Factory Method(②, 규칙에 따라 덱 생성)·Strategy(③)·Template Method(④)·Builder(⑤)·Decorator(⑦)를 모두 내부에서 사용합니다. Facade의 진짜 가치는 이 조합을 <b>클라이언트가 몰라도 되게</b> 감춘다는 데 있습니다.</div>
+</div>
+
+<!-- ============ OBSERVER ============ -->
+<div class="algo-section" id="tab-observer">
+  <div class="sec-head">
+    <div class="sec-icon">📡</div>
+    <div>
+      <h2>9. Observer — 카드가 나올 때마다 여러 시스템에 동시 통보</h2>
+      <p>카드 한 장이 나올 때마다 화면 애니메이션, 카드 카운팅 시스템(러닝 카운트 갱신), 리플레이 로그 기록이 <b>동시에</b> 반응해야 합니다. Shoe(또는 Game)가 발행자가 되고, 이 시스템들이 구독자가 됩니다.</p>
+      <div class="stage-badges"><span class="sbadge beh">행동 패턴</span><span class="sbadge file">CardObserver — 카드 딜링 이벤트 구독</span></div>
+    </div>
+  </div>
+
+  <div class="split-card">
+    <div class="split-side java-side">
+      <div class="lang-label java"><span class="lang-dot"></span>Java — CardObserver / Shoe에 통지 기능 추가</div>
+      <pre><span class="kw">public interface</span> CardObserver {
+    <span class="kw">void</span> onCardDealt(Card card);
+}
+
+<span class="kw">public class</span> CountingObserver <span class="kw">implements</span> CardObserver {   <span class="cm">// 하이-로우 카드카운팅</span>
+    <span class="kw">private int</span> runningCount = <span class="num">0</span>;
+    <span class="kw">public void</span> onCardDealt(Card card) {
+        <span class="ty">int</span> v = card.<span class="fn">getValue</span>();
+        <span class="kw">if</span> (v &gt;= <span class="num">2</span> &amp;&amp; v &lt;= <span class="num">6</span>) runningCount++;      <span class="cm">// 낮은 카드 = +1</span>
+        <span class="kw">else if</span> (v == <span class="num">10</span> || card.<span class="fn">isAce</span>()) runningCount--;  <span class="cm">// 10/A = -1</span>
+    }
+    <span class="kw">public int</span> getRunningCount() { <span class="kw">return</span> runningCount; }
+}
+
+<span class="kw">public class</span> LoggingObserver <span class="kw">implements</span> CardObserver {
+    <span class="kw">public void</span> onCardDealt(Card card) {
+        System.out.<span class="fn">println</span>(<span class="st">"[LOG] 카드 딜링: "</span> + card);
+    }
+}
+
+<span class="kw">public class</span> Shoe {
+    <span class="kw">private final</span> List&lt;CardObserver&gt; observers = <span class="kw">new</span> ArrayList&lt;&gt;();  <span class="cm">// 구독자 목록</span>
+    <span class="kw">public void</span> addObserver(CardObserver o) { observers.<span class="fn">add</span>(o); }
+
+    <span class="kw">public</span> Card drawCard() {
+        Card c = cards.<span class="fn">remove</span>(cards.<span class="fn">size</span>()-<span class="num">1</span>);
+        <span class="kw">for</span> (CardObserver o : observers) o.<span class="fn">onCardDealt</span>(c);   <span class="cm">// ★ 카드가 나갈 때마다 전원 통지</span>
+        <span class="kw">return</span> c;
+    }
+}
+
+<span class="cm">// 사용 예</span>
+Shoe shoe = Shoe.<span class="fn">getInstance</span>(<span class="num">6</span>);
+CountingObserver counter = <span class="kw">new</span> CountingObserver();
+shoe.<span class="fn">addObserver</span>(counter);
+shoe.<span class="fn">addObserver</span>(<span class="kw">new</span> LoggingObserver());
+shoe.<span class="fn">drawCard</span>();  <span class="cm">// 로그도 찍히고 카운트도 갱신됨</span>
+System.out.<span class="fn">println</span>(<span class="st">"현재 러닝카운트: "</span> + counter.<span class="fn">getRunningCount</span>());</pre>
+      <div class="tag-row"><span class="tag java">카드카운팅 실전 로직</span><span class="tag java">일대다 통지</span></div>
+    </div>
+    <div class="split-side py-side">
+      <div class="lang-label py"><span class="lang-dot"></span>Python — card_observer.py</div>
+      <pre><span class="kw">from</span> abc <span class="kw">import</span> ABC, abstractmethod
+
+<span class="kw">class</span> CardObserver(ABC):
+    <span class="kw">@abstractmethod</span>
+    <span class="kw">def</span> <span class="fn">on_card_dealt</span>(self, card): ...
+
+<span class="kw">class</span> CountingObserver(CardObserver):
+    <span class="kw">def</span> <span class="fn">__init__</span>(self):
+        self.running_count = <span class="num">0</span>
+    <span class="kw">def</span> <span class="fn">on_card_dealt</span>(self, card):
+        <span class="kw">if</span> <span class="num">2</span> &lt;= card.value &lt;= <span class="num">6</span>:
+            self.running_count += <span class="num">1</span>              <span class="cm"># 낮은 카드 = +1</span>
+        <span class="kw">elif</span> card.value == <span class="num">10</span> <span class="kw">or</span> card.is_ace():
+            self.running_count -= <span class="num">1</span>              <span class="cm"># 10/A = -1</span>
+
+<span class="kw">class</span> LoggingObserver(CardObserver):
+    <span class="kw">def</span> <span class="fn">on_card_dealt</span>(self, card):
+        <span class="fn">print</span>(f<span class="st">"[LOG] 카드 딜링: {card}"</span>)
+
+
+<span class="kw">class</span> Shoe:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, deck_count):
+        self._observers = []          <span class="cm"># 구독자 목록</span>
+        ...
+
+    <span class="kw">def</span> <span class="fn">add_observer</span>(self, observer):
+        self._observers.append(observer)
+
+    <span class="kw">def</span> <span class="fn">draw_card</span>(self):
+        card = self._cards.pop()
+        <span class="kw">for</span> o <span class="kw">in</span> self._observers:
+            o.on_card_dealt(card)     <span class="cm"># ★ 전원 통지</span>
+        <span class="kw">return</span> card
+
+
+<span class="cm"># 사용 예</span>
+shoe = Shoe(<span class="num">6</span>)
+counter = CountingObserver()
+shoe.add_observer(counter)
+shoe.add_observer(LoggingObserver())
+shoe.draw_card()
+<span class="fn">print</span>(f<span class="st">"현재 러닝카운트: {counter.running_count}"</span>)</pre>
+      <div class="tag-row"><span class="tag py">ABC</span><span class="tag py">카드카운팅과 자연스럽게 결합</span></div>
+    </div>
+  </div>
+
+  <table class="ctbl">
+    <thead><tr><th>구독자</th><th>역할</th></tr></thead>
+    <tbody>
+      <tr><td>CountingObserver</td><td>하이-로우 카운팅으로 러닝 카운트를 실시간 갱신 (덱이 얼마나 플레이어에게 유리한지 추적)</td></tr>
+      <tr><td>LoggingObserver</td><td>모든 카드 딜링 이벤트를 기록해 리플레이/디버깅에 활용</td></tr>
+      <tr><td>UIAnimationObserver (예시)</td><td>화면에 카드가 나오는 애니메이션을 트리거</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ============ STATE ============ -->
+<div class="algo-section" id="tab-state">
+  <div class="sec-head">
+    <div class="sec-icon">🚦</div>
+    <div>
+      <h2>10. State — 라운드 진행 단계를 명시적 상태로 관리</h2>
+      <p>블랙잭 한 라운드는 <b>베팅 → 딜링 → 플레이어 턴 → 딜러 턴 → 정산</b>이라는 명확한 상태 흐름을 갖습니다. if-else로 "현재 몇 번째 단계인지"를 변수로 추적하는 대신, <b>각 상태를 객체로 만들어</b> 상태 자신이 "다음에 무엇을 할 수 있는지"를 알게 합니다.</p>
+      <div class="stage-badges"><span class="sbadge beh">행동 패턴</span><span class="sbadge file">RoundState — 잘못된 순서의 행동을 원천 차단</span></div>
+    </div>
+  </div>
+
+  <div class="intent-box"><b>의도(Intent)</b> 객체의 내부 상태에 따라 행동이 달라지도록 하되, 마치 객체의 클래스가 바뀌는 것처럼 보이게 한다. "지금 배팅 중인데 카드를 더 받으려는" 것 같은 <b>잘못된 순서의 호출을 상태 객체 스스로 차단</b>할 수 있다.</div>
+
+  <div class="viz">
+    <div class="viz-title">// UML — State (상태 전이 다이어그램)</div>
+    <div class="graph-wrap">
+      <svg width="760" height="180" viewBox="0 0 760 180">
+        <rect x="10" y="60" width="120" height="50" rx="25" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.4"/>
+        <text x="70" y="90" text-anchor="middle" font-size="10.5" font-weight="700" fill="#15803d">BettingState</text>
+        <rect x="170" y="60" width="120" height="50" rx="25" fill="#eff6ff" stroke="#2563eb" stroke-width="1.4"/>
+        <text x="230" y="90" text-anchor="middle" font-size="10.5" font-weight="700" fill="#1d4ed8">DealingState</text>
+        <rect x="330" y="60" width="130" height="50" rx="25" fill="#faf5ff" stroke="#7c3aed" stroke-width="1.4"/>
+        <text x="395" y="90" text-anchor="middle" font-size="10.5" font-weight="700" fill="#6d28d9">PlayerTurnState</text>
+        <rect x="500" y="60" width="120" height="50" rx="25" fill="#faf5ff" stroke="#7c3aed" stroke-width="1.4"/>
+        <text x="560" y="90" text-anchor="middle" font-size="10.5" font-weight="700" fill="#6d28d9">DealerTurnState</text>
+        <rect x="660" y="60" width="100" height="50" rx="25" fill="#fef3e2" stroke="#d97706" stroke-width="1.4"/>
+        <text x="710" y="90" text-anchor="middle" font-size="10.5" font-weight="700" fill="#b45309">PayoutState</text>
+
+        <line x1="130" y1="85" x2="168" y2="85" stroke="#94a3b8" marker-end="url(#st1)"/>
+        <line x1="290" y1="85" x2="328" y2="85" stroke="#94a3b8" marker-end="url(#st1)"/>
+        <line x1="460" y1="85" x2="498" y2="85" stroke="#94a3b8" marker-end="url(#st1)"/>
+        <line x1="620" y1="85" x2="658" y2="85" stroke="#94a3b8" marker-end="url(#st1)"/>
+        <path d="M 710 60 C 690 20, 90 20, 70 58" fill="none" stroke="#94a3b8" stroke-width="1.2" marker-end="url(#st1)"/>
+        <text x="390" y="20" text-anchor="middle" font-size="9" fill="#94a3b8">다음 라운드로 순환</text>
+        <defs><marker id="st1" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="none" stroke="#94a3b8" stroke-width="1"/></marker></defs>
+      </svg>
+    </div>
+    <div class="uml-legend">각 상태는 <b>자신에게 허용된 행동만 노출</b>합니다 — BettingState에서는 hit()을 호출할 수 없고, PlayerTurnState에서는 베팅 금액을 바꿀 수 없습니다.</div>
+  </div>
+
+  <div class="split-card">
+    <div class="split-side java-side">
+      <div class="lang-label java"><span class="lang-dot"></span>Java — RoundState 인터페이스 + 5개 상태</div>
+      <pre><span class="kw">public interface</span> RoundState {
+    RoundState next(RoundContext ctx);      <span class="cm">// 다음 상태로 전이하며 해당 단계 처리</span>
+    <span class="kw">default</span> String name() { <span class="kw">return</span> <span class="kw">this</span>.<span class="fn">getClass</span>().<span class="fn">getSimpleName</span>(); }
+}
+
+<span class="kw">public class</span> RoundContext {                  <span class="cm">// 상태들이 공유하는 데이터(라운드 정보)</span>
+    Shoe shoe; Player player; Dealer dealer; Bet bet; Card dealerUp;
+    <span class="kw">private</span> RoundState current = <span class="kw">new</span> BettingState();
+
+    <span class="kw">public void</span> advance() { current = current.<span class="fn">next</span>(<span class="kw">this</span>); }  <span class="cm">// ★ 상태 전이는 이 메서드로만 발생</span>
+    <span class="kw">public</span> String currentStateName() { <span class="kw">return</span> current.<span class="fn">name</span>(); }
+}
+
+<span class="kw">public class</span> BettingState <span class="kw">implements</span> RoundState {
+    <span class="kw">public</span> RoundState next(RoundContext ctx) {
+        ctx.bet = <span class="kw">new</span> BaseBet(<span class="num">10</span>);            <span class="cm">// 베팅 확정</span>
+        System.out.<span class="fn">println</span>(<span class="st">"베팅 완료: "</span> + ctx.bet.<span class="fn">getAmount</span>());
+        <span class="kw">return new</span> DealingState();          <span class="cm">// ★ 다음 상태 객체를 반환 — 전이 자체가 명시적</span>
+    }
+}
+
+<span class="kw">public class</span> DealingState <span class="kw">implements</span> RoundState {
+    <span class="kw">public</span> RoundState next(RoundContext ctx) {
+        <span class="kw">for</span> (<span class="ty">int</span> i=<span class="num">0</span>;i&lt;<span class="num">2</span>;i++) {
+            ctx.player.<span class="fn">receiveCard</span>(ctx.shoe.<span class="fn">drawCard</span>());
+            ctx.dealer.<span class="fn">receiveCard</span>(ctx.shoe.<span class="fn">drawCard</span>());
+        }
+        ctx.dealerUp = ctx.dealer.<span class="fn">getHand</span>().<span class="fn">getCards</span>().<span class="fn">get</span>(<span class="num">0</span>);
+        <span class="kw">return new</span> PlayerTurnState();
+    }
+}
+
+<span class="kw">public class</span> PlayerTurnState <span class="kw">implements</span> RoundState {
+    <span class="kw">public</span> RoundState next(RoundContext ctx) {
+        ctx.player.<span class="fn">playTurn</span>(ctx.shoe, ctx.dealerUp);   <span class="cm">// Template Method 재사용</span>
+        <span class="kw">return</span> ctx.player.<span class="fn">getHand</span>().<span class="fn">isBust</span>() ? <span class="kw">new</span> PayoutState() : <span class="kw">new</span> DealerTurnState();  <span class="cm">// 버스트면 딜러턴 건너뜀</span>
+    }
+}
+<span class="cm">// DealerTurnState, PayoutState도 동일한 구조로 구현 (생략)</span>
+
+<span class="cm">// 사용 예 — Context는 "지금 뭘 해도 되는지" 신경 쓸 필요 없이 advance()만 호출</span>
+RoundContext ctx = <span class="kw">new</span> RoundContext();
+<span class="kw">while</span> (!(ctx.<span class="fn">currentStateName</span>().<span class="fn">equals</span>(<span class="st">"PayoutState"</span>))) {
+    ctx.<span class="fn">advance</span>();
+}</pre>
+      <div class="tag-row"><span class="tag java">상태 객체가 전이를 스스로 결정</span><span class="tag java">잘못된 순서 호출 차단</span></div>
+    </div>
+    <div class="split-side py-side">
+      <div class="lang-label py"><span class="lang-dot"></span>Python — round_state.py</div>
+      <pre><span class="kw">from</span> abc <span class="kw">import</span> ABC, abstractmethod
+
+<span class="kw">class</span> RoundState(ABC):
+    <span class="kw">@abstractmethod</span>
+    <span class="kw">def</span> <span class="fn">next</span>(self, ctx): ...     <span class="cm"># 다음 상태를 반환</span>
+    <span class="kw">def</span> <span class="fn">name</span>(self): <span class="kw">return</span> <span class="fn">type</span>(self).__name__
+
+
+<span class="kw">class</span> RoundContext:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, shoe, player, dealer):
+        self.shoe, self.player, self.dealer = shoe, player, dealer
+        self.bet = <span class="kw">None</span>; self.dealer_up = <span class="kw">None</span>
+        self._current = BettingState()
+
+    <span class="kw">def</span> <span class="fn">advance</span>(self):
+        self._current = self._current.next(self)   <span class="cm"># ★ 전이는 이 메서드로만</span>
+
+    <span class="kw">def</span> <span class="fn">current_state_name</span>(self):
+        <span class="kw">return</span> self._current.name()
+
+
+<span class="kw">class</span> BettingState(RoundState):
+    <span class="kw">def</span> <span class="fn">next</span>(self, ctx):
+        ctx.bet = BaseBet(<span class="num">10</span>)
+        <span class="fn">print</span>(f<span class="st">"베팅 완료: {ctx.bet.amount()}"</span>)
+        <span class="kw">return</span> DealingState()          <span class="cm"># 다음 상태 객체 반환</span>
+
+
+<span class="kw">class</span> DealingState(RoundState):
+    <span class="kw">def</span> <span class="fn">next</span>(self, ctx):
+        <span class="kw">for</span> _ <span class="kw">in</span> <span class="fn">range</span>(<span class="num">2</span>):
+            ctx.player.receive_card(ctx.shoe.draw_card())
+            ctx.dealer.receive_card(ctx.shoe.draw_card())
+        ctx.dealer_up = ctx.dealer.hand._cards[<span class="num">0</span>]
+        <span class="kw">return</span> PlayerTurnState()
+
+
+<span class="kw">class</span> PlayerTurnState(RoundState):
+    <span class="kw">def</span> <span class="fn">next</span>(self, ctx):
+        ctx.player.play_turn(ctx.shoe, ctx.dealer_up)   <span class="cm"># Template Method 재사용</span>
+        <span class="kw">return</span> PayoutState() <span class="kw">if</span> ctx.player.hand.is_bust() <span class="kw">else</span> DealerTurnState()
+
+<span class="cm"># DealerTurnState, PayoutState도 동일 구조 (생략)</span>
+
+
+<span class="cm"># 사용 예</span>
+ctx = RoundContext(shoe, player, dealer)
+<span class="kw">while</span> ctx.current_state_name() != <span class="st">"PayoutState"</span>:
+    ctx.advance()</pre>
+      <div class="tag-row"><span class="tag py">상태별 클래스 분리</span><span class="tag py">전이는 next()가 전담</span></div>
+    </div>
+  </div>
+
+  <table class="ctbl">
+    <thead><tr><th>State 없이 (플래그/if-else)</th><th class="acc">State 패턴 적용</th></tr></thead>
+    <tbody>
+      <tr><td>int phase; if(phase==0){...} else if(phase==1){...}</td><td>각 단계가 독립된 클래스 — 새 단계 추가 시 기존 코드 수정 불필요</td></tr>
+      <tr><td>"베팅 중에 히트 호출"같은 실수를 런타임에야 발견</td><td>애초에 BettingState에는 hit() 관련 메서드 자체가 없어 컴파일/설계 단계에서 방지</td></tr>
+      <tr><td>상태가 늘어날수록 조건문이 기하급수적으로 복잡해짐</td><td>각 상태 클래스는 자신의 전이 로직만 알면 됨(관심사 분리)</td></tr>
+    </tbody>
+  </table>
+
+  <div class="note acc"><b>State vs Strategy — 헷갈리기 쉬운 두 패턴</b> 구조는 거의 동일(인터페이스 + 여러 구현체를 필드로 보유)하지만 의도가 다릅니다. Strategy는 "어떤 알고리즘을 쓸지" 외부에서 선택하고 좀처럼 자동으로 안 바뀌지만, State는 "지금 어떤 상태인지"에 따라 <b>객체 스스로 다음 상태로 전이</b>합니다. BasicStrategy는 라운드 내내 그대로지만, RoundState는 매 단계마다 자동으로 바뀝니다.</div>
+</div>
+
+<!-- ============ ITERATOR ============ -->
+<div class="algo-section" id="tab-iterator">
+  <div class="sec-head">
+    <div class="sec-icon">🔄</div>
+    <div>
+      <h2>11. Iterator — 손패와 슈를 다양한 방식으로 순회</h2>
+      <p>손패는 "받은 순서대로", 슈는 "남은 카드 통계용 정렬 순서로" 순회하고 싶을 수 있습니다. 내부 저장 구조(List)를 노출하지 않고도 원하는 순서로 순회할 수 있게 합니다.</p>
+      <div class="stage-badges"><span class="sbadge beh">행동 패턴</span><span class="sbadge file">Hand/Shoe 순회 분리</span></div>
+    </div>
+  </div>
+
+  <div class="split-card">
+    <div class="split-side java-side">
+      <div class="lang-label java"><span class="lang-dot"></span>Java — Hand implements Iterable&lt;Card&gt;</div>
+      <pre><span class="kw">public class</span> Hand <span class="kw">implements</span> Iterable&lt;Card&gt; {
+    <span class="kw">private final</span> List&lt;Card&gt; cards = <span class="kw">new</span> ArrayList&lt;&gt;();
+    <span class="cm">// ... addCard(), getScore() 등은 기본 소스와 동일 ...</span>
+
+    <span class="kw">@Override</span>
+    <span class="kw">public</span> Iterator&lt;Card&gt; iterator() {         <span class="cm">// 기본은 받은 순서(딜링 순서)</span>
+        <span class="kw">return</span> cards.<span class="fn">iterator</span>();
+    }
+    <span class="kw">public</span> Iterator&lt;Card&gt; byValueDescending() {   <span class="cm">// 값이 높은 순으로 순회하는 이터레이터</span>
+        List&lt;Card&gt; sorted = <span class="kw">new</span> ArrayList&lt;&gt;(cards);
+        sorted.<span class="fn">sort</span>((a,b) -&gt; b.<span class="fn">getValue</span>() - a.<span class="fn">getValue</span>());
+        <span class="kw">return</span> sorted.<span class="fn">iterator</span>();
+    }
+}
+
+<span class="cm">// 사용 예 — for-each가 자동으로 iterator()를 호출</span>
+<span class="kw">for</span> (Card c : hand) System.out.<span class="fn">print</span>(c + <span class="st">" "</span>);          <span class="cm">// 받은 순서</span>
+
+Iterator&lt;Card&gt; desc = hand.<span class="fn">byValueDescending</span>();
+<span class="kw">while</span> (desc.<span class="fn">hasNext</span>()) System.out.<span class="fn">print</span>(desc.<span class="fn">next</span>() + <span class="st">" "</span>);  <span class="cm">// 값 높은 순</span></pre>
+      <div class="tag-row"><span class="tag java">Iterable&lt;T&gt;</span><span class="tag java">정렬 순회</span></div>
+    </div>
+    <div class="split-side py-side">
+      <div class="lang-label py"><span class="lang-dot"></span>Python — Hand에 __iter__ 추가</div>
+      <pre><span class="kw">class</span> Hand:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self):
+        self._cards = []
+    <span class="cm"># ... add_card(), score() 등은 기본 소스와 동일 ...</span>
+
+    <span class="kw">def</span> <span class="fn">__iter__</span>(self):              <span class="cm"># 기본은 받은 순서</span>
+        <span class="kw">return</span> <span class="fn">iter</span>(self._cards)
+
+    <span class="kw">def</span> <span class="fn">by_value_descending</span>(self):   <span class="cm"># 제너레이터로 정렬 순회</span>
+        <span class="kw">yield from</span> <span class="fn">sorted</span>(self._cards, key=<span class="kw">lambda</span> c: -c.value)
+
+
+<span class="cm"># 사용 예</span>
+<span class="kw">for</span> c <span class="kw">in</span> hand:                    <span class="cm"># 받은 순서 (__iter__ 자동 호출)</span>
+    <span class="fn">print</span>(c, end=<span class="st">" "</span>)
+
+<span class="kw">for</span> c <span class="kw">in</span> hand.by_value_descending():  <span class="cm"># 값 높은 순</span>
+    <span class="fn">print</span>(c, end=<span class="st">" "</span>)</pre>
+      <div class="tag-row"><span class="tag py">__iter__</span><span class="tag py">yield from</span></div>
+    </div>
+  </div>
+
+  <div class="note felt"><b>어디에 쓰이나</b> "손패에 10 이상 카드가 몇 장인가"(카드카운팅), "가장 낮은 카드부터 계산"(디버깅) 등 다양한 분석에 커스텀 이터레이터를 재사용할 수 있고, Hand 클래스 자체는 내부 List 구조를 절대 외부에 노출하지 않습니다.</div>
+</div>
+
+<!-- ============ SUMMARY ============ -->
+<div class="algo-section" id="tab-summary">
+  <div class="sec-head">
+    <div class="sec-icon">📚</div>
+    <div>
+      <h2>11개 패턴 종합 비교 — 블랙잭 한 라운드 지도</h2>
+      <p>Facade 하나가 나머지 10개 패턴을 어떻게 조합하는지, 그리고 각 패턴이 라운드의 어느 단계에서 동작하는지 정리합니다.</p>
+    </div>
+  </div>
+
+  <table class="ov-table" style="margin-bottom:24px;">
+    <thead><tr><th>패턴</th><th>분류</th><th>라운드 단계</th><th>핵심 클래스</th></tr></thead>
+    <tbody>
+      <tr><td><b>Singleton</b></td><td><span class="badge g">생성</span></td><td>테이블 준비</td><td>Shoe</td></tr>
+      <tr><td><b>Factory Method</b></td><td><span class="badge g">생성</span></td><td>테이블 준비</td><td>DeckFactory</td></tr>
+      <tr><td><b>Builder</b></td><td><span class="badge g">생성</span></td><td>테이블 준비</td><td>TableRulesBuilder</td></tr>
+      <tr><td><b>Strategy</b></td><td><span class="badge p">행동</span></td><td>플레이어/딜러 턴</td><td>PlayingStrategy, BasicStrategy</td></tr>
+      <tr><td><b>Template Method</b></td><td><span class="badge p">행동</span></td><td>플레이어/딜러 턴</td><td>Participant.playTurn()</td></tr>
+      <tr><td><b>State</b></td><td><span class="badge p">행동</span></td><td>라운드 전체</td><td>RoundState 5종</td></tr>
+      <tr><td><b>Decorator</b></td><td><span class="badge b">구조</span></td><td>베팅</td><td>BetDecorator, DoubleDownDecorator</td></tr>
+      <tr><td><b>Observer</b></td><td><span class="badge p">행동</span></td><td>딜링 전체</td><td>CardObserver, CountingObserver</td></tr>
+      <tr><td><b>Prototype</b></td><td><span class="badge g">생성</span></td><td>전략 검증(시뮬레이션)</td><td>GameState.clone()</td></tr>
+      <tr><td><b>Iterator</b></td><td><span class="badge p">행동</span></td><td>손패 분석</td><td>Hand.iterator()</td></tr>
+      <tr><td><b>Facade</b></td><td><span class="badge b">구조</span></td><td>전체를 감싸는 진입점</td><td>BlackjackFacade</td></tr>
+    </tbody>
+  </table>
+
+  <div class="viz">
+    <div class="viz-title">// BlackjackFacade 내부에서 패턴들이 협력하는 모습</div>
+    <div class="graph-wrap">
+      <svg width="760" height="270" viewBox="0 0 760 270">
+        <rect x="290" y="10" width="180" height="44" rx="6" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.6"/>
+        <text x="380" y="36" text-anchor="middle" font-size="12" font-weight="700" fill="#15803d">BlackjackFacade</text>
+
+        <rect x="30" y="100" width="130" height="40" rx="5" fill="#fff" stroke="#16a34a" stroke-width="1.2"/>
+        <text x="95" y="124" text-anchor="middle" font-size="9.5" fill="#15803d">Shoe (Singleton)</text>
+        <rect x="180" y="100" width="130" height="40" rx="5" fill="#fff" stroke="#16a34a" stroke-width="1.2"/>
+        <text x="245" y="124" text-anchor="middle" font-size="9.5" fill="#15803d">TableRulesBuilder</text>
+        <rect x="330" y="100" width="130" height="40" rx="5" fill="#fff" stroke="#7c3aed" stroke-width="1.2"/>
+        <text x="395" y="124" text-anchor="middle" font-size="9.5" fill="#6d28d9">RoundState(전체)</text>
+        <rect x="480" y="100" width="130" height="40" rx="5" fill="#fff" stroke="#7c3aed" stroke-width="1.2"/>
+        <text x="545" y="124" text-anchor="middle" font-size="9.5" fill="#6d28d9">PlayingStrategy</text>
+        <rect x="630" y="100" width="120" height="40" rx="5" fill="#fff" stroke="#2563eb" stroke-width="1.2"/>
+        <text x="690" y="124" text-anchor="middle" font-size="9.5" fill="#1d4ed8">BetDecorator</text>
+
+        <rect x="100" y="180" width="150" height="40" rx="5" fill="#fff" stroke="#7c3aed" stroke-width="1.2"/>
+        <text x="175" y="204" text-anchor="middle" font-size="9.5" fill="#6d28d9">Participant.playTurn()</text>
+        <text x="180" y="215" text-anchor="middle" font-size="7.5" fill="#94a3b8">(Template Method)</text>
+        <rect x="290" y="180" width="150" height="40" rx="5" fill="#fff" stroke="#7c3aed" stroke-width="1.2"/>
+        <text x="365" y="204" text-anchor="middle" font-size="9.5" fill="#6d28d9">Shoe.addObserver()</text>
+        <text x="365" y="215" text-anchor="middle" font-size="7.5" fill="#94a3b8">(Observer)</text>
+        <rect x="480" y="180" width="150" height="40" rx="5" fill="#fff" stroke="#16a34a" stroke-width="1.2"/>
+        <text x="555" y="204" text-anchor="middle" font-size="9.5" fill="#15803d">GameState.clone()</text>
+        <text x="555" y="215" text-anchor="middle" font-size="7.5" fill="#94a3b8">(Prototype, 전략 검증용)</text>
+
+        <line x1="380" y1="54" x2="95" y2="98" stroke="#94a3b8" stroke-width="1"/>
+        <line x1="380" y1="54" x2="245" y2="98" stroke="#94a3b8" stroke-width="1"/>
+        <line x1="380" y1="54" x2="395" y2="98" stroke="#94a3b8" stroke-width="1"/>
+        <line x1="380" y1="54" x2="545" y2="98" stroke="#94a3b8" stroke-width="1"/>
+        <line x1="380" y1="54" x2="690" y2="98" stroke="#94a3b8" stroke-width="1"/>
+        <line x1="395" y1="140" x2="175" y2="178" stroke="#c4b5fd" stroke-width="1"/>
+        <line x1="395" y1="140" x2="365" y2="178" stroke="#c4b5fd" stroke-width="1"/>
+        <line x1="395" y1="140" x2="555" y2="178" stroke="#a7f3d0" stroke-width="1"/>
+      </svg>
+    </div>
+    <div class="uml-legend">RoundState가 각 단계로 전이할 때 Template Method(Participant.playTurn)를 호출하고, 그 안에서 Strategy가 결정을 내리며, Shoe가 카드를 내줄 때마다 Observer가 통지받는 구조입니다.</div>
+  </div>
+
+  <table class="ctbl">
+    <thead><tr><th>마방진(이전 학습서)</th><th class="felt">블랙잭(이번 학습서)</th><th>공통 원리</th></tr></thead>
+    <tbody>
+      <tr><td>FactoryMagic (싱글턴)</td><td>Shoe (싱글턴)</td><td>상태를 오래 유지하는 리소스는 하나만</td></tr>
+      <tr><td>FactoryMagic.getMagicSquare(n)</td><td>DeckFactory.createDeck(type)</td><td>조건별 생성 로직을 한 곳에</td></tr>
+      <tr><td>MagicSquareContext + Strategy</td><td>PlayingStrategy + 베이직 전략표</td><td>알고리즘을 교체 가능한 객체로</td></tr>
+      <tr><td>MagicSquareTemplate</td><td>Participant.playTurn()</td><td>절차는 고정, 일부만 오버라이딩</td></tr>
+      <tr><td>(해당 없음)</td><td>RoundState (신규)</td><td>단계별 흐름을 명시적 상태로 분리</td></tr>
+      <tr><td>MagicSquareBuilder</td><td>TableRulesBuilder</td><td>옵션 많은 객체를 체이닝으로 조립</td></tr>
+      <tr><td>OddMagicSquare.clone()</td><td>GameState.clone()</td><td>생성 비용을 아끼고 시뮬레이션에 활용</td></tr>
+      <tr><td>BorderDecorator/StatisticsDecorator</td><td>DoubleDownDecorator/InsuranceDecorator</td><td>원본 수정 없이 기능 겹쳐 쌓기</td></tr>
+      <tr><td>MagicFacade.create(n)</td><td>BlackjackFacade.playRound()</td><td>복잡한 내부를 한 번의 호출로</td></tr>
+      <tr><td>MagicSquareSubject</td><td>Shoe의 CardObserver 통지</td><td>이벤트를 여러 대상에 동시 전파</td></tr>
+      <tr><td>RowIterator/SpiralIterator</td><td>Hand.byValueDescending()</td><td>내부 구조를 감춘 채 원하는 순서로 순회</td></tr>
+    </tbody>
+  </table>
+
+  <div class="note felt"><b>다음 연습 과제</b> ① SplitDecorator를 직접 구현해 페어 스플릿을 완성해보기, ② CardCountingStrategy를 만들어 러닝 카운트가 +2 이상이면 더 공격적으로 베팅하도록 확장해보기, ③ RoundState에 InsuranceState를 추가해 딜러 업카드가 A일 때만 진입하는 분기를 만들어보기 — 모두 지금까지 배운 패턴을 그대로 재사용하면 됩니다.</div>
+</div>
+
+</div><!-- end main -->
+
+<script>
+function showTab(name, btn) {
+  document.querySelectorAll('.algo-section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
+</body>
+</html>

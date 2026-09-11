@@ -1,0 +1,60 @@
+Algorithm-Study
+├─ 들어가기 (Intro)
+│  ├─ 복잡도 (Complexity)
+│  │  └─ 시간-공간 복잡도 분석 방법(Time-Space Complexity Analysis Method)
+│  └─ 파일 입출력 (File IO)
+├─ 자료 구조 (Data Structure)
+│  ├─ 배열 (Array)
+│  ├─ 리스트 (List)
+│  ├─ 연결 리스트 (LinkedList)
+│  ├─ 맵 (Map)
+│  ├─ 세트 (Set)
+│  ├─ 스택 (Stack)
+│  ├─ 큐 (Queue)
+│  ├─ 덱 (Deque) 
+│  └─ 트리 (Tree)
+├─ 수학 (Number Theory) 소수, GCD
+│  ├─ 기하학 (Geometry) Vector, Convex-Hull
+│  └─ 소수 (Prime Number)
+├─ 구현 (Implementation)
+│  ├─ DFS-BFS
+│  ├─ 브루트 포스 (Brute Force)
+│  └─ 백트래킹 (Backtracking)
+├─ 알고리즘 (Algorithm)
+│  ├─ 슬라이드 윈도우(Slide Window)
+│  ├─ 이분 탐색 (Binary Search)
+│  ├─ 투 포인터 (Two Pointer)
+│  ├─ 탐욕 알고리즘 (Greedy)
+│  ├─ 재귀 (Recursion)
+│  │  ├─ 재귀 함수 작성 방법(Writing Recursive Function)
+│  │  ├─ 정렬 (Sorting)
+│  │  └─ 분할 정복 (Divide and Conquer)
+│  ├─ 문자열 (String)
+│  │  ├─ 문자열 검색 알고리즘 (KMP)
+│  │  └─ 트라이 (Trie)
+│  └─ 유니온-파인드 (Union-Find)
+├─ 조합-순열 (Combination-Permutation)
+│  ├─ NextPerm, PrevPerm
+│  ├─ 부분집합 (Subset/PowerSet), BitSubset
+│  ├─ 조합 (Combination)
+│  ├─ 중복 조합 (Combination with Repetition), BitPerm
+│  ├─ 순열 (Permutation)
+│  └─ 중복 순열 (Permutation with Repetition)
+├─ 그래프 (Graph) adjM, adjL, userNode
+│  ├─ 그래프 표현 방법.md (Graph-Representation)
+│  ├─ 최소신장트리 (MST)
+│  │  ├─ 크루스칼 (Kruskal) 간적쿠 = QUF+PQ
+│  │  └─ 프림 (Prim)          간만프
+│  ├─ 최단경로 (Shortest Path)
+│  │  ├─ 다익스트라 (Dijkstra)
+│  │  ├─ 벨만-포드 (Bellman Ford)
+│  │  └─ 플로이드-워셜 (Floyd Warshall)
+│  ├─ Bipartite(2color)
+│  ├─ 단절점 (Articulation Points)
+│  ├─ 위상 정렬 (Topological sort)
+│  ├─ 최소 공통 조상 (Lowest Common Ancestor)
+│  └─ Segment, Fenwick(B형만)
+├─ 동적 계획법 (Dynamic Programming) top-down memoi, bottom-up table
+│  ├─ 점화식, 관계식유도
+│  ├─ 가장 긴 증가하는 부분 수열 (Longest Increasing Subsequence) LIS(w/ BS, w/o BS)
+│  └─ 누적합 (Prefix Sum)

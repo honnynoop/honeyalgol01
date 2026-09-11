@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>자바 기초 문법 완전학습서</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap');
+
+  :root{
+    --paper:#faf5ec; --paper2:#f3ead9; --ink:#2c2620; --ink-soft:#5c5248;
+    --accent:#bd5a2e; --accent-soft:#e7c9ab; --accent-bg:#fbe9d8;
+    --green:#6b7d4f; --green-bg:#e9edda; --blue:#4d6a8a; --blue-bg:#dfe8f0;
+    --line:#e3d5bd; --code-bg:#2c2620; --code-ink:#f3ead9;
+  }
+  *{box-sizing:border-box;}
+  body{ margin:0; background:var(--paper); color:var(--ink);
+    font-family:'Pretendard','Spectral',-apple-system,'Malgun Gothic',sans-serif; line-height:1.75; font-size:16px; }
+  h1,h2,h3,h4{ font-family:'Spectral',serif; font-weight:700; color:var(--ink); }
+  .layout{ display:flex; max-width:1280px; margin:0 auto; }
+  nav#toc{ width:260px; flex-shrink:0; position:sticky; top:0; align-self:flex-start; height:100vh;
+    overflow-y:auto; padding:28px 16px; border-right:1px solid var(--line); background:var(--paper2); }
+  nav#toc h3{ font-size:13px; letter-spacing:.08em; color:var(--accent); text-transform:uppercase; margin:0 0 12px 4px;}
+  nav#toc a{ display:block; padding:6px 8px; border-radius:6px; color:var(--ink-soft); text-decoration:none;
+    font-size:13.5px; margin-bottom:2px; border-left:2px solid transparent; }
+  nav#toc a:hover{ background:var(--accent-bg); color:var(--accent);}
+  nav#toc a.active{ background:var(--accent-bg); color:var(--accent); border-left:2px solid var(--accent); font-weight:600;}
+  main{ flex:1; padding:40px 56px 120px; max-width:920px; }
+  header.hero{ padding:36px 32px; background:linear-gradient(135deg,var(--accent-bg),var(--paper2));
+    border:1px solid var(--accent-soft); border-radius:16px; margin-bottom:48px; }
+  header.hero h1{ font-size:30px; margin:0 0 10px; }
+  header.hero p{ margin:0; color:var(--ink-soft); font-size:15px; }
+  .badge{ display:inline-block; background:var(--accent); color:#fff; font-size:11px; padding:3px 10px;
+    border-radius:20px; margin-right:6px; margin-top:12px; letter-spacing:.03em;}
+  section{ margin-bottom:64px; scroll-margin-top:20px; }
+  section h2{ font-size:25px; border-bottom:3px solid var(--accent); padding-bottom:10px; margin-bottom:22px;
+    display:flex; align-items:center; gap:10px; }
+  section h2 .num{ display:inline-flex; align-items:center; justify-content:center; width:34px; height:34px;
+    background:var(--accent); color:#fff; border-radius:8px; font-size:15px; font-family:'JetBrains Mono',monospace; flex-shrink:0;}
+  section h3{ font-size:18.5px; color:var(--accent); margin-top:32px; }
+  p{ color:var(--ink); }
+  .note{ background:var(--blue-bg); border-left:4px solid var(--blue); padding:14px 18px; border-radius:0 8px 8px 0; margin:18px 0; font-size:14.5px; }
+  .warn{ background:var(--accent-bg); border-left:4px solid var(--accent); padding:14px 18px; border-radius:0 8px 8px 0; margin:18px 0; font-size:14.5px; }
+  .tip{ background:var(--green-bg); border-left:4px solid var(--green); padding:14px 18px; border-radius:0 8px 8px 0; margin:18px 0; font-size:14.5px; }
+  table{ width:100%; border-collapse:collapse; margin:20px 0; font-size:14px; }
+  th,td{ border:1px solid var(--line); padding:9px 11px; text-align:left; }
+  th{ background:var(--accent-bg); color:var(--accent); font-family:'Spectral',serif; }
+  tr:nth-child(even){ background:var(--paper2); }
+  code{ font-family:'JetBrains Mono',monospace; background:var(--paper2); padding:2px 5px; border-radius:4px; font-size:13.5px; color:var(--accent);}
+  pre.code-block{ background:var(--code-bg); color:var(--code-ink); padding:18px 20px; border-radius:10px 10px 0 0;
+    overflow-x:auto; font-family:'JetBrains Mono',monospace; font-size:13px; margin:0; line-height:1.6; }
+  .code-label{ background:#1d1812; color:var(--accent-soft); font-family:'JetBrains Mono',monospace; font-size:11.5px;
+    padding:6px 20px; border-radius:10px 10px 0 0; letter-spacing:.05em; }
+  .code-label + pre.code-block{ border-radius:0; }
+  pre.output-block{ background:#efe7d6; color:var(--ink); padding:14px 20px; border-radius:0 0 10px 10px;
+    border-top:2px dashed var(--accent-soft); font-family:'JetBrains Mono',monospace; font-size:12.5px; margin:0 0 20px; }
+  .output-label{ font-size:11px; color:var(--ink-soft); padding:6px 20px 0; letter-spacing:.05em;}
+  svg text{ font-family:'Pretendard','Spectral',sans-serif; }
+  .diagram-wrap{ background:#fff; border:1px solid var(--line); border-radius:12px; padding:16px; margin:22px 0; }
+  .diagram-cap{ text-align:center; font-size:13px; color:var(--ink-soft); margin-top:8px; }
+  .grid2{ display:grid; grid-template-columns:1fr 1fr; gap:18px; margin:20px 0;}
+  .card{ background:var(--paper2); border:1px solid var(--line); border-radius:10px; padding:16px 18px;}
+  .card h4{ margin:0 0 8px; color:var(--accent); font-size:15px;}
+  .checklist{ list-style:none; padding:0; }
+  .checklist li{ padding:8px 0 8px 30px; position:relative; border-bottom:1px dashed var(--line); font-size:14.5px;}
+  .checklist li::before{ content:"✓"; position:absolute; left:0; color:var(--green); font-weight:700; }
+  footer{ text-align:center; color:var(--ink-soft); font-size:13px; padding:40px 0; }
+</style>
+</head>
+<body>
+<div class="layout">
+  <nav id="toc">
+    <h3>목차</h3>
+    <a href="#ch1">1. 기본 타입 (Primitive Type)</a>
+    <a href="#ch2">2. 조건문 — if / switch</a>
+    <a href="#ch3">3. 반복문 — for / while</a>
+    <a href="#ch4">4. 1차원 배열</a>
+    <a href="#ch5">5. 2차원 배열 구조와 원리</a>
+    <a href="#ch6">6. 2차원 배열의 용도</a>
+    <a href="#ch7">7. 2차원 배열 시계방향 회전</a>
+    <a href="#ch8">8. 2차원 배열 반시계방향 회전</a>
+    <a href="#ch9">9. 종합 체크리스트</a>
+  </nav>
+
+  <main>
+    <header class="hero">
+      <h1>자바 기초 문법 완전학습서</h1>
+      <p>기본 타입, 조건문·반복문 같은 자바의 뼈대 문법부터, 1차원·2차원 배열의 메모리 구조와 실제 쓰임, 2차원 배열 시계/반시계 방향 회전까지 —
+      그림과 실행 가능한 소스코드로 정리했습니다.</p>
+      <span class="badge">기본타입</span><span class="badge">제어문</span><span class="badge">배열 메모리구조</span><span class="badge">2차원배열 회전</span>
+    </header>
+
+    <!-- CH1 -->
+    <section id="ch1">
+      <h2><span class="num">1</span>기본 타입 (Primitive Type)</h2>
+      <p>자바는 <strong>8개의 기본형(primitive type)</strong>을 언어 차원에서 제공합니다. 기본형은 객체가 아니라 <strong>값 자체</strong>를 저장하며, 크기가 고정되어 있습니다.</p>
+
+      <div class="diagram-wrap">
+      <svg viewBox="0 0 700 190" xmlns="http://www.w3.org/2000/svg">
+        <text x="20" y="22" font-size="12" fill="#8a7a63">타입별 저장 크기(바이트) — 칸의 너비가 클수록 큰 값을 담을 수 있음</text>
+        <g font-family="JetBrains Mono, monospace" font-size="11">
+          <rect x="20" y="35" width="16" height="24" fill="#fbe9d8" stroke="#bd5a2e"/><text x="40" y="52" fill="#2c2620">byte (1B)  -128 ~ 127</text>
+          <rect x="20" y="65" width="32" height="24" fill="#fbe9d8" stroke="#bd5a2e"/><text x="60" y="82" fill="#2c2620">short (2B)  -32,768 ~ 32,767</text>
+          <rect x="20" y="95" width="64" height="24" fill="#fbe9d8" stroke="#bd5a2e"/><text x="92" y="112" fill="#2c2620">int (4B)  약 -21억 ~ 21억</text>
+          <rect x="20" y="125" width="128" height="24" fill="#fbe9d8" stroke="#bd5a2e"/><text x="156" y="142" fill="#2c2620">long (8B)  매우 큰 정수 (숫자 뒤 L)</text>
+
+          <rect x="380" y="35" width="64" height="24" fill="#dfe8f0" stroke="#4d6a8a"/><text x="452" y="52" fill="#2c2620">float (4B)  소수, 숫자 뒤 F 필요</text>
+          <rect x="380" y="65" width="128" height="24" fill="#dfe8f0" stroke="#4d6a8a"/><text x="516" y="82" fill="#2c2620">double (8B)  소수, 기본 실수형</text>
+          <rect x="380" y="95" width="32" height="24" fill="#e9edda" stroke="#6b7d4f"/><text x="420" y="112" fill="#2c2620">char (2B)  유니코드 문자 1개, 작은따옴표</text>
+          <rect x="380" y="125" width="16" height="24" fill="#f0e3ea" stroke="#8a5a78"/><text x="400" y="142" fill="#2c2620">boolean (크기 미규정)  true/false</text>
+        </g>
+        <text x="20" y="175" font-size="10.5" fill="#8a7a63">작은 타입 → 큰 타입은 자동 형변환(묵시적), 큰 타입 → 작은 타입은 값 손실 위험이 있어 명시적 캐스팅이 필요하다</text>
+      </svg>
+      </div>
+
+      <table>
+        <tr><th>분류</th><th>타입</th><th>기본값</th><th>비고</th></tr>
+        <tr><td rowspan="4">정수형</td><td><code>byte</code></td><td>0</td><td>가장 작은 정수, 파일 바이트 처리 등에 사용</td></tr>
+        <tr><td><code>short</code></td><td>0</td><td>실무에서는 드물게 사용</td></tr>
+        <tr><td><code>int</code></td><td>0</td><td><strong>가장 많이 쓰는 기본 정수형</strong></td></tr>
+        <tr><td><code>long</code></td><td>0L</td><td>큰 수(예: 밀리초 타임스탬프), 리터럴 끝에 <code>L</code></td></tr>
+        <tr><td rowspan="2">실수형</td><td><code>float</code></td><td>0.0F</td><td>정밀도 낮음, 리터럴 끝에 <code>F</code></td></tr>
+        <tr><td><code>double</code></td><td>0.0</td><td><strong>가장 많이 쓰는 기본 실수형</strong></td></tr>
+        <tr><td>문자형</td><td><code>char</code></td><td>'\u0000'</td><td>작은따옴표 <code>'A'</code>, 내부적으로 정수(유니코드 코드값)로 취급됨</td></tr>
+        <tr><td>논리형</td><td><code>boolean</code></td><td>false</td><td><code>true</code> / <code>false</code>만 가능</td></tr>
+      </table>
+
+      <div class="code-label">PrimitiveDemo.java</div>
+<pre class="code-block">public class PrimitiveDemo {
+    public static void main(String[] args) {
+        int i = 10;
+        long l = i;          // 묵시적(자동) 형변환: int → long (작은 것 → 큰 것)
+        double d = l;         // long → double 도 자동
+
+        double pi = 3.14;
+        int truncated = (int) pi;   // 명시적 캐스팅 필요: double → int (소수점 버림)
+        System.out.println(truncated);  // 3
+
+        byte b = (byte) 130;          // int 130을 byte로 강제 변환 → 범위 초과로 값이 깨짐
+        System.out.println(b);          // -126 (오버플로우)
+
+        char c = 'A';
+        int code = c;                    // char → int : 유니코드 값 65
+        System.out.println(code);
+        System.out.println((char)(c + 1)); // 'B' - 문자에 정수 연산 가능
+    }
+}</pre>
+      <div class="output-label">실행결과</div>
+<pre class="output-block">3
+-126
+65
+B</pre>
+      <div class="warn"><strong>정수 나눗셈 함정:</strong> <code>int</code>끼리 나누면 소수점이 버려집니다. <code>7 / 2</code>는 <code>3</code>이지, <code>3.5</code>가 아닙니다. 실수 결과가 필요하면 <code>7 / 2.0</code>처럼 피연산자 중 하나 이상을 실수형으로 만들어야 합니다.</div>
+    </section>
+
+    <!-- CH2 -->
+    <section id="ch2">
+      <h2><span class="num">2</span>조건문 — if / switch</h2>
+
+      <div class="diagram-wrap">
+      <svg viewBox="0 0 620 170" xmlns="http://www.w3.org/2000/svg">
+        <rect x="20" y="15" width="140" height="34" rx="6" fill="#fbe9d8" stroke="#bd5a2e" stroke-width="2"/>
+        <text x="90" y="37" text-anchor="middle" font-size="11">조건1 참?</text>
+        <line x1="160" y1="32" x2="220" y2="32" stroke="#5c5248"/>
+        <text x="190" y="24" text-anchor="middle" font-size="9" fill="#5c5248">Yes</text>
+        <rect x="220" y="15" width="120" height="34" rx="6" fill="#fdf3e8" stroke="#bd5a2e"/><text x="280" y="37" text-anchor="middle" font-size="10.5">실행A</text>
+        <line x1="90" y1="49" x2="90" y2="80" stroke="#5c5248"/>
+        <text x="100" y="65" font-size="9" fill="#5c5248">No</text>
+        <rect x="20" y="80" width="140" height="34" rx="6" fill="#fbe9d8" stroke="#bd5a2e" stroke-width="2"/>
+        <text x="90" y="102" text-anchor="middle" font-size="11">조건2 참?</text>
+        <line x1="160" y1="97" x2="220" y2="97" stroke="#5c5248"/>
+        <text x="190" y="89" text-anchor="middle" font-size="9" fill="#5c5248">Yes</text>
+        <rect x="220" y="80" width="120" height="34" rx="6" fill="#fdf3e8" stroke="#bd5a2e"/><text x="280" y="102" text-anchor="middle" font-size="10.5">실행B</text>
+        <line x1="90" y1="114" x2="90" y2="140" stroke="#5c5248"/>
+        <text x="100" y="130" font-size="9" fill="#5c5248">No</text>
+        <rect x="20" y="140" width="140" height="30" rx="6" fill="#f3ead9" stroke="#5c5248"/><text x="90" y="160" text-anchor="middle" font-size="10.5">else 실행C</text>
+
+        <text x="430" y="30" font-size="12" font-weight="700" fill="#4d6a8a">switch — 값 하나로 여러 갈래</text>
+        <text x="410" y="55" font-size="10.5" fill="#3d5a78">case 1: ... break;</text>
+        <text x="410" y="72" font-size="10.5" fill="#3d5a78">case 2: ... break;</text>
+        <text x="410" y="89" font-size="10.5" fill="#3d5a78">default: ...</text>
+        <text x="410" y="115" font-size="9.5" fill="#8a7a63">break 없으면 다음 case로</text>
+        <text x="410" y="130" font-size="9.5" fill="#8a7a63">"흘러내림"(fall-through) 발생</text>
+      </svg>
+      </div>
+
+      <div class="code-label">IfSwitchDemo.java</div>
+<pre class="code-block">public class IfSwitchDemo {
+    public static void main(String[] args) {
+        int score = 85;
+
+        // if - else if - else : 범위 조건에 적합
+        if (score >= 90) System.out.println("A");
+        else if (score >= 80) System.out.println("B");   // 여기 실행됨
+        else System.out.println("C");
+
+        // switch (전통 방식) : break 필수, 없으면 fall-through
+        int day = 3;
+        switch (day) {
+            case 1: System.out.println("월"); break;
+            case 2: System.out.println("화"); break;
+            case 3: System.out.println("수"); break;   // 여기서 멈춤
+            default: System.out.println("그 외");
+        }
+
+        // switch expression (Java 14+) : 화살표(->), break 불필요, 값 반환 가능
+        String result = switch (day) {
+            case 1, 7 -> "주말 근처";
+            case 2, 3, 4, 5, 6 -> "평일";
+            default -> "알 수 없음";
+        };
+        System.out.println(result);
+    }
+}</pre>
+      <div class="output-label">실행결과</div>
+<pre class="output-block">B
+수
+평일</pre>
+      <div class="tip"><code>switch</code>는 값이 <strong>몇 가지로 딱 떨어질 때</strong>(요일, 메뉴 번호, enum 등) <code>if-else</code> 체인보다 읽기 좋습니다. 반면 <strong>범위 비교</strong>(<code>score >= 80</code> 같은)는 <code>if</code>로만 표현할 수 있습니다.</div>
+    </section>
+
+    <!-- CH3 -->
+    <section id="ch3">
+      <h2><span class="num">3</span>반복문 — for / while</h2>
+
+      <div class="diagram-wrap">
+      <svg viewBox="0 0 640 170" xmlns="http://www.w3.org/2000/svg">
+        <rect x="20" y="15" width="130" height="32" rx="6" fill="#fbe9d8" stroke="#bd5a2e" stroke-width="2"/><text x="85" y="36" text-anchor="middle" font-size="10.5">① 초기화 i=0</text>
+        <line x1="150" y1="31" x2="200" y2="31" stroke="#5c5248" marker-end="url(#arrhead)"/>
+        <rect x="200" y="15" width="130" height="32" rx="6" fill="#fdf3e8" stroke="#bd5a2e"/><text x="265" y="36" text-anchor="middle" font-size="10.5">② 조건 i&lt;n?</text>
+        <line x1="330" y1="31" x2="380" y2="31" stroke="#5c5248" marker-end="url(#arrhead)"/>
+        <text x="355" y="22" text-anchor="middle" font-size="9" fill="#5c5248">참</text>
+        <rect x="380" y="15" width="110" height="32" rx="6" fill="#e9edda" stroke="#6b7d4f"/><text x="435" y="36" text-anchor="middle" font-size="10.5">③ 본문 실행</text>
+        <line x1="435" y1="47" x2="435" y2="80" stroke="#5c5248" marker-end="url(#arrhead)"/>
+        <rect x="380" y="80" width="110" height="32" rx="6" fill="#f0e3ea" stroke="#8a5a78"/><text x="435" y="101" text-anchor="middle" font-size="10.5">④ 증감 i++</text>
+        <path d="M380,96 C260,120 260,40 265,47" fill="none" stroke="#5c5248" marker-end="url(#arrhead)"/>
+        <text x="300" y="130" font-size="9" fill="#5c5248">② 조건으로 되돌아감</text>
+        <line x1="265" y1="47" x2="265" y2="130" stroke="#5c5248" stroke-dasharray="3,3"/>
+        <text x="220" y="145" font-size="9" fill="#5c5248">거짓 → 반복문 종료</text>
+        <defs><marker id="arrhead" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#5c5248"/></marker></defs>
+        <text x="520" y="30" font-size="11" font-weight="700" fill="#bd5a2e">for(초기화; 조건; 증감)</text>
+        <text x="520" y="55" font-size="10.5" fill="#5c5248">while(조건) — 조건 먼저 검사</text>
+        <text x="520" y="75" font-size="10.5" fill="#5c5248">do{...}while(조건) — 본문 먼저 1회 실행 후 검사</text>
+      </svg>
+      </div>
+
+      <table>
+        <tr><th>반복문</th><th>조건 검사 시점</th><th>특징</th></tr>
+        <tr><td><code>for</code></td><td>매 반복 전</td><td>초기화·조건·증감이 한 줄에 모여있어 <strong>횟수가 명확할 때</strong> 적합</td></tr>
+        <tr><td><code>while</code></td><td>매 반복 전</td><td>조건이 언제 끝날지 모를 때(입력 대기 등) 적합, <strong>0번 실행될 수도 있음</strong></td></tr>
+        <tr><td><code>do-while</code></td><td>매 반복 후</td><td>본문을 <strong>최소 1번은 반드시 실행</strong>(예: 메뉴 최초 1회 표시)</td></tr>
+        <tr><td>향상된 for(for-each)</td><td>-</td><td><code>for(타입 변수 : 배열/컬렉션)</code> — 인덱스 없이 순회, 값 변경/인덱스 필요시 부적합</td></tr>
+      </table>
+
+      <div class="code-label">LoopDemo.java</div>
+<pre class="code-block">public class LoopDemo {
+    public static void main(String[] args) {
+        for (int i = 1; i &lt;= 3; i++) {          // 정확히 3번 반복
+            System.out.println("for: " + i);
+        }
+
+        int n = 3;
+        while (n > 0) {                          // 조건이 거짓이면 한 번도 안 돌 수 있음
+            System.out.println("while: " + n);
+            n--;
+        }
+
+        int m = 0;
+        do {                                        // 조건과 무관하게 최소 1번 실행
+            System.out.println("do-while: " + m);
+            m++;
+        } while (m &lt; 0);   // 처음부터 거짓이지만 이미 1번은 실행됨
+
+        for (int i = 1; i &lt;= 5; i++) {
+            if (i == 3) continue;   // 3만 건너뜀
+            if (i == 5) break;       // 5에서 반복문 완전히 종료
+            System.out.print(i + " ");
+        }
+    }
+}</pre>
+      <div class="output-label">실행결과</div>
+<pre class="output-block">for: 1
+for: 2
+for: 3
+while: 3
+while: 2
+while: 1
+do-while: 0
+1 2 4 </pre>
+    </section>
+
+    <!-- CH4 -->
+    <section id="ch4">
+      <h2><span class="num">4</span>1차원 배열</h2>
+      <p>배열은 <strong>같은 타입의 값을 고정 개수만큼, 메모리에 연속으로</strong> 저장하는 자료구조입니다. 한 번 크기를 정하면 <strong>바꿀 수 없습니다</strong>(크기 변경이 필요하면 ArrayList 사용).</p>
+
+      <div class="diagram-wrap">
+      <svg viewBox="0 0 500 130" xmlns="http://www.w3.org/2000/svg">
+        <text x="20" y="20" font-size="11" fill="#8a7a63">int[] arr = {10, 20, 30, 40}; — 힙에 연속 공간 확보, 각 칸은 정확히 4바이트(int)</text>
+        <g font-family="JetBrains Mono, monospace" font-size="13">
+          <rect x="30" y="35" width="70" height="40" fill="#fbe9d8" stroke="#bd5a2e" stroke-width="2"/><text x="65" y="60" text-anchor="middle">10</text>
+          <rect x="100" y="35" width="70" height="40" fill="#fbe9d8" stroke="#bd5a2e" stroke-width="2"/><text x="135" y="60" text-anchor="middle">20</text>
+          <rect x="170" y="35" width="70" height="40" fill="#fbe9d8" stroke="#bd5a2e" stroke-width="2"/><text x="205" y="60" text-anchor="middle">30</text>
+          <rect x="240" y="35" width="70" height="40" fill="#fbe9d8" stroke="#bd5a2e" stroke-width="2"/><text x="275" y="60" text-anchor="middle">40</text>
+        </g>
+        <text x="65" y="90" text-anchor="middle" font-size="10" fill="#8a4a24">arr[0]</text>
+        <text x="135" y="90" text-anchor="middle" font-size="10" fill="#8a4a24">arr[1]</text>
+        <text x="205" y="90" text-anchor="middle" font-size="10" fill="#8a4a24">arr[2]</text>
+        <text x="275" y="90" text-anchor="middle" font-size="10" fill="#8a4a24">arr[3]</text>
+        <text x="20" y="115" font-size="10" fill="#8a7a63">주소가 연속이라 arr[i] = 시작주소 + i×4바이트 계산만으로 즉시 접근(O(1)) — 인덱스는 항상 0부터 시작, arr.length=4</text>
+      </svg>
+      </div>
+
+      <div class="code-label">Array1DDemo.java</div>
+<pre class="code-block">public class Array1DDemo {
+    public static void main(String[] args) {
+        int[] a = new int[5];         // 크기 5, 기본값 0으로 초기화됨: [0,0,0,0,0]
+        int[] b = {10, 20, 30, 40};   // 선언과 동시에 초기화
+
+        for (int i = 0; i &lt; b.length; i++) {   // length는 배열의 "속성"(메서드 아님, 괄호 없음)
+            System.out.print(b[i] + " ");
+        }
+        System.out.println();
+
+        int sum = 0;
+        for (int v : b) sum += v;      // 향상된 for : 값만 필요할 때 간결
+        System.out.println("합계: " + sum);
+
+        // 배열 뒤집기
+        for (int i = 0; i &lt; b.length / 2; i++) {
+            int tmp = b[i];
+            b[i] = b[b.length - 1 - i];
+            b[b.length - 1 - i] = tmp;
+        }
+        System.out.println(java.util.Arrays.toString(b));
+    }
+}</pre>
+      <div class="output-label">실행결과</div>
+<pre class="output-block">10 20 30 40 
+합계: 100
+[40, 30, 20, 10]</pre>
+      <div class="warn"><strong>배열 범위 초과(<code>ArrayIndexOutOfBoundsException</code>)</strong>는 자바에서 가장 흔한 런타임 에러 중 하나입니다. 반복문에서 <code>i &lt;= arr.length</code>처럼 <code>=</code>를 실수로 넣지 않도록 항상 <code>i &lt; arr.length</code>를 확인하세요.</div>
+    </section>
+
+    <!-- CH5 -->
+    <section id="ch5">
+      <h2><span class="num">5</span>2차원 배열 구조와 원리</h2>
+      <p>자바의 2차원 배열은 사실 <strong>"배열의 배열(array of arrays)"</strong>입니다. 바깥 배열의 각 칸이 숫자를 담는 게 아니라, <strong>또 다른 1차원 배열의 주소(참조)</strong>를 담고 있습니다.</p>
+
+      <div class="diagram-wrap">
+      <svg viewBox="0 0 620 240" xmlns="http://www.w3.org/2000/svg">
+        <defs><marker id="arrheadCh5" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#5c5248"/></marker></defs>
+        <text x="20" y="20" font-size="11.5" fill="#8a7a63">int[][] arr = new int[3][4]; — 바깥 배열(3칸)이 안쪽 배열(각 4칸) 3개를 "참조"로 가리킨다</text>
+
+        <rect x="20" y="35" width="150" height="130" rx="6" fill="#fbe9d8" stroke="#bd5a2e" stroke-width="2"/>
+        <text x="95" y="55" text-anchor="middle" font-size="11" font-weight="700" fill="#bd5a2e">outer (바깥배열, 3칸)</text>
+        <rect x="35" y="65" width="120" height="26" fill="#fff" stroke="#bd5a2e"/><text x="95" y="83" text-anchor="middle" font-size="10.5" font-family="JetBrains Mono, monospace">arr[0] → row0주소</text>
+        <rect x="35" y="95" width="120" height="26" fill="#fff" stroke="#bd5a2e"/><text x="95" y="113" text-anchor="middle" font-size="10.5" font-family="JetBrains Mono, monospace">arr[1] → row1주소</text>
+        <rect x="35" y="125" width="120" height="26" fill="#fff" stroke="#bd5a2e"/><text x="95" y="143" text-anchor="middle" font-size="10.5" font-family="JetBrains Mono, monospace">arr[2] → row2주소</text>
+
+        <line x1="155" y1="78" x2="230" y2="55" stroke="#5c5248" stroke-width="1.4" marker-end="url(#arrheadCh5)"/>
+        <line x1="155" y1="108" x2="230" y2="108" stroke="#5c5248" stroke-width="1.4" marker-end="url(#arrheadCh5)"/>
+        <line x1="155" y1="138" x2="230" y2="163" stroke="#5c5248" stroke-width="1.4" marker-end="url(#arrheadCh5)"/>
+
+        <text x="230" y="45" font-size="10" fill="#4d6a8a">row0 (int[4])</text>
+        <g font-family="JetBrains Mono, monospace" font-size="10">
+          <rect x="230" y="50" width="35" height="26" fill="#dfe8f0" stroke="#4d6a8a"/><text x="247" y="67" text-anchor="middle">0</text>
+          <rect x="265" y="50" width="35" height="26" fill="#dfe8f0" stroke="#4d6a8a"/><text x="282" y="67" text-anchor="middle">0</text>
+          <rect x="300" y="50" width="35" height="26" fill="#dfe8f0" stroke="#4d6a8a"/><text x="317" y="67" text-anchor="middle">0</text>
+          <rect x="335" y="50" width="35" height="26" fill="#dfe8f0" stroke="#4d6a8a"/><text x="352" y="67" text-anchor="middle">0</text>
+        </g>
+
+        <text x="230" y="98" font-size="10" fill="#4d6a8a">row1 (int[4])</text>
+        <g font-family="JetBrains Mono, monospace" font-size="10">
+          <rect x="230" y="103" width="35" height="26" fill="#e9edda" stroke="#6b7d4f"/><text x="247" y="120" text-anchor="middle">0</text>
+          <rect x="265" y="103" width="35" height="26" fill="#e9edda" stroke="#6b7d4f"/><text x="282" y="120" text-anchor="middle">0</text>
+          <rect x="300" y="103" width="35" height="26" fill="#e9edda" stroke="#6b7d4f"/><text x="317" y="120" text-anchor="middle">0</text>
+          <rect x="335" y="103" width="35" height="26" fill="#e9edda" stroke="#6b7d4f"/><text x="352" y="120" text-anchor="middle">0</text>
+        </g>
+
+        <text x="230" y="153" font-size="10" fill="#4d6a8a">row2 (int[4])</text>
+        <g font-family="JetBrains Mono, monospace" font-size="10">
+          <rect x="230" y="158" width="35" height="26" fill="#f0e3ea" stroke="#8a5a78"/><text x="247" y="175" text-anchor="middle">0</text>
+          <rect x="265" y="158" width="35" height="26" fill="#f0e3ea" stroke="#8a5a78"/><text x="282" y="175" text-anchor="middle">0</text>
+          <rect x="300" y="158" width="35" height="26" fill="#f0e3ea" stroke="#8a5a78"/><text x="317" y="175" text-anchor="middle">0</text>
+          <rect x="335" y="158" width="35" height="26" fill="#f0e3ea" stroke="#8a5a78"/><text x="352" y="175" text-anchor="middle">0</text>
+        </g>
+        <text x="20" y="210" font-size="10" fill="#8a7a63">arr[i][j] = i번째 row 배열을 먼저 찾아간 뒤, 그 배열의 j번째 칸에 접근 — 두 단계 참조</text>
+        <text x="20" y="226" font-size="10" fill="#8a7a63">각 row의 길이가 달라도 됨(가변 배열, jagged array) — C의 진짜 "행렬"과 다른 점</text>
+      </svg>
+      </div>
+
+      <div class="code-label">Array2DBasics.java</div>
+<pre class="code-block">public class Array2DBasics {
+    public static void main(String[] args) {
+        int[][] arr = new int[3][4];       // 3행 4열, 모두 0으로 초기화
+        int[][] arr2 = {                     // 선언과 동시에 초기화
+            {1, 2, 3},
+            {4, 5, 6}
+        };
+        int[][] jagged = {                   // 행마다 길이가 다른 "가변 배열"도 가능
+            {1},
+            {1, 2},
+            {1, 2, 3}
+        };
+
+        System.out.println(arr.length);       // 3 (행의 개수, 바깥 배열 길이)
+        System.out.println(arr[0].length);      // 4 (0번째 행의 길이)
+
+        for (int i = 0; i &lt; arr2.length; i++) {          // 행
+            for (int j = 0; j &lt; arr2[i].length; j++) {      // 열 (행마다 따로 length 확인!)
+                System.out.print(arr2[i][j] + " ");
+            }
+            System.out.println();
+        }
+
+        for (int[] row : jagged) System.out.println(java.util.Arrays.toString(row));
+    }
+}</pre>
+      <div class="output-label">실행결과</div>
+<pre class="output-block">3
+4
+1 2 3 
+4 5 6 
+[1]
+[1, 2]
+[1, 2, 3]</pre>
+      <div class="note"><strong>이중 for문 순회 규칙</strong>: 바깥 for는 <strong>행(row, i)</strong>을, 안쪽 for는 <strong>열(column, j)</strong>을 도는 것이 관례입니다. 가변 배열일 수 있으므로 안쪽 반복 조건은 <code>arr[0].length</code>가 아니라 <strong><code>arr[i].length</code></strong>로 매번 그 행의 길이를 확인하는 것이 안전합니다.</div>
+    </section>
+
+    <!-- CH6 -->
+    <section id="ch6">
+      <h2><span class="num">6</span>2차원 배열의 용도</h2>
+      <p>2차원 배열은 <strong>"행과 열로 이루어진 모든 데이터"</strong>를 표현할 때 사용합니다. 1차원 배열로는 어색하거나 불가능한 관계를 자연스럽게 담을 수 있습니다.</p>
+
+      <table>
+        <tr><th>용도</th><th>행(row)이 의미하는 것</th><th>열(column)이 의미하는 것</th></tr>
+        <tr><td>성적표</td><td>학생 한 명</td><td>과목별 점수</td></tr>
+        <tr><td>게임판(틱택토, 지뢰찾기, 오목)</td><td>세로 좌표</td><td>가로 좌표</td></tr>
+        <tr><td>이미지/픽셀</td><td>Y좌표(세로)</td><td>X좌표(가로), 값은 색상/밝기</td></tr>
+        <tr><td>미로·격자 탐색(DFS/BFS)</td><td>격자의 행</td><td>격자의 열, 값은 벽(1)/길(0)</td></tr>
+        <tr><td>행렬(수학) 연산</td><td>행 벡터</td><td>열 성분</td></tr>
+        <tr><td>달력</td><td>주(week)</td><td>요일</td></tr>
+      </table>
+
+      <div class="code-label">Array2DUsage.java — 성적표 예제(학생×과목)</div>
+<pre class="code-block">public class Array2DUsage {
+    public static void main(String[] args) {
+        String[] students = {"철수", "영희", "민수"};
+        String[] subjects = {"국어", "영어", "수학"};
+        int[][] scores = {              // scores[학생번호][과목번호]
+            {80, 90, 70},
+            {95, 85, 100},
+            {60, 75, 80}
+        };
+
+        for (int i = 0; i &lt; students.length; i++) {   // 행 = 학생
+            int sum = 0;
+            for (int j = 0; j &lt; subjects.length; j++) {  // 열 = 과목
+                sum += scores[i][j];
+            }
+            double avg = sum / (double) subjects.length;
+            System.out.printf("%s 평균: %.1f%n", students[i], avg);
+        }
+
+        // 과목별(열) 합계 — "열 방향"으로 훑으려면 바깥/안쪽을 반대로 순회
+        for (int j = 0; j &lt; subjects.length; j++) {
+            int subjectSum = 0;
+            for (int i = 0; i &lt; students.length; i++) {
+                subjectSum += scores[i][j];
+            }
+            System.out.println(subjects[j] + " 총점: " + subjectSum);
+        }
+    }
+}</pre>
+      <div class="output-label">실행결과</div>
+<pre class="output-block">철수 평균: 80.0
+영희 평균: 93.3
+민수 평균: 71.7
+국어 총점: 235
+영어 총점: 250
+수학 총점: 250</pre>
+      <div class="tip">2차원 배열의 진짜 힘은 <strong>"행 우선으로도, 열 우선으로도 자유롭게 순회할 수 있다"</strong>는 점입니다 — 위 예제처럼 <code>scores[i][j]</code>는 그대로 두고 반복문의 바깥/안쪽 순서만 바꾸면 "학생별 평균"과 "과목별 총점"을 둘 다 구할 수 있습니다.</div>
+    </section>
+
+    <!-- CH7 -->
+    <section id="ch7">
+      <h2><span class="num">7</span>2차원 배열 시계방향 회전</h2>
+      <p>N×M 배열을 시계방향으로 90도 돌리면, <strong>결과는 M×N 크기</strong>가 되고 각 원소는 다음 규칙으로 이동합니다:</p>
+      <p style="text-align:center;"><code>result[j][N-1-i] = original[i][j]</code> &nbsp; (N = 원본의 행 개수)</p>
+
+      <div class="diagram-wrap">
+      <svg viewBox="0 0 520 220" xmlns="http://www.w3.org/2000/svg">
+        <text x="90" y="20" text-anchor="middle" font-size="12" font-weight="700" fill="#bd5a2e">원본 (3×3)</text>
+        <text x="400" y="20" text-anchor="middle" font-size="12" font-weight="700" fill="#4a5a33">시계방향 90° 회전 후</text>
+        <g font-family="JetBrains Mono, monospace" font-size="12">
+          <rect x="20" y="35" width="46" height="40" fill="#fbe9d8" stroke="#bd5a2e" stroke-width="2"/><text x="43" y="59" text-anchor="middle">1</text>
+          <rect x="66" y="35" width="46" height="40" fill="#fff" stroke="#8a7a63"/><text x="89" y="59" text-anchor="middle">2</text>
+          <rect x="112" y="35" width="46" height="40" fill="#fff" stroke="#8a7a63"/><text x="135" y="59" text-anchor="middle">3</text>
+          <rect x="20" y="75" width="46" height="40" fill="#fff" stroke="#8a7a63"/><text x="43" y="99" text-anchor="middle">4</text>
+          <rect x="66" y="75" width="46" height="40" fill="#fff" stroke="#8a7a63"/><text x="89" y="99" text-anchor="middle">5</text>
+          <rect x="112" y="75" width="46" height="40" fill="#fff" stroke="#8a7a63"/><text x="135" y="99" text-anchor="middle">6</text>
+          <rect x="20" y="115" width="46" height="40" fill="#fff" stroke="#8a7a63"/><text x="43" y="139" text-anchor="middle">7</text>
+          <rect x="66" y="115" width="46" height="40" fill="#fff" stroke="#8a7a63"/><text x="89" y="139" text-anchor="middle">8</text>
+          <rect x="112" y="115" width="46" height="40" fill="#fff" stroke="#8a7a63"/><text x="135" y="139" text-anchor="middle">9</text>
+        </g>
+
+        <path d="M170,55 C230,20 330,20 355,55" fill="none" stroke="#5c5248" stroke-width="1.6" marker-end="url(#arrhead2)"/>
+
+        <g font-family="JetBrains Mono, monospace" font-size="12">
+          <rect x="340" y="35" width="46" height="40" fill="#fff" stroke="#8a7a63"/><text x="363" y="59" text-anchor="middle">7</text>
+          <rect x="386" y="35" width="46" height="40" fill="#fff" stroke="#8a7a63"/><text x="409" y="59" text-anchor="middle">4</text>
+          <rect x="432" y="35" width="46" height="40" fill="#e9edda" stroke="#6b7d4f" stroke-width="2"/><text x="455" y="59" text-anchor="middle">1</text>
+          <rect x="340" y="75" width="46" height="40" fill="#fff" stroke="#8a7a63"/><text x="363" y="99" text-anchor="middle">8</text>
+          <rect x="386" y="75" width="46" height="40" fill="#fff" stroke="#8a7a63"/><text x="409" y="99" text-anchor="middle">5</text>
+          <rect x="432" y="75" width="46" height="40" fill="#fff" stroke="#8a7a63"/><text x="455" y="99" text-anchor="middle">2</text>
+          <rect x="340" y="115" width="46" height="40" fill="#fff" stroke="#8a7a63"/><text x="363" y="139" text-anchor="middle">9</text>
+          <rect x="386" y="115" width="46" height="40" fill="#fff" stroke="#8a7a63"/><text x="409" y="139" text-anchor="middle">6</text>
+          <rect x="432" y="115" width="46" height="40" fill="#fff" stroke="#8a7a63"/><text x="455" y="139" text-anchor="middle">3</text>
+        </g>
+        <text x="90" y="195" text-anchor="middle" font-size="10.5" fill="#8a4a24">원본의 "왼쪽 위(1)"가 회전 후 "오른쪽 위"로 이동한다</text>
+        <text x="400" y="195" text-anchor="middle" font-size="10.5" fill="#4a5a33">원본의 첫 번째 열(1,4,7)이 결과의 첫 번째 행이 된다</text>
+        <defs><marker id="arrhead2" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#5c5248"/></marker></defs>
+      </svg>
+      <p class="diagram-cap">핵심 관찰: 시계방향 회전은 "각 열을 아래→위 순서로 읽어, 새 배열의 각 행으로 채우는 것"과 같다</p>
+      </div>
+
+      <div class="code-label">RotateClockwise.java</div>
+<pre class="code-block">import java.util.Arrays;
+
+public class RotateClockwise {
+    public static void main(String[] args) {
+        int[][] original = {
+            {1, 2, 3},
+            {4, 5, 6},
+            {7, 8, 9}
+        };
+        int[][] rotated = rotateClockwise(original);
+        for (int[] row : rotated) System.out.println(Arrays.toString(row));
+    }
+
+    static int[][] rotateClockwise(int[][] arr) {
+        int n = arr.length;         // 원본 행 개수
+        int m = arr[0].length;      // 원본 열 개수
+        int[][] result = new int[m][n];   // 결과는 행/열이 뒤바뀐 m×n 크기
+
+        for (int i = 0; i &lt; n; i++) {
+            for (int j = 0; j &lt; m; j++) {
+                result[j][n - 1 - i] = arr[i][j];   // 핵심 공식
+            }
+        }
+        return result;
+    }
+}</pre>
+      <div class="output-label">실행결과</div>
+<pre class="output-block">[7, 4, 1]
+[8, 5, 2]
+[9, 6, 3]</pre>
+    </section>
+
+    <!-- CH8 -->
+    <section id="ch8">
+      <h2><span class="num">8</span>2차원 배열 반시계방향 회전</h2>
+      <p>반시계방향(90도)은 시계방향과 <strong>정반대 방향으로 대응</strong>됩니다:</p>
+      <p style="text-align:center;"><code>result[M-1-j][i] = original[i][j]</code> &nbsp; (M = 원본의 열 개수)</p>
+
+      <div class="diagram-wrap">
+      <svg viewBox="0 0 520 220" xmlns="http://www.w3.org/2000/svg">
+        <defs><marker id="arrheadCh8" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#5c5248"/></marker></defs>
+        <text x="90" y="20" text-anchor="middle" font-size="12" font-weight="700" fill="#bd5a2e">원본 (3×3)</text>
+        <text x="400" y="20" text-anchor="middle" font-size="12" font-weight="700" fill="#4a5a33">반시계방향 90° 회전 후</text>
+        <g font-family="JetBrains Mono, monospace" font-size="12">
+          <rect x="20" y="35" width="46" height="40" fill="#fff" stroke="#8a7a63"/><text x="43" y="59" text-anchor="middle">1</text>
+          <rect x="66" y="35" width="46" height="40" fill="#fff" stroke="#8a7a63"/><text x="89" y="59" text-anchor="middle">2</text>
+          <rect x="112" y="35" width="46" height="40" fill="#fbe9d8" stroke="#bd5a2e" stroke-width="2"/><text x="135" y="59" text-anchor="middle">3</text>
+          <rect x="20" y="75" width="46" height="40" fill="#fff" stroke="#8a7a63"/><text x="43" y="99" text-anchor="middle">4</text>
+          <rect x="66" y="75" width="46" height="40" fill="#fff" stroke="#8a7a63"/><text x="89" y="99" text-anchor="middle">5</text>
+          <rect x="112" y="75" width="46" height="40" fill="#fff" stroke="#8a7a63"/><text x="135" y="99" text-anchor="middle">6</text>
+          <rect x="20" y="115" width="46" height="40" fill="#fff" stroke="#8a7a63"/><text x="43" y="139" text-anchor="middle">7</text>
+          <rect x="66" y="115" width="46" height="40" fill="#fff" stroke="#8a7a63"/><text x="89" y="139" text-anchor="middle">8</text>
+          <rect x="112" y="115" width="46" height="40" fill="#fff" stroke="#8a7a63"/><text x="135" y="139" text-anchor="middle">9</text>
+        </g>
+
+        <path d="M170,95 C230,140 330,140 355,95" fill="none" stroke="#5c5248" stroke-width="1.6" marker-end="url(#arrheadCh8)"/>
+
+        <g font-family="JetBrains Mono, monospace" font-size="12">
+          <rect x="340" y="35" width="46" height="40" fill="#e9edda" stroke="#6b7d4f" stroke-width="2"/><text x="363" y="59" text-anchor="middle">3</text>
+          <rect x="386" y="35" width="46" height="40" fill="#fff" stroke="#8a7a63"/><text x="409" y="59" text-anchor="middle">6</text>
+          <rect x="432" y="35" width="46" height="40" fill="#fff" stroke="#8a7a63"/><text x="455" y="59" text-anchor="middle">9</text>
+          <rect x="340" y="75" width="46" height="40" fill="#fff" stroke="#8a7a63"/><text x="363" y="99" text-anchor="middle">2</text>
+          <rect x="386" y="75" width="46" height="40" fill="#fff" stroke="#8a7a63"/><text x="409" y="99" text-anchor="middle">5</text>
+          <rect x="432" y="75" width="46" height="40" fill="#fff" stroke="#8a7a63"/><text x="455" y="99" text-anchor="middle">8</text>
+          <rect x="340" y="115" width="46" height="40" fill="#fff" stroke="#8a7a63"/><text x="363" y="139" text-anchor="middle">1</text>
+          <rect x="386" y="115" width="46" height="40" fill="#fff" stroke="#8a7a63"/><text x="409" y="139" text-anchor="middle">4</text>
+          <rect x="432" y="115" width="46" height="40" fill="#fff" stroke="#8a7a63"/><text x="455" y="139" text-anchor="middle">7</text>
+        </g>
+        <text x="90" y="195" text-anchor="middle" font-size="10.5" fill="#8a4a24">원본의 "오른쪽 위(3)"가 회전 후 "왼쪽 위"로 이동한다</text>
+        <text x="400" y="195" text-anchor="middle" font-size="10.5" fill="#4a5a33">원본의 마지막 열(3,6,9)이 결과의 첫 번째 행이 된다</text>
+      </svg>
+      <p class="diagram-cap">핵심 관찰: 반시계방향 회전은 "각 열을 위→아래 순서로 읽되, 오른쪽 열부터 새 배열의 행으로 채우는 것"과 같다 (시계방향과 정확히 대칭)</p>
+      </div>
+
+      <div class="code-label">RotateCounterClockwise.java</div>
+<pre class="code-block">import java.util.Arrays;
+
+public class RotateCounterClockwise {
+    public static void main(String[] args) {
+        int[][] original = {
+            {1, 2, 3},
+            {4, 5, 6},
+            {7, 8, 9}
+        };
+        int[][] rotated = rotateCCW(original);
+        for (int[] row : rotated) System.out.println(Arrays.toString(row));
+    }
+
+    static int[][] rotateCCW(int[][] arr) {
+        int n = arr.length;          // 원본 행 개수
+        int m = arr[0].length;       // 원본 열 개수
+        int[][] result = new int[m][n];    // 결과는 m×n 크기 (시계방향과 동일)
+
+        for (int i = 0; i &lt; n; i++) {
+            for (int j = 0; j &lt; m; j++) {
+                result[m - 1 - j][i] = arr[i][j];   // 핵심 공식 (시계방향과 좌우가 다름)
+            }
+        }
+        return result;
+    }
+}</pre>
+      <div class="output-label">실행결과</div>
+<pre class="output-block">[3, 6, 9]
+[2, 5, 8]
+[1, 4, 7]</pre>
+
+      <table>
+        <tr><th></th><th>시계방향(CW)</th><th>반시계방향(CCW)</th></tr>
+        <tr><td>공식</td><td><code>result[j][N-1-i] = arr[i][j]</code></td><td><code>result[M-1-j][i] = arr[i][j]</code></td></tr>
+        <tr><td>결과 크기</td><td>M×N (행/열이 뒤바뀜)</td><td>M×N (행/열이 뒤바뀜)</td></tr>
+        <tr><td>원본 왼쪽위(0,0)의 행선</td><td>결과의 오른쪽 위 모서리로</td><td>결과의 왼쪽 아래 모서리로</td></tr>
+        <tr><td>기억법</td><td>"열을 세로로 읽어 → 결과의 가로 줄로, 아래에서 위로"</td><td>"열을 세로로 읽어 → 결과의 가로 줄로, 위에서 아래로, 오른쪽 열부터"</td></tr>
+      </table>
+      <div class="tip">두 공식 모두 <strong>"바깥 for는 원본의 행 i, 안쪽 for는 원본의 열 j"</strong>를 그대로 돌면서 <strong>대입되는 위치(왼쪽 <code>result[...]</code>)만 바뀐다</strong>는 점이 같습니다. 회전 방향을 헷갈릴 때는 3×3 예제로 손으로 한 번 직접 옮겨보는 것이 가장 빠릅니다.</div>
+    </section>
+
+    <!-- CH9 -->
+    <section id="ch9">
+      <h2><span class="num">9</span>종합 체크리스트</h2>
+      <ul class="checklist">
+        <li>8개 기본형(byte/short/int/long/float/double/char/boolean)의 크기와 기본값을 안다</li>
+        <li>묵시적(자동) 형변환과 명시적 캐스팅의 차이, 캐스팅 시 값 손실 가능성을 안다</li>
+        <li>if-else 체인(범위 조건)과 switch(값별 분기, break/fall-through, 화살표식)의 쓰임을 구분한다</li>
+        <li>for(횟수 명확)/while(조건 기반, 0번 가능)/do-while(최소 1번)의 차이를 안다</li>
+        <li>1차원 배열이 메모리에 연속으로 저장되어 인덱스 접근이 O(1)이라는 것을 안다</li>
+        <li>2차원 배열이 "배열의 배열"이며, 바깥 배열이 각 행 배열의 참조를 담는다는 구조를 설명할 수 있다</li>
+        <li>가변 배열(jagged array)이 가능하며 안쪽 반복에서 <code>arr[i].length</code>를 써야 안전한 이유를 안다</li>
+        <li>2차원 배열이 성적표·게임판·이미지·격자탐색·행렬 등 "행-열 관계"를 표현하는 데 쓰인다는 것을 안다</li>
+        <li>행 우선/열 우선으로 반복문 순서만 바꿔 같은 데이터를 다르게 집계할 수 있음을 안다</li>
+        <li>시계방향 회전 공식 <code>result[j][N-1-i]=arr[i][j]</code>을 그림과 함께 설명할 수 있다</li>
+        <li>반시계방향 회전 공식 <code>result[M-1-j][i]=arr[i][j]</code>을 그림과 함께 설명할 수 있다</li>
+        <li>두 회전 공식이 "대입 위치만 다르고 순회 구조는 같다"는 공통점을 안다</li>
+      </ul>
+    </section>
+
+    <footer>자바 기초 문법 완전학습서 · warm-paper study series</footer>
+  </main>
+</div>
+
+<script>
+  const links = document.querySelectorAll('#toc a');
+  const sections = Array.from(links).map(l => document.querySelector(l.getAttribute('href')));
+  function onScroll(){
+    let idx = 0;
+    const y = window.scrollY + 120;
+    sections.forEach((s,i)=>{ if(s && s.offsetTop <= y) idx = i; });
+    links.forEach(l=>l.classList.remove('active'));
+    if(links[idx]) links[idx].classList.add('active');
+  }
+  window.addEventListener('scroll', onScroll);
+  onScroll();
+</script>
+</body>
+</html>
