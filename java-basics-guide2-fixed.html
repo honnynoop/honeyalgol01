@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>자바 컬렉션 · 알고리즘 완전학습서</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap');
+
+  :root{
+    --paper:#ffffff; --paper2:#ffffff; --ink:#2c2620; --ink-soft:#5c5248;
+    --accent:#bd5a2e; --accent-soft:#e7c9ab; --accent-bg:#fbe9d8;
+    --green:#6b7d4f; --green-bg:#e9edda; --blue:#4d6a8a; --blue-bg:#dfe8f0;
+    --line:#e3d5bd; --code-bg:#2c2620; --code-ink:#f3ead9;
+  }
+  *{box-sizing:border-box;}
+  body{ margin:0; background:var(--paper); color:var(--ink);
+    font-family:'Pretendard','Spectral',-apple-system,'Malgun Gothic',sans-serif; line-height:1.75; font-size:16px; }
+  h1,h2,h3,h4{ font-family:'Spectral',serif; font-weight:700; color:var(--ink); }
+  .layout{ display:flex; max-width:1280px; margin:0 auto; }
+  nav#toc{ width:260px; flex-shrink:0; position:sticky; top:0; align-self:flex-start; height:100vh;
+    overflow-y:auto; padding:28px 16px; border-right:1px solid var(--line); background:var(--paper2); }
+  nav#toc h3{ font-size:13px; letter-spacing:.08em; color:var(--accent); text-transform:uppercase; margin:0 0 12px 4px;}
+  nav#toc a{ display:block; padding:6px 8px; border-radius:6px; color:var(--ink-soft); text-decoration:none;
+    font-size:13.5px; margin-bottom:2px; border-left:2px solid transparent; }
+  nav#toc a:hover{ background:var(--accent-bg); color:var(--accent);}
+  nav#toc a.active{ background:var(--accent-bg); color:var(--accent); border-left:2px solid var(--accent); font-weight:600;}
+  main{ flex:1; padding:40px 56px 120px; max-width:920px; }
+  header.hero{ padding:36px 32px; background:linear-gradient(135deg,var(--accent-bg),var(--paper2));
+    border:1px solid var(--accent-soft); border-radius:16px; margin-bottom:48px; }
+  header.hero h1{ font-size:30px; margin:0 0 10px; }
+  header.hero p{ margin:0; color:var(--ink-soft); font-size:15px; }
+  .badge{ display:inline-block; background:var(--accent); color:#fff; font-size:11px; padding:3px 10px;
+    border-radius:20px; margin-right:6px; margin-top:12px; letter-spacing:.03em;}
+  section{ margin-bottom:64px; scroll-margin-top:20px; }
+  section h2{ font-size:25px; border-bottom:3px solid var(--accent); padding-bottom:10px; margin-bottom:22px;
+    display:flex; align-items:center; gap:10px; }
+  section h2 .num{ display:inline-flex; align-items:center; justify-content:center; width:34px; height:34px;
+    background:var(--accent); color:#fff; border-radius:8px; font-size:15px; font-family:'JetBrains Mono',monospace; flex-shrink:0;}
+  section h3{ font-size:18.5px; color:var(--accent); margin-top:32px; }
+  p{ color:var(--ink); }
+  .note{ background:var(--blue-bg); border-left:4px solid var(--blue); padding:14px 18px; border-radius:0 8px 8px 0; margin:18px 0; font-size:14.5px; }
+  .warn{ background:var(--accent-bg); border-left:4px solid var(--accent); padding:14px 18px; border-radius:0 8px 8px 0; margin:18px 0; font-size:14.5px; }
+  .tip{ background:var(--green-bg); border-left:4px solid var(--green); padding:14px 18px; border-radius:0 8px 8px 0; margin:18px 0; font-size:14.5px; }
+  table{ width:100%; border-collapse:collapse; margin:20px 0; font-size:14px; }
+  th,td{ border:1px solid var(--line); padding:9px 11px; text-align:left; }
+  th{ background:var(--accent-bg); color:var(--accent); font-family:'Spectral',serif; }
+  tr:nth-child(even){ background:var(--paper2); }
+  code{ font-family:'JetBrains Mono',monospace; background:var(--paper2); padding:2px 5px; border-radius:4px; font-size:13.5px; color:var(--accent);}
+  pre.code-block{ background:var(--code-bg); color:var(--code-ink); padding:18px 20px; border-radius:10px 10px 0 0;
+    overflow-x:auto; font-family:'JetBrains Mono',monospace; font-size:13px; margin:0; line-height:1.6; }
+  .code-label{ background:#1d1812; color:var(--accent-soft); font-family:'JetBrains Mono',monospace; font-size:11.5px;
+    padding:6px 20px; border-radius:10px 10px 0 0; letter-spacing:.05em; }
+  .code-label + pre.code-block{ border-radius:0; }
+  pre.output-block{ background:#efe7d6; color:var(--ink); padding:14px 20px; border-radius:0 0 10px 10px;
+    border-top:2px dashed var(--accent-soft); font-family:'JetBrains Mono',monospace; font-size:12.5px; margin:0 0 20px; }
+  .output-label{ font-size:11px; color:var(--ink-soft); padding:6px 20px 0; letter-spacing:.05em;}
+  svg text{ font-family:'Pretendard','Spectral',sans-serif; }
+  .diagram-wrap{ background:#fff; border:1px solid var(--line); border-radius:12px; padding:16px; margin:22px 0; }
+  .diagram-cap{ text-align:center; font-size:13px; color:var(--ink-soft); margin-top:8px; }
+  .grid2{ display:grid; grid-template-columns:1fr 1fr; gap:18px; margin:20px 0;}
+  .card{ background:var(--paper2); border:1px solid var(--line); border-radius:10px; padding:16px 18px;}
+  .card h4{ margin:0 0 8px; color:var(--accent); font-size:15px;}
+  .checklist{ list-style:none; padding:0; }
+  .checklist li{ padding:8px 0 8px 30px; position:relative; border-bottom:1px dashed var(--line); font-size:14.5px;}
+  .checklist li::before{ content:"✓"; position:absolute; left:0; color:var(--green); font-weight:700; }
+  footer{ text-align:center; color:var(--ink-soft); font-size:13px; padding:40px 0; }
+</style>
+</head>
+<body>
+<div class="layout">
+  <nav id="toc">
+    <h3>목차</h3>
+    <a href="#ch1">1. 컬렉션 프레임워크 개관</a>
+    <a href="#ch2">2. List — ArrayList / LinkedList</a>
+    <a href="#ch3">3. Set — HashSet / LinkedHashSet / TreeSet</a>
+    <a href="#ch4">4. Map — HashMap / LinkedHashMap / TreeMap</a>
+    <a href="#ch5">5. Queue — Deque / PriorityQueue</a>
+    <a href="#ch6">6. Stack — LIFO 구조</a>
+    <a href="#ch7">7. Comparable vs Comparator</a>
+    <a href="#ch8">8. DFS (깊이우선탐색)</a>
+    <a href="#ch9">9. BFS (너비우선탐색)</a>
+    <a href="#ch10">10. Flood Fill</a>
+    <a href="#ch11">11. Backtracking</a>
+    <a href="#ch12">12. 순열 (Permutation)</a>
+    <a href="#ch13">13. 조합 (Combination)</a>
+    <a href="#ch14">14. 부분집합 (Power Set)</a>
+    <a href="#ch15">15. 종합 체크리스트</a>
+  </nav>
+
+  <main>
+    <header class="hero">
+      <h1>자바 컬렉션 · 알고리즘 완전학습서</h1>
+      <p>List·Set·Map·Queue·Stack의 계층구조와 내부 작동원리부터, Comparable/Comparator, DFS·BFS·플러드필·백트래킹·순열·조합·부분집합까지 —
+      그림 · API · 실행 가능한 소스코드로 정리했습니다.</p>
+      <span class="badge">Collections Framework</span><span class="badge">해시/트리 구조</span><span class="badge">완전탐색</span><span class="badge">DFS/BFS</span><span class="badge">백트래킹</span>
+    </header>
+
+    <!-- CH1 -->
+    <section id="ch1">
+      <h2><span class="num">1</span>컬렉션 프레임워크 개관</h2>
+      <p>자바의 자료구조는 <code>java.util</code> 패키지의 <strong>인터페이스 계층</strong> 위에 구현체가 얹히는 구조입니다. 핵심은 <strong>Collection</strong>과 <strong>Map</strong> 두 계열이 서로 <strong>상속관계가 아니라는 점</strong>입니다.</p>
+
+      <div class="diagram-wrap">
+      <svg viewBox="0 0 760 300" xmlns="http://www.w3.org/2000/svg">
+        <defs><marker id="tri1" markerWidth="12" markerHeight="10" refX="10" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#fff" stroke="#5c5248" stroke-width="1"/></marker></defs>
+
+        <rect x="270" y="10" width="140" height="36" rx="6" fill="#f3ead9" stroke="#5c5248" stroke-width="2"/>
+        <text x="340" y="33" text-anchor="middle" font-size="12" font-weight="700">Iterable</text>
+
+        <line x1="340" y1="72" x2="340" y2="46" stroke="#5c5248" stroke-width="1.5" marker-end="url(#tri1)"/>
+        <rect x="260" y="76" width="160" height="36" rx="6" fill="#fbe9d8" stroke="#bd5a2e" stroke-width="2"/>
+        <text x="340" y="99" text-anchor="middle" font-size="12" font-weight="700" fill="#bd5a2e">Collection</text>
+
+        <line x1="140" y1="140" x2="300" y2="112" stroke="#5c5248" stroke-width="1.3" marker-end="url(#tri1)"/>
+        <line x1="340" y1="140" x2="340" y2="112" stroke="#5c5248" stroke-width="1.3" marker-end="url(#tri1)"/>
+        <line x1="540" y1="140" x2="380" y2="112" stroke="#5c5248" stroke-width="1.3" marker-end="url(#tri1)"/>
+
+        <rect x="60" y="144" width="140" height="34" rx="5" fill="#dfe8f0" stroke="#4d6a8a" stroke-width="2"/>
+        <text x="130" y="166" text-anchor="middle" font-size="12" font-weight="700" fill="#4d6a8a">List</text>
+        <rect x="270" y="144" width="140" height="34" rx="5" fill="#e9edda" stroke="#6b7d4f" stroke-width="2"/>
+        <text x="340" y="166" text-anchor="middle" font-size="12" font-weight="700" fill="#4a5a33">Set</text>
+        <rect x="470" y="144" width="140" height="34" rx="5" fill="#f0e3ea" stroke="#8a5a78" stroke-width="2"/>
+        <text x="540" y="166" text-anchor="middle" font-size="12" font-weight="700" fill="#7a3a68">Queue</text>
+
+        <text x="130" y="200" text-anchor="middle" font-size="10.5" fill="#3d5a78">ArrayList</text>
+        <text x="130" y="216" text-anchor="middle" font-size="10.5" fill="#3d5a78">LinkedList</text>
+        <text x="130" y="232" text-anchor="middle" font-size="10.5" fill="#3d5a78">Vector</text>
+
+        <text x="340" y="200" text-anchor="middle" font-size="10.5" fill="#4a5a33">HashSet</text>
+        <text x="340" y="216" text-anchor="middle" font-size="10.5" fill="#4a5a33">LinkedHashSet</text>
+        <text x="340" y="232" text-anchor="middle" font-size="10.5" fill="#4a5a33">TreeSet</text>
+
+        <text x="540" y="200" text-anchor="middle" font-size="10.5" fill="#7a3a68">LinkedList</text>
+        <text x="540" y="216" text-anchor="middle" font-size="10.5" fill="#7a3a68">ArrayDeque</text>
+        <text x="540" y="232" text-anchor="middle" font-size="10.5" fill="#7a3a68">PriorityQueue</text>
+
+        <!-- Map, separate tree -->
+        <rect x="640" y="76" width="110" height="36" rx="6" fill="#fdeef0" stroke="#a85a6a" stroke-width="2"/>
+        <text x="695" y="99" text-anchor="middle" font-size="12" font-weight="700" fill="#a85a6a">Map</text>
+        <text x="695" y="140" text-anchor="middle" font-size="10.5" fill="#a85a6a">HashMap</text>
+        <text x="695" y="156" text-anchor="middle" font-size="10.5" fill="#a85a6a">LinkedHashMap</text>
+        <text x="695" y="172" text-anchor="middle" font-size="10.5" fill="#a85a6a">TreeMap</text>
+
+        <text x="695" y="240" text-anchor="middle" font-size="10" fill="#8a7a63">※ Map은 Collection을</text>
+        <text x="695" y="255" text-anchor="middle" font-size="10" fill="#8a7a63">상속하지 않는 별도 계층</text>
+
+        <text x="380" y="280" text-anchor="middle" font-size="11" fill="#8a7a63">Stack은 legacy Vector 상속 클래스 — 실무에서는 Deque(ArrayDeque)를 스택으로 사용 권장</text>
+      </svg>
+      <p class="diagram-cap">Collection(List/Set/Queue)과 Map은 서로 다른 뿌리 — Map은 "키-값 쌍"을 다루므로 원소 하나를 다루는 Collection과 설계가 다르다<br>※ UML 표기 규칙: 속이 빈 삼각형 화살표는 항상 <strong>자식(하위 인터페이스) → 부모(상위 인터페이스)</strong> 방향, 화살표 끝이 부모 쪽에 붙는다</p>
+      </div>
+
+      <table>
+        <tr><th>인터페이스</th><th>특징</th><th>대표 구현체</th></tr>
+        <tr><td><strong>List</strong></td><td>순서 O, 중복 O, 인덱스 접근</td><td>ArrayList, LinkedList, Vector</td></tr>
+        <tr><td><strong>Set</strong></td><td>순서 X(구현체별 상이), 중복 X</td><td>HashSet, LinkedHashSet, TreeSet</td></tr>
+        <tr><td><strong>Queue</strong></td><td>FIFO(선입선출), 일부는 우선순위</td><td>LinkedList, ArrayDeque, PriorityQueue</td></tr>
+        <tr><td><strong>Deque</strong></td><td>양쪽 끝 입출력(Queue+Stack 겸용)</td><td>ArrayDeque, LinkedList</td></tr>
+        <tr><td><strong>Map</strong></td><td>키-값 쌍, 키 중복 X</td><td>HashMap, LinkedHashMap, TreeMap</td></tr>
+      </table>
+      <div class="tip">선택 기준 한 줄 요약: <strong>순서+중복 허용→List, 중복 제거→Set, 키로 찾기→Map, 처리 순서 관리(FIFO/LIFO/우선순위)→Queue·Deque</strong>.</div>
+    </section>
+
+    <!-- CH2 -->
+    <section id="ch2">
+      <h2><span class="num">2</span>List — ArrayList / LinkedList</h2>
+      <p>둘 다 "순서 있는 목록"이지만 내부 저장 방식이 완전히 다릅니다.</p>
+
+      <div class="diagram-wrap">
+      <svg viewBox="0 0 700 220" xmlns="http://www.w3.org/2000/svg">
+        <text x="20" y="30" font-size="13" font-weight="700" fill="#bd5a2e">ArrayList — 연속된 배열</text>
+        <g font-family="JetBrains Mono, monospace" font-size="12">
+          <rect x="20" y="45" width="60" height="40" fill="#fbe9d8" stroke="#bd5a2e" stroke-width="2"/><text x="50" y="70" text-anchor="middle">"A"</text>
+          <rect x="80" y="45" width="60" height="40" fill="#fbe9d8" stroke="#bd5a2e" stroke-width="2"/><text x="110" y="70" text-anchor="middle">"B"</text>
+          <rect x="140" y="45" width="60" height="40" fill="#fbe9d8" stroke="#bd5a2e" stroke-width="2"/><text x="170" y="70" text-anchor="middle">"C"</text>
+          <rect x="200" y="45" width="60" height="40" fill="#f8ded0" stroke="#bd5a2e" stroke-width="1.5" stroke-dasharray="4,3"/><text x="230" y="70" text-anchor="middle" fill="#a3937a">여유</text>
+        </g>
+        <text x="50" y="100" text-anchor="middle" font-size="10" fill="#8a4a24">[0]</text>
+        <text x="110" y="100" text-anchor="middle" font-size="10" fill="#8a4a24">[1]</text>
+        <text x="170" y="100" text-anchor="middle" font-size="10" fill="#8a4a24">[2]</text>
+        <text x="20" y="125" font-size="10.5" fill="#5c5248">인덱스로 즉시 접근(O(1)) · 중간 삽입/삭제 시 뒤 요소를 모두 밀어야 함(O(n)) · 꽉 차면 더 큰 배열로 복사(resize)</text>
+
+        <text x="20" y="165" font-size="13" font-weight="700" fill="#4d6a8a">LinkedList — 노드 + 양방향 포인터</text>
+        <g font-family="JetBrains Mono, monospace" font-size="11">
+          <rect x="20" y="180" width="70" height="34" fill="#dfe8f0" stroke="#4d6a8a" stroke-width="2"/><text x="55" y="202" text-anchor="middle">prev|A|next</text>
+          <line x1="90" y1="197" x2="120" y2="197" stroke="#4d6a8a" stroke-width="1.5" marker-end="url(#tri1)"/>
+          <line x1="120" y1="203" x2="90" y2="203" stroke="#4d6a8a" stroke-width="1.5"/>
+          <rect x="120" y="180" width="70" height="34" fill="#dfe8f0" stroke="#4d6a8a" stroke-width="2"/><text x="155" y="202" text-anchor="middle">prev|B|next</text>
+          <line x1="190" y1="197" x2="220" y2="197" stroke="#4d6a8a" stroke-width="1.5" marker-end="url(#tri1)"/>
+          <line x1="220" y1="203" x2="190" y2="203" stroke="#4d6a8a" stroke-width="1.5"/>
+          <rect x="220" y="180" width="70" height="34" fill="#dfe8f0" stroke="#4d6a8a" stroke-width="2"/><text x="255" y="202" text-anchor="middle">prev|C|next</text>
+        </g>
+        <text x="330" y="200" font-size="10.5" fill="#3d5a78">각 노드가 앞/뒤 노드 주소를 가짐 · 삽입/삭제는 포인터만 변경(O(1))</text>
+        <text x="330" y="215" font-size="10.5" fill="#3d5a78">단, i번째 접근은 처음부터 따라가야 함(O(n))</text>
+      </svg>
+      </div>
+
+      <table>
+        <tr><th>연산</th><th>ArrayList</th><th>LinkedList</th></tr>
+        <tr><td>인덱스 접근 <code>get(i)</code></td><td><strong>O(1)</strong></td><td>O(n)</td></tr>
+        <tr><td>맨 끝 추가 <code>add(e)</code></td><td>O(1) (평균, 가끔 resize)</td><td><strong>O(1)</strong></td></tr>
+        <tr><td>중간 삽입/삭제</td><td>O(n) (뒤 요소 밀기)</td><td>O(n) (탐색) + O(1) (연결변경)</td></tr>
+        <tr><td>맨 앞 삽입/삭제</td><td>O(n)</td><td><strong>O(1)</strong></td></tr>
+      </table>
+
+      <h3>주요 API</h3>
+      <table>
+        <tr><th>메서드</th><th>기능</th></tr>
+        <tr><td><code>add(e)</code> / <code>add(i, e)</code></td><td>끝에 추가 / i번째에 삽입</td></tr>
+        <tr><td><code>get(i)</code> / <code>set(i, e)</code></td><td>i번째 조회 / 교체</td></tr>
+        <tr><td><code>remove(i)</code> / <code>remove(Object)</code></td><td>인덱스로 삭제 / 값으로 삭제</td></tr>
+        <tr><td><code>size()</code> / <code>isEmpty()</code></td><td>크기 / 비었는지</td></tr>
+        <tr><td><code>contains(e)</code> / <code>indexOf(e)</code></td><td>포함 여부 / 위치</td></tr>
+        <tr><td><code>Collections.sort(list)</code> / <code>list.sort(comparator)</code></td><td>정렬</td></tr>
+      </table>
+
+      <div class="code-label">ListDemo.java</div>
+<pre class="code-block">import java.util.*;
+
+public class ListDemo {
+    public static void main(String[] args) {
+        List&lt;String&gt; arr = new ArrayList&lt;&gt;();
+        arr.add("A"); arr.add("B"); arr.add("C");
+        arr.add(1, "X");                 // 인덱스 1에 삽입 → [A, X, B, C]
+        System.out.println(arr);
+        System.out.println(arr.get(2));  // "B"
+
+        LinkedList&lt;String&gt; linked = new LinkedList&lt;&gt;(arr);
+        linked.addFirst("HEAD");          // 맨 앞 O(1) 삽입
+        linked.addLast("TAIL");            // 맨 뒤 O(1) 삽입
+        System.out.println(linked);
+
+        Collections.sort(arr);              // 사전순 정렬
+        System.out.println(arr);
+    }
+}</pre>
+      <div class="output-label">실행결과</div>
+<pre class="output-block">[A, X, B, C]
+B
+[HEAD, A, X, B, C, TAIL]
+[A, B, C, X]</pre>
+    </section>
+
+    <!-- CH3 -->
+    <section id="ch3">
+      <h2><span class="num">3</span>Set — HashSet / LinkedHashSet / TreeSet</h2>
+      <p>세 Set 모두 <strong>중복을 허용하지 않지만</strong>, 내부 구조가 달라 <strong>순서 보장 여부</strong>가 다릅니다.</p>
+
+      <div class="diagram-wrap">
+      <svg viewBox="0 0 720 240" xmlns="http://www.w3.org/2000/svg">
+        <text x="20" y="25" font-size="12.5" font-weight="700" fill="#bd5a2e">HashSet — 해시 버킷 배열</text>
+        <g font-family="JetBrains Mono, monospace" font-size="10">
+          <rect x="20" y="35" width="46" height="30" fill="#fff" stroke="#bd5a2e"/><text x="43" y="55" text-anchor="middle">[0]</text>
+          <rect x="66" y="35" width="46" height="30" fill="#fff" stroke="#bd5a2e"/><text x="89" y="55" text-anchor="middle">[1]</text>
+          <rect x="112" y="35" width="46" height="30" fill="#fff" stroke="#bd5a2e"/><text x="135" y="55" text-anchor="middle">[2]</text>
+          <rect x="158" y="35" width="46" height="30" fill="#fff" stroke="#bd5a2e"/><text x="181" y="55" text-anchor="middle">[3]</text>
+        </g>
+        <text x="43" y="85" text-anchor="middle" font-size="9" fill="#8a4a24">"C"</text>
+        <text x="135" y="85" text-anchor="middle" font-size="9" fill="#8a4a24">"A"→"D"</text>
+        <text x="10" y="105" font-size="9.5" fill="#8a7a63">hash("A")%4=2, hash("D")%4=2 → 충돌시 같은 버킷에 연결(체이닝)</text>
+        <text x="10" y="120" font-size="9.5" fill="#8a7a63">저장 순서 보장 X, 평균 O(1) 탐색</text>
+
+        <text x="260" y="25" font-size="12.5" font-weight="700" fill="#4d6a8a">LinkedHashSet — 해시 + 삽입순서 연결</text>
+        <g font-family="JetBrains Mono, monospace" font-size="10">
+          <rect x="260" y="40" width="60" height="30" fill="#dfe8f0" stroke="#4d6a8a"/><text x="290" y="60" text-anchor="middle">"B"</text>
+          <rect x="330" y="40" width="60" height="30" fill="#dfe8f0" stroke="#4d6a8a"/><text x="360" y="60" text-anchor="middle">"A"</text>
+          <rect x="400" y="40" width="60" height="30" fill="#dfe8f0" stroke="#4d6a8a"/><text x="430" y="60" text-anchor="middle">"D"</text>
+        </g>
+        <line x1="320" y1="55" x2="330" y2="55" stroke="#4d6a8a" marker-end="url(#tri1)"/>
+        <line x1="390" y1="55" x2="400" y2="55" stroke="#4d6a8a" marker-end="url(#tri1)"/>
+        <text x="260" y="90" font-size="9.5" fill="#3d5a78">해시로 탐색은 빠르게, 별도의 연결리스트로 "넣은 순서" 기억</text>
+
+        <text x="20" y="150" font-size="12.5" font-weight="700" fill="#4a5a33">TreeSet — 정렬 이진탐색트리(Red-Black Tree)</text>
+        <circle cx="150" cy="185" r="20" fill="#e9edda" stroke="#6b7d4f" stroke-width="2"/><text x="150" y="190" text-anchor="middle" font-size="11">D</text>
+        <line x1="150" y1="205" x2="100" y2="225" stroke="#6b7d4f"/>
+        <line x1="150" y1="205" x2="200" y2="225" stroke="#6b7d4f"/>
+        <circle cx="100" cy="235" r="18" fill="#f2f6e8" stroke="#6b7d4f" stroke-width="2"/><text x="100" y="240" text-anchor="middle" font-size="10">A</text>
+        <circle cx="200" cy="235" r="18" fill="#f2f6e8" stroke="#6b7d4f" stroke-width="2"/><text x="200" y="240" text-anchor="middle" font-size="10">F</text>
+        <text x="260" y="200" font-size="9.5" fill="#4a5a33">항상 정렬 상태 유지(중위순회=오름차순)</text>
+        <text x="260" y="215" font-size="9.5" fill="#4a5a33">삽입/삭제/탐색 O(log n)</text>
+      </svg>
+      </div>
+
+      <table>
+        <tr><th></th><th>HashSet</th><th>LinkedHashSet</th><th>TreeSet</th></tr>
+        <tr><td>순서</td><td>보장 안 됨</td><td>삽입 순서</td><td>정렬 순서(오름차순 기본)</td></tr>
+        <tr><td>내부 구조</td><td>해시테이블</td><td>해시테이블+연결리스트</td><td>Red-Black Tree</td></tr>
+        <tr><td>탐색/삽입</td><td>평균 O(1)</td><td>평균 O(1)</td><td>O(log n)</td></tr>
+        <tr><td>null 허용</td><td>1개 허용</td><td>1개 허용</td><td>불허(NullPointerException)</td></tr>
+      </table>
+
+      <h3>주요 API</h3>
+      <table>
+        <tr><th>메서드</th><th>기능</th></tr>
+        <tr><td><code>add(e)</code> / <code>remove(e)</code></td><td>추가(중복시 false 반환) / 삭제</td></tr>
+        <tr><td><code>contains(e)</code></td><td>포함 여부(평균 O(1)~O(log n))</td></tr>
+        <tr><td><code>TreeSet.first()/last()</code></td><td>최소/최대값</td></tr>
+        <tr><td><code>TreeSet.ceiling(x)/floor(x)</code></td><td>x 이상 최소값 / x 이하 최대값</td></tr>
+      </table>
+
+      <div class="code-label">SetDemo.java</div>
+<pre class="code-block">import java.util.*;
+
+public class SetDemo {
+    public static void main(String[] args) {
+        Set&lt;String&gt; hs = new HashSet&lt;&gt;(List.of("B", "A", "D", "A"));
+        Set&lt;String&gt; lhs = new LinkedHashSet&lt;&gt;(List.of("B", "A", "D"));
+        TreeSet&lt;String&gt; ts = new TreeSet&lt;&gt;(List.of("B", "A", "D"));
+
+        System.out.println("HashSet(순서무작위): " + hs);       // 중복 "A" 자동 제거
+        System.out.println("LinkedHashSet(입력순): " + lhs);
+        System.out.println("TreeSet(정렬됨): " + ts);
+        System.out.println("최소값: " + ts.first() + ", 최대값: " + ts.last());
+    }
+}</pre>
+      <div class="output-label">실행결과 (HashSet 순서는 실행마다 다를 수 있음)</div>
+<pre class="output-block">HashSet(순서무작위): [A, B, D]
+LinkedHashSet(입력순): [B, A, D]
+TreeSet(정렬됨): [A, B, D]
+최소값: A, 최대값: D</pre>
+    </section>
+
+    <!-- CH4 -->
+    <section id="ch4">
+      <h2><span class="num">4</span>Map — HashMap / LinkedHashMap / TreeMap</h2>
+      <p>Map은 <strong>Key-Value 쌍</strong>을 저장합니다. 내부적으로 Key는 Set처럼(중복불가) 관리되고, 각 Key가 Value 하나를 가리킵니다.</p>
+
+      <div class="diagram-wrap">
+      <svg viewBox="0 0 640 210" xmlns="http://www.w3.org/2000/svg">
+        <text x="20" y="25" font-size="12.5" font-weight="700" fill="#bd5a2e">HashMap 내부 — hash(key)로 버킷 결정, 같은 버킷은 연결(체이닝)</text>
+        <g font-family="JetBrains Mono, monospace" font-size="10.5">
+          <rect x="20" y="40" width="50" height="30" fill="#fff" stroke="#bd5a2e"/><text x="45" y="60" text-anchor="middle">[0]</text>
+          <rect x="70" y="40" width="50" height="30" fill="#fff" stroke="#bd5a2e"/><text x="95" y="60" text-anchor="middle">[1]</text>
+          <rect x="120" y="40" width="50" height="30" fill="#fff" stroke="#bd5a2e"/><text x="145" y="60" text-anchor="middle">[2]</text>
+        </g>
+        <rect x="180" y="35" width="110" height="40" rx="4" fill="#fbe9d8" stroke="#bd5a2e"/>
+        <text x="235" y="50" text-anchor="middle" font-size="10">"age"→30</text>
+        <line x1="290" y1="55" x2="330" y2="55" stroke="#bd5a2e" marker-end="url(#tri1)"/>
+        <rect x="330" y="35" width="110" height="40" rx="4" fill="#fce0c8" stroke="#bd5a2e"/>
+        <text x="385" y="50" text-anchor="middle" font-size="10">"page"→5 (충돌)</text>
+        <text x="20" y="100" font-size="10" fill="#8a4a24">hash("age")%3=1, hash("page")%3=1 → 버킷[1]에서 체이닝(또는 트리화, Java8+ 버킷당 8개 이상시 Red-Black Tree)</text>
+        <text x="20" y="118" font-size="10" fill="#8a4a24">순서 보장 X, 평균 O(1) put/get</text>
+
+        <text x="20" y="150" font-size="12.5" font-weight="700" fill="#4a5a33">TreeMap — Key 기준 정렬(Red-Black Tree), LinkedHashMap — 입력/접근 순서 유지</text>
+        <text x="20" y="170" font-size="10" fill="#4a5a33">TreeMap: keySet() 순회시 항상 오름차순 · LinkedHashMap: accessOrder=true로 LRU 캐시 구현 가능</text>
+      </svg>
+      </div>
+
+      <table>
+        <tr><th></th><th>HashMap</th><th>LinkedHashMap</th><th>TreeMap</th></tr>
+        <tr><td>순서</td><td>보장 안 됨</td><td>삽입(또는 접근) 순서</td><td>Key 정렬 순서</td></tr>
+        <tr><td>탐색/삽입</td><td>평균 O(1)</td><td>평균 O(1)</td><td>O(log n)</td></tr>
+        <tr><td>대표 용도</td><td>일반적인 매핑</td><td>LRU 캐시</td><td>범위 검색, 정렬 필요시</td></tr>
+      </table>
+
+      <h3>주요 API</h3>
+      <table>
+        <tr><th>메서드</th><th>기능</th></tr>
+        <tr><td><code>put(k,v)</code> / <code>get(k)</code></td><td>저장 / 조회(없으면 null)</td></tr>
+        <tr><td><code>getOrDefault(k, default)</code></td><td>없으면 기본값 반환</td></tr>
+        <tr><td><code>containsKey(k)</code> / <code>containsValue(v)</code></td><td>키/값 존재 확인</td></tr>
+        <tr><td><code>remove(k)</code></td><td>삭제</td></tr>
+        <tr><td><code>keySet()</code> / <code>values()</code> / <code>entrySet()</code></td><td>키 집합 / 값 목록 / (키,값) 쌍 집합</td></tr>
+        <tr><td><code>merge(k, v, function)</code></td><td>있으면 병합함수 적용, 없으면 v로 put — 빈도수 계산에 자주 사용</td></tr>
+        <tr><td><code>computeIfAbsent(k, function)</code></td><td>없을 때만 계산해서 put</td></tr>
+      </table>
+
+      <div class="code-label">MapDemo.java</div>
+<pre class="code-block">import java.util.*;
+
+public class MapDemo {
+    public static void main(String[] args) {
+        Map&lt;String, Integer&gt; freq = new HashMap&lt;&gt;();
+        String[] words = {"apple", "banana", "apple", "cherry", "banana", "apple"};
+        for (String w : words) {
+            freq.merge(w, 1, Integer::sum);   // 없으면 1, 있으면 +1
+        }
+        for (Map.Entry&lt;String, Integer&gt; e : freq.entrySet()) {
+            System.out.println(e.getKey() + " : " + e.getValue());
+        }
+
+        TreeMap&lt;String, Integer&gt; sorted = new TreeMap&lt;&gt;(freq);
+        System.out.println("정렬됨: " + sorted);
+    }
+}</pre>
+      <div class="output-label">실행결과 (HashMap 순회 순서는 실행마다 다를 수 있음)</div>
+<pre class="output-block">banana : 2
+apple : 3
+cherry : 1
+정렬됨: {apple=3, banana=2, cherry=1}</pre>
+    </section>
+
+    <!-- CH5 -->
+    <section id="ch5">
+      <h2><span class="num">5</span>Queue — Deque / PriorityQueue</h2>
+      <p>Queue는 <strong>FIFO(First In First Out, 선입선출)</strong>가 기본 원칙입니다. <code>PriorityQueue</code>만 예외적으로 "우선순위가 높은 것부터" 나옵니다.</p>
+
+      <div class="diagram-wrap">
+      <svg viewBox="0 0 640 200" xmlns="http://www.w3.org/2000/svg">
+        <text x="20" y="25" font-size="12.5" font-weight="700" fill="#7a3a68">Queue(FIFO) — 뒤(rear)로 넣고 앞(front)에서 뺀다</text>
+        <text x="30" y="55" font-size="11" fill="#5c5248">offer(추가) →</text>
+        <g font-family="JetBrains Mono, monospace" font-size="12">
+          <rect x="130" y="40" width="50" height="36" fill="#f0e3ea" stroke="#8a5a78" stroke-width="2"/><text x="155" y="63" text-anchor="middle">1</text>
+          <rect x="180" y="40" width="50" height="36" fill="#f0e3ea" stroke="#8a5a78" stroke-width="2"/><text x="205" y="63" text-anchor="middle">2</text>
+          <rect x="230" y="40" width="50" height="36" fill="#f0e3ea" stroke="#8a5a78" stroke-width="2"/><text x="255" y="63" text-anchor="middle">3</text>
+        </g>
+        <text x="130" y="95" text-anchor="middle" font-size="10" fill="#7a3a68">front (poll로 나감)</text>
+        <text x="255" y="95" text-anchor="middle" font-size="10" fill="#7a3a68">rear</text>
+
+        <text x="20" y="140" font-size="12.5" font-weight="700" fill="#7a3a68">PriorityQueue — 내부는 배열이지만 논리적으로 힙(min-heap) 트리</text>
+        <circle cx="120" cy="165" r="18" fill="#f0e3ea" stroke="#8a5a78" stroke-width="2"/><text x="120" y="170" text-anchor="middle" font-size="11">1</text>
+        <line x1="120" y1="183" x2="90" y2="205" stroke="#8a5a78"/><line x1="120" y1="183" x2="150" y2="205" stroke="#8a5a78"/>
+        <circle cx="90" cy="213" r="16" fill="#f6ecf2" stroke="#8a5a78" stroke-width="2"/><text x="90" y="218" text-anchor="middle" font-size="10">3</text>
+        <circle cx="150" cy="213" r="16" fill="#f6ecf2" stroke="#8a5a78" stroke-width="2"/><text x="150" y="218" text-anchor="middle" font-size="10">5</text>
+        <text x="260" y="175" font-size="10.5" fill="#7a3a68">항상 루트(맨 위)가 최소값(기본) — poll()마다 O(log n)에 재정렬</text>
+        <text x="260" y="192" font-size="10.5" fill="#7a3a68">Comparator를 주면 최대힙 등으로 순서 변경 가능</text>
+      </svg>
+      </div>
+
+      <table>
+        <tr><th>메서드</th><th>일반형(예외 던짐)</th><th>안전형(값 반환)</th></tr>
+        <tr><td>추가</td><td><code>add(e)</code></td><td><code>offer(e)</code></td></tr>
+        <tr><td>꺼내기(제거)</td><td><code>remove()</code></td><td><code>poll()</code> — 비었으면 null</td></tr>
+        <tr><td>맨앞 확인(유지)</td><td><code>element()</code></td><td><code>peek()</code> — 비었으면 null</td></tr>
+      </table>
+
+      <div class="code-label">QueueDemo.java</div>
+<pre class="code-block">import java.util.*;
+
+public class QueueDemo {
+    public static void main(String[] args) {
+        Queue&lt;Integer&gt; q = new ArrayDeque&lt;&gt;();
+        q.offer(1); q.offer(2); q.offer(3);
+        System.out.println(q.poll());  // 1 (먼저 넣은 게 먼저 나옴)
+        System.out.println(q.peek());  // 2 (제거 안 하고 확인만)
+
+        PriorityQueue&lt;Integer&gt; pq = new PriorityQueue&lt;&gt;();          // 기본: 최소힙
+        pq.offer(5); pq.offer(1); pq.offer(3);
+        System.out.println(pq.poll());  // 1 (가장 작은 값부터)
+
+        PriorityQueue&lt;Integer&gt; maxHeap = new PriorityQueue&lt;&gt;(Collections.reverseOrder()); // 최대힙
+        maxHeap.offer(5); maxHeap.offer(1); maxHeap.offer(3);
+        System.out.println(maxHeap.poll());  // 5
+    }
+}</pre>
+      <div class="output-label">실행결과</div>
+<pre class="output-block">1
+2
+1
+5</pre>
+    </section>
+
+    <!-- CH6 -->
+    <section id="ch6">
+      <h2><span class="num">6</span>Stack — LIFO 구조</h2>
+      <p>Stack은 <strong>LIFO(Last In First Out, 후입선출)</strong>입니다. <code>java.util.Stack</code>은 legacy(Vector 상속, 동기화로 느림)라, 실무에서는 <strong><code>Deque</code>(ArrayDeque)</strong>를 스택으로 쓰는 것이 권장됩니다.</p>
+
+      <div class="diagram-wrap">
+      <svg viewBox="0 0 400 220" xmlns="http://www.w3.org/2000/svg">
+        <text x="20" y="25" font-size="12.5" font-weight="700" fill="#bd5a2e">push(넣기) / pop(빼기) — 항상 맨 위(top)에서만</text>
+        <rect x="130" y="150" width="90" height="34" fill="#fbe9d8" stroke="#bd5a2e" stroke-width="2"/><text x="175" y="172" text-anchor="middle" font-size="12">1 (bottom)</text>
+        <rect x="130" y="116" width="90" height="34" fill="#fbe9d8" stroke="#bd5a2e" stroke-width="2"/><text x="175" y="138" text-anchor="middle" font-size="12">2</text>
+        <rect x="130" y="82" width="90" height="34" fill="#f8ded0" stroke="#bd5a2e" stroke-width="2.5"/><text x="175" y="104" text-anchor="middle" font-size="12">3 (top)</text>
+        <line x1="230" y1="99" x2="280" y2="99" stroke="#5c5248" marker-end="url(#tri1)"/>
+        <text x="300" y="95" font-size="10.5" fill="#5c5248">push(4)</text>
+        <line x1="280" y1="115" x2="230" y2="115" stroke="#5c5248" marker-end="url(#tri1)"/>
+        <text x="300" y="120" font-size="10.5" fill="#5c5248">pop() → 3</text>
+      </svg>
+      </div>
+
+      <table>
+        <tr><th>메서드</th><th>Deque(권장)</th><th>Stack(legacy)</th></tr>
+        <tr><td>넣기</td><td><code>push(e)</code></td><td><code>push(e)</code></td></tr>
+        <tr><td>빼기</td><td><code>pop()</code></td><td><code>pop()</code></td></tr>
+        <tr><td>확인만</td><td><code>peek()</code></td><td><code>peek()</code></td></tr>
+        <tr><td>비었는지</td><td><code>isEmpty()</code></td><td><code>empty()</code></td></tr>
+      </table>
+
+      <div class="code-label">StackDemo.java</div>
+<pre class="code-block">import java.util.*;
+
+public class StackDemo {
+    public static void main(String[] args) {
+        Deque&lt;Integer&gt; stack = new ArrayDeque&lt;&gt;();   // 스택으로 사용 (권장 방식)
+        stack.push(1); stack.push(2); stack.push(3);
+        System.out.println(stack.pop());   // 3 - 가장 나중에 넣은 게 먼저 나옴
+        System.out.println(stack.peek());  // 2 - 제거하지 않고 확인
+        System.out.println(stack);          // [2, 1]
+    }
+}</pre>
+      <div class="output-label">실행결과</div>
+<pre class="output-block">3
+2
+[2, 1]</pre>
+    </section>
+
+    <!-- CH7 -->
+    <section id="ch7">
+      <h2><span class="num">7</span>Comparable vs Comparator</h2>
+      <p>둘 다 "정렬 기준"을 정의하지만, <strong>어디에 정의하느냐</strong>가 다릅니다.</p>
+      <table>
+        <tr><th></th><th>Comparable</th><th>Comparator</th></tr>
+        <tr><td>정의 위치</td><td>정렬 대상 클래스 <strong>내부</strong>(<code>implements Comparable&lt;T&gt;</code>)</td><td>클래스 <strong>외부</strong>(별도 클래스 또는 람다)</td></tr>
+        <tr><td>메서드</td><td><code>compareTo(T o)</code></td><td><code>compare(T a, T b)</code></td></tr>
+        <tr><td>기준 개수</td><td>1개(자연 순서, natural ordering)</td><td>여러 개 자유롭게 정의 가능</td></tr>
+        <tr><td>사용 예</td><td><code>Collections.sort(list)</code></td><td><code>Collections.sort(list, comparator)</code></td></tr>
+      </table>
+
+      <div class="code-label">ComparableComparator.java</div>
+<pre class="code-block">import java.util.*;
+
+class Student implements Comparable&lt;Student&gt; {   // Comparable: 클래스 내부에 "기본 정렬 기준" 1개
+    String name; int score;
+    Student(String name, int score) { this.name = name; this.score = score; }
+
+    @Override
+    public int compareTo(Student o) {
+        return this.score - o.score;   // 점수 오름차순이 "자연 순서"
+    }
+    @Override public String toString() { return name + "(" + score + ")"; }
+}
+
+public class ComparableComparator {
+    public static void main(String[] args) {
+        List&lt;Student&gt; list = new ArrayList&lt;&gt;(List.of(
+            new Student("영희", 85), new Student("철수", 70), new Student("민수", 85)
+        ));
+
+        Collections.sort(list);   // Comparable 기준(점수 오름차순)
+        System.out.println("자연순서: " + list);
+
+        // Comparator: 이름 오름차순, 점수 같으면 상관없음 - 외부에서 자유롭게 기준 교체
+        list.sort(Comparator.comparing((Student s) -> s.name));
+        System.out.println("이름순: " + list);
+
+        // 점수 내림차순, 같으면 이름 오름차순 (다중 기준 체이닝)
+        list.sort(Comparator.comparingInt((Student s) -> s.score).reversed()
+                             .thenComparing(s -> s.name));
+        System.out.println("점수내림차순+이름오름차순: " + list);
+    }
+}</pre>
+      <div class="output-label">실행결과</div>
+<pre class="output-block">자연순서: [철수(70), 영희(85), 민수(85)]
+이름순: [민수(85), 영희(85), 철수(70)]
+점수내림차순+이름오름차순: [민수(85), 영희(85), 철수(70)]</pre>
+      <div class="tip"><code>Comparator.comparing()</code>, <code>.reversed()</code>, <code>.thenComparing()</code> 체이닝은 실무·코딩테스트에서 가장 많이 쓰는 정렬 패턴입니다. <code>TreeSet</code>/<code>TreeMap</code>/<code>PriorityQueue</code> 생성자에도 그대로 Comparator를 넘길 수 있습니다.</div>
+    </section>
+
+    <!-- CH8 -->
+    <section id="ch8">
+      <h2><span class="num">8</span>DFS (깊이우선탐색)</h2>
+      <p>DFS는 "<strong>한 방향으로 갈 수 있는 만큼 깊이 들어갔다가, 막히면 되돌아오는(백트랙)</strong>" 탐색입니다. <strong>재귀 호출 스택</strong>이 곧 탐색 경로가 됩니다.</p>
+
+      <div class="diagram-wrap">
+      <svg viewBox="0 0 500 200" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="250" cy="25" r="20" fill="#fbe9d8" stroke="#bd5a2e" stroke-width="2"/><text x="250" y="30" text-anchor="middle" font-size="12">1</text>
+        <line x1="235" y1="42" x2="150" y2="80" stroke="#5c5248"/>
+        <line x1="265" y1="42" x2="350" y2="80" stroke="#5c5248"/>
+        <circle cx="150" cy="95" r="20" fill="#fbe9d8" stroke="#bd5a2e" stroke-width="2"/><text x="150" y="100" text-anchor="middle" font-size="12">2</text>
+        <circle cx="350" cy="95" r="20" fill="#fdf3e8" stroke="#bd5a2e" stroke-width="2"/><text x="350" y="100" text-anchor="middle" font-size="12">5</text>
+        <line x1="135" y1="112" x2="90" y2="150" stroke="#5c5248"/>
+        <line x1="165" y1="112" x2="210" y2="150" stroke="#5c5248"/>
+        <circle cx="90" cy="165" r="20" fill="#fbe9d8" stroke="#bd5a2e" stroke-width="2"/><text x="90" y="170" text-anchor="middle" font-size="12">3</text>
+        <circle cx="210" cy="165" r="20" fill="#fbe9d8" stroke="#bd5a2e" stroke-width="2"/><text x="210" y="170" text-anchor="middle" font-size="12">4</text>
+        <text x="250" y="195" text-anchor="middle" font-size="11" fill="#8a4a24">방문 순서 1→2→3→(막힘,백트랙)→4→(백트랙)→5 — 왼쪽 가지를 끝까지 판 뒤 되돌아온다</text>
+      </svg>
+      </div>
+
+      <div class="code-label">DFSDemo.java (인접리스트 그래프, 재귀)</div>
+<pre class="code-block">import java.util.*;
+
+public class DFSDemo {
+    static List&lt;List&lt;Integer&gt;&gt; graph;
+    static boolean[] visited;
+
+    public static void main(String[] args) {
+        int n = 6;
+        graph = new ArrayList&lt;&gt;();
+        for (int i = 0; i &lt; n; i++) graph.add(new ArrayList&lt;&gt;());
+        addEdge(1,2); addEdge(1,5); addEdge(2,3); addEdge(2,4);
+
+        visited = new boolean[n];
+        dfs(1);
+    }
+    static void addEdge(int a, int b) { graph.get(a).add(b); graph.get(b).add(a); }
+
+    static void dfs(int cur) {
+        visited[cur] = true;
+        System.out.print(cur + " ");
+        for (int next : graph.get(cur)) {
+            if (!visited[next]) dfs(next);   // 재귀 = 스택에 쌓임
+        }
+    }
+}</pre>
+      <div class="output-label">실행결과</div>
+<pre class="output-block">1 2 3 4 5 </pre>
+
+      <div class="note"><strong>재귀 대신 스택으로도 구현 가능</strong>: <code>Deque&lt;Integer&gt; stack</code>에 push/pop을 직접 다루면 같은 순서(구현에 따라 방문순서는 약간 달라질 수 있음)로 반복문만으로 DFS를 흉내낼 수 있습니다 — "재귀 = 시스템이 대신 관리해주는 스택"이라는 것이 핵심입니다.</div>
+    </section>
+
+    <!-- CH9 -->
+    <section id="ch9">
+      <h2><span class="num">9</span>BFS (너비우선탐색)</h2>
+      <p>BFS는 "<strong>가까운 것부터 한 단계씩 넓게</strong>" 탐색합니다. <strong>Queue</strong>를 사용해 <strong>레벨(단계) 순서</strong>대로 방문합니다. 최단 거리(가중치 없는 그래프)를 구할 때 사용합니다.</p>
+
+      <div class="diagram-wrap">
+      <svg viewBox="0 0 500 210" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="250" cy="25" r="20" fill="#f0e3ea" stroke="#8a5a78" stroke-width="2"/><text x="250" y="30" text-anchor="middle" font-size="12">1</text>
+        <line x1="235" y1="42" x2="150" y2="80" stroke="#5c5248"/>
+        <line x1="265" y1="42" x2="350" y2="80" stroke="#5c5248"/>
+        <circle cx="150" cy="95" r="20" fill="#f0e3ea" stroke="#8a5a78" stroke-width="2"/><text x="150" y="100" text-anchor="middle" font-size="12">2</text>
+        <circle cx="350" cy="95" r="20" fill="#f0e3ea" stroke="#8a5a78" stroke-width="2"/><text x="350" y="100" text-anchor="middle" font-size="12">3</text>
+        <line x1="135" y1="112" x2="90" y2="150" stroke="#5c5248"/>
+        <line x1="165" y1="112" x2="210" y2="150" stroke="#5c5248"/>
+        <circle cx="90" cy="165" r="20" fill="#f6ecf2" stroke="#8a5a78" stroke-width="2"/><text x="90" y="170" text-anchor="middle" font-size="12">4</text>
+        <circle cx="210" cy="165" r="20" fill="#f6ecf2" stroke="#8a5a78" stroke-width="2"/><text x="210" y="170" text-anchor="middle" font-size="12">5</text>
+        <text x="250" y="195" text-anchor="middle" font-size="11" fill="#7a3a68">방문 순서 1→2→3(레벨1) →4→5(레벨2) — 큐에 넣은 순서 그대로 처리, 레벨 단위로 퍼져나간다</text>
+      </svg>
+      </div>
+
+      <div class="code-label">BFSDemo.java</div>
+<pre class="code-block">import java.util.*;
+
+public class BFSDemo {
+    public static void main(String[] args) {
+        int n = 6;
+        List&lt;List&lt;Integer&gt;&gt; graph = new ArrayList&lt;&gt;();
+        for (int i = 0; i &lt; n; i++) graph.add(new ArrayList&lt;&gt;());
+        addEdge(graph, 1,2); addEdge(graph, 1,3); addEdge(graph, 2,4); addEdge(graph, 2,5);
+
+        boolean[] visited = new boolean[n];
+        Queue&lt;Integer&gt; q = new ArrayDeque&lt;&gt;();
+        q.offer(1);
+        visited[1] = true;
+
+        while (!q.isEmpty()) {
+            int cur = q.poll();
+            System.out.print(cur + " ");
+            for (int next : graph.get(cur)) {
+                if (!visited[next]) {
+                    visited[next] = true;   // 큐에 넣을 때 바로 방문 처리 (중복 삽입 방지)
+                    q.offer(next);
+                }
+            }
+        }
+    }
+    static void addEdge(List&lt;List&lt;Integer&gt;&gt; g, int a, int b) { g.get(a).add(b); g.get(b).add(a); }
+}</pre>
+      <div class="output-label">실행결과</div>
+<pre class="output-block">1 2 3 4 5 </pre>
+      <div class="warn"><strong>DFS vs BFS 선택 기준:</strong> 모든 경로를 다 확인해야 하거나 백트래킹이 필요하면 <strong>DFS</strong>(재귀), <strong>최단거리·최소횟수</strong>를 구해야 하면 <strong>BFS</strong>(큐)를 씁니다.</div>
+    </section>
+
+    <!-- CH10 -->
+    <section id="ch10">
+      <h2><span class="num">10</span>Flood Fill</h2>
+      <p>그림판의 "페인트 통" 기능처럼, <strong>2차원 격자에서 같은 값을 가진 연결된 영역 전체</strong>를 DFS 또는 BFS로 찾아 바꾸는 기법입니다.</p>
+
+      <div class="diagram-wrap">
+      <svg viewBox="0 0 420 180" xmlns="http://www.w3.org/2000/svg">
+        <text x="60" y="20" text-anchor="middle" font-size="12" font-weight="700" fill="#bd5a2e">Before</text>
+        <text x="300" y="20" text-anchor="middle" font-size="12" font-weight="700" fill="#4a5a33">After floodFill(0,0)</text>
+        <g font-family="JetBrains Mono, monospace" font-size="11">
+          <!-- before grid 3x3, values 0/1 -->
+          <rect x="20" y="35" width="40" height="40" fill="#fff" stroke="#8a7a63"/><text x="40" y="59" text-anchor="middle">0</text>
+          <rect x="60" y="35" width="40" height="40" fill="#fff" stroke="#8a7a63"/><text x="80" y="59" text-anchor="middle">0</text>
+          <rect x="100" y="35" width="40" height="40" fill="#e8dcc8" stroke="#8a7a63"/><text x="120" y="59" text-anchor="middle">1</text>
+          <rect x="20" y="75" width="40" height="40" fill="#fff" stroke="#8a7a63"/><text x="40" y="99" text-anchor="middle">0</text>
+          <rect x="60" y="75" width="40" height="40" fill="#e8dcc8" stroke="#8a7a63"/><text x="80" y="99" text-anchor="middle">1</text>
+          <rect x="100" y="75" width="40" height="40" fill="#e8dcc8" stroke="#8a7a63"/><text x="120" y="99" text-anchor="middle">1</text>
+
+          <!-- after grid -->
+          <rect x="260" y="35" width="40" height="40" fill="#fbe9d8" stroke="#bd5a2e" stroke-width="2"/><text x="280" y="59" text-anchor="middle">2</text>
+          <rect x="300" y="35" width="40" height="40" fill="#fbe9d8" stroke="#bd5a2e" stroke-width="2"/><text x="320" y="59" text-anchor="middle">2</text>
+          <rect x="340" y="35" width="40" height="40" fill="#e8dcc8" stroke="#8a7a63"/><text x="360" y="59" text-anchor="middle">1</text>
+          <rect x="260" y="75" width="40" height="40" fill="#fbe9d8" stroke="#bd5a2e" stroke-width="2"/><text x="280" y="99" text-anchor="middle">2</text>
+          <rect x="300" y="75" width="40" height="40" fill="#e8dcc8" stroke="#8a7a63"/><text x="320" y="99" text-anchor="middle">1</text>
+          <rect x="340" y="75" width="40" height="40" fill="#e8dcc8" stroke="#8a7a63"/><text x="360" y="99" text-anchor="middle">1</text>
+        </g>
+        <text x="210" y="145" text-anchor="middle" font-size="10.5" fill="#8a7a63">(0,0)에서 시작해 상하좌우로 연결된 "0"만 "2"로 바꾼다 — DFS/BFS 둘 다 가능</text>
+      </svg>
+      </div>
+
+      <div class="code-label">FloodFillDemo.java (DFS 버전)</div>
+<pre class="code-block">public class FloodFillDemo {
+    static int[][] grid = {
+        {0,0,1},
+        {0,1,1}
+    };
+    static int rows = grid.length, cols = grid[0].length;
+    static int[] dx = {-1,1,0,0}, dy = {0,0,-1,1};   // 상하좌우
+
+    public static void main(String[] args) {
+        floodFill(0, 0, 0, 2);   // (0,0)에서 시작, 0을 2로 채운다
+        for (int[] row : grid) {
+            for (int v : row) System.out.print(v + " ");
+            System.out.println();
+        }
+    }
+
+    static void floodFill(int x, int y, int target, int newColor) {
+        if (x &lt; 0 || x &gt;= rows || y &lt; 0 || y &gt;= cols) return;   // 범위 밖
+        if (grid[x][y] != target) return;                          // 다른 색이면 멈춤
+        grid[x][y] = newColor;                                       // 색칠(=방문처리 겸용)
+        for (int d = 0; d &lt; 4; d++) {
+            floodFill(x + dx[d], y + dy[d], target, newColor);        // 4방향 재귀 = DFS
+        }
+    }
+}</pre>
+      <div class="output-label">실행결과</div>
+<pre class="output-block">2 2 1 
+2 1 1 </pre>
+      <div class="tip">배열 값 자체를 바꾸는 것이 <code>visited[]</code> 역할을 겸하므로 별도의 방문 배열 없이도 무한루프를 막을 수 있습니다. 재귀 깊이가 너무 깊어질 수 있는 큰 격자에서는 DFS 대신 <strong>BFS(Queue) 버전</strong>을 쓰는 것이 안전합니다.</div>
+    </section>
+
+    <!-- CH11 -->
+    <section id="ch11">
+      <h2><span class="num">11</span>Backtracking (백트래킹)</h2>
+      <p>백트래킹은 <strong>"선택 → 조건 확인 → 안 되면 되돌리고 다른 선택"</strong>을 반복하는 DFS의 응용입니다. 가능성이 없는 가지는 더 들어가지 않고 <strong>가지치기(pruning)</strong>합니다.</p>
+
+      <div class="diagram-wrap">
+      <svg viewBox="0 0 460 190" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="230" cy="20" r="16" fill="#fbe9d8" stroke="#bd5a2e" stroke-width="2"/><text x="230" y="25" text-anchor="middle" font-size="10">시작</text>
+        <line x1="217" y1="34" x2="140" y2="65" stroke="#5c5248"/>
+        <line x1="243" y1="34" x2="320" y2="65" stroke="#5c5248"/>
+        <circle cx="140" cy="78" r="16" fill="#fbe9d8" stroke="#bd5a2e" stroke-width="2"/><text x="140" y="83" text-anchor="middle" font-size="10">A</text>
+        <circle cx="320" cy="78" r="16" fill="#f6dede" stroke="#a8443a" stroke-width="2"/><text x="320" y="83" text-anchor="middle" font-size="10">B</text>
+        <text x="345" y="83" font-size="16" fill="#a8443a">✗</text>
+        <text x="345" y="100" font-size="9" fill="#a8443a">조건불만족→가지치기</text>
+
+        <line x1="127" y1="92" x2="90" y2="125" stroke="#5c5248"/>
+        <line x1="153" y1="92" x2="190" y2="125" stroke="#5c5248"/>
+        <circle cx="90" cy="138" r="16" fill="#fbe9d8" stroke="#bd5a2e" stroke-width="2"/><text x="90" y="143" text-anchor="middle" font-size="9">해답1</text>
+        <circle cx="190" cy="138" r="16" fill="#f6dede" stroke="#a8443a" stroke-width="2"/><text x="200" y="143" font-size="15" fill="#a8443a">✗</text>
+
+        <text x="230" y="175" text-anchor="middle" font-size="10.5" fill="#8a4a24">B, 190쪽처럼 막히면 "되돌아가서(backtrack)" 다른 선택지를 시도한다</text>
+      </svg>
+      </div>
+
+      <div class="code-label">BacktrackTemplate.java — 공통 뼈대</div>
+<pre class="code-block">// 백트래킹 공통 템플릿
+void backtrack(상태) {
+    if (조건 만족) { 결과 저장; return; }
+    for (선택지 : 가능한 선택들) {
+        if (조건에 맞지 않으면) continue;   // 가지치기
+        선택한다;                             // 상태 변경
+        backtrack(다음 상태);                  // 더 깊이 탐색
+        선택을 취소한다;                       // 되돌리기(백트랙) — 핵심!
+    }
+}</pre>
+
+      <div class="code-label">NQueenDemo.java (4-Queen — 서로 공격하지 않게 4개 놓기)</div>
+<pre class="code-block">public class NQueenDemo {
+    static int n = 4;
+    static int[] col = new int[n];   // col[row] = 그 행에 놓인 퀸의 열
+    static int count = 0;
+
+    public static void main(String[] args) {
+        backtrack(0);
+        System.out.println("4-Queen 해의 개수: " + count);
+    }
+
+    static void backtrack(int row) {
+        if (row == n) { count++; return; }              // 모든 행에 성공적으로 놓음
+        for (int c = 0; c &lt; n; c++) {
+            if (isSafe(row, c)) {                          // 가지치기: 공격 가능하면 스킵
+                col[row] = c;                                // 선택
+                backtrack(row + 1);                           // 다음 행 탐색
+                // col[row]는 다음 반복에서 덮어써지므로 별도 취소 코드 불필요
+            }
+        }
+    }
+
+    static boolean isSafe(int row, int c) {
+        for (int r = 0; r &lt; row; r++) {
+            if (col[r] == c) return false;                    // 같은 열
+            if (Math.abs(col[r] - c) == Math.abs(r - row)) return false;  // 같은 대각선
+        }
+        return true;
+    }
+}</pre>
+      <div class="output-label">실행결과</div>
+<pre class="output-block">4-Queen 해의 개수: 2</pre>
+    </section>
+
+    <!-- CH12 -->
+    <section id="ch12">
+      <h2><span class="num">12</span>순열 (Permutation)</h2>
+      <p>순열은 <strong>순서를 구별</strong>해서 n개 중 r개를 뽑아 배열하는 경우입니다(<code>nPr</code>). "이미 쓴 원소"를 <code>visited[]</code>로 표시하며 재귀합니다.</p>
+
+      <div class="diagram-wrap">
+      <svg viewBox="0 0 480 170" xmlns="http://www.w3.org/2000/svg">
+        <text x="20" y="20" font-size="11" fill="#5c5248">[1,2,3]의 순열 — 재귀 트리 (자리마다 "아직 안 쓴 수"를 고른다)</text>
+        <circle cx="240" cy="35" r="14" fill="#fbe9d8" stroke="#bd5a2e" stroke-width="2"/><text x="240" y="39" text-anchor="middle" font-size="9">[]</text>
+        <line x1="228" y1="46" x2="140" y2="70" stroke="#5c5248"/>
+        <line x1="240" y1="49" x2="240" y2="70" stroke="#5c5248"/>
+        <line x1="252" y1="46" x2="340" y2="70" stroke="#5c5248"/>
+        <circle cx="140" cy="83" r="14" fill="#fdf3e8" stroke="#bd5a2e" stroke-width="1.5"/><text x="140" y="87" text-anchor="middle" font-size="9">[1]</text>
+        <circle cx="240" cy="83" r="14" fill="#fdf3e8" stroke="#bd5a2e" stroke-width="1.5"/><text x="240" y="87" text-anchor="middle" font-size="9">[2]</text>
+        <circle cx="340" cy="83" r="14" fill="#fdf3e8" stroke="#bd5a2e" stroke-width="1.5"/><text x="340" y="87" text-anchor="middle" font-size="9">[3]</text>
+        <line x1="130" y1="95" x2="100" y2="120" stroke="#5c5248"/><line x1="150" y1="95" x2="180" y2="120" stroke="#5c5248"/>
+        <circle cx="100" cy="132" r="14" fill="#fff9f0" stroke="#bd5a2e" stroke-width="1"/><text x="100" y="136" text-anchor="middle" font-size="8">[1,2,3]</text>
+        <circle cx="180" cy="132" r="14" fill="#fff9f0" stroke="#bd5a2e" stroke-width="1"/><text x="180" y="136" text-anchor="middle" font-size="8">[1,3,2]</text>
+        <text x="20" y="160" font-size="10" fill="#8a7a63">한 자리 채울 때마다 "아직 안 쓴 원소"만 다음 후보가 됨 → 리프까지 가면 순열 하나 완성</text>
+      </svg>
+      </div>
+
+      <div class="code-label">PermutationDemo.java</div>
+<pre class="code-block">import java.util.*;
+
+public class PermutationDemo {
+    static int n = 3;
+    static int[] nums = {1, 2, 3};
+    static int[] path = new int[n];
+    static boolean[] used = new boolean[n];
+
+    public static void main(String[] args) {
+        permute(0);
+    }
+
+    static void permute(int depth) {
+        if (depth == n) {
+            System.out.println(Arrays.toString(path));
+            return;
+        }
+        for (int i = 0; i &lt; n; i++) {
+            if (used[i]) continue;          // 이미 쓴 원소는 건너뜀
+            used[i] = true;                   // 선택
+            path[depth] = nums[i];
+            permute(depth + 1);                // 다음 자리로
+            used[i] = false;                    // 백트랙(취소) — 다른 조합을 위해 되돌림
+        }
+    }
+}</pre>
+      <div class="output-label">실행결과 (3! = 6가지)</div>
+<pre class="output-block">[1, 2, 3]
+[1, 3, 2]
+[2, 1, 3]
+[2, 3, 1]
+[3, 1, 2]
+[3, 2, 1]</pre>
+      <div class="tip"><strong>자바 내장</strong>으로는 직접적인 순열 API가 없어 보통 위처럼 직접 구현하거나, 소규모라면 재귀 백트래킹 템플릿을 그대로 재사용합니다.</div>
+    </section>
+
+    <!-- CH13 -->
+    <section id="ch13">
+      <h2><span class="num">13</span>조합 (Combination)</h2>
+      <p>조합은 <strong>순서를 구별하지 않고</strong> n개 중 r개를 뽑는 경우입니다(<code>nCr</code>). "시작 인덱스(start)"를 넘겨 <strong>이미 지나간 원소는 다시 고르지 않도록</strong> 합니다.</p>
+
+      <div class="diagram-wrap">
+      <svg viewBox="0 0 480 150" xmlns="http://www.w3.org/2000/svg">
+        <text x="20" y="20" font-size="11" fill="#5c5248">[1,2,3,4] 중 2개 뽑기 — start 인덱스 이후만 후보로 삼는다</text>
+        <circle cx="240" cy="35" r="14" fill="#e9edda" stroke="#6b7d4f" stroke-width="2"/><text x="240" y="39" text-anchor="middle" font-size="9">[]</text>
+        <line x1="228" y1="46" x2="140" y2="70" stroke="#5c5248"/>
+        <line x1="252" y1="46" x2="340" y2="70" stroke="#5c5248"/>
+        <circle cx="140" cy="83" r="14" fill="#f2f6e8" stroke="#6b7d4f" stroke-width="1.5"/><text x="140" y="87" text-anchor="middle" font-size="9">[1]</text>
+        <circle cx="340" cy="83" r="14" fill="#f2f6e8" stroke="#6b7d4f" stroke-width="1.5"/><text x="340" y="87" text-anchor="middle" font-size="9">[2]</text>
+        <text x="380" y="87" font-size="8" fill="#8a7a63">(1은 후보에서 제외)</text>
+        <line x1="130" y1="95" x2="90" y2="120" stroke="#5c5248"/><line x1="150" y1="95" x2="190" y2="120" stroke="#5c5248"/>
+        <circle cx="90" cy="132" r="14" fill="#fbfef4" stroke="#6b7d4f" stroke-width="1"/><text x="90" y="136" text-anchor="middle" font-size="8">[1,2]</text>
+        <circle cx="190" cy="132" r="14" fill="#fbfef4" stroke="#6b7d4f" stroke-width="1"/><text x="190" y="136" text-anchor="middle" font-size="8">[1,3]</text>
+      </svg>
+      </div>
+
+      <div class="code-label">CombinationDemo.java</div>
+<pre class="code-block">import java.util.*;
+
+public class CombinationDemo {
+    static int n = 4, r = 2;
+    static int[] nums = {1, 2, 3, 4};
+    static int[] path = new int[r];
+
+    public static void main(String[] args) {
+        combine(0, 0);
+    }
+
+    static void combine(int start, int depth) {
+        if (depth == r) {
+            System.out.println(Arrays.toString(path));
+            return;
+        }
+        for (int i = start; i &lt; n; i++) {     // start부터 시작 → 순서 구별 없이, 중복 조합 방지
+            path[depth] = nums[i];
+            combine(i + 1, depth + 1);           // 다음엔 i+1부터만 고른다 (i를 다시 못 고름)
+        }
+    }
+}</pre>
+      <div class="output-label">실행결과 (4C2 = 6가지)</div>
+<pre class="output-block">[1, 2]
+[1, 3]
+[1, 4]
+[2, 3]
+[2, 4]
+[3, 4]</pre>
+      <div class="warn"><strong>순열과의 차이는 단 하나</strong>: 순열은 매번 <code>0</code>부터 "안 쓴 것"을 모두 후보로 보고(<code>visited[]</code>), 조합은 <code>start</code>부터만 후보로 봅니다(이미 지나간 인덱스는 다시 보지 않음) — 그래서 [1,2]와 [2,1]을 조합에서는 같은 것으로 취급(한 번만 생성)합니다.</div>
+    </section>
+
+    <!-- CH14 -->
+    <section id="ch14">
+      <h2><span class="num">14</span>부분집합 (Power Set)</h2>
+      <p>부분집합(멱집합)은 각 원소를 <strong>"포함한다/안 한다"</strong> 두 가지로 결정하는 문제입니다. 원소가 n개면 부분집합은 <strong>2ⁿ개</strong>입니다. 재귀(포함/제외) 방식과 <strong>비트마스크</strong> 방식 두 가지를 모두 봅니다.</p>
+
+      <div class="diagram-wrap">
+      <svg viewBox="0 0 480 170" xmlns="http://www.w3.org/2000/svg">
+        <text x="20" y="20" font-size="11" fill="#5c5248">[1,2] 부분집합 — 각 원소마다 포함(●)/제외(○) 두 갈래</text>
+        <circle cx="240" cy="35" r="14" fill="#f3ead9" stroke="#5c5248" stroke-width="2"/><text x="240" y="39" text-anchor="middle" font-size="9">[]</text>
+        <line x1="228" y1="46" x2="140" y2="70" stroke="#5c5248"/><text x="170" y="60" font-size="9" fill="#5c5248">1 포함</text>
+        <line x1="252" y1="46" x2="340" y2="70" stroke="#5c5248"/><text x="300" y="60" font-size="9" fill="#5c5248">1 제외</text>
+        <circle cx="140" cy="83" r="14" fill="#fdf3e8" stroke="#5c5248" stroke-width="1.5"/><text x="140" y="87" text-anchor="middle" font-size="8">[1]</text>
+        <circle cx="340" cy="83" r="14" fill="#fdf3e8" stroke="#5c5248" stroke-width="1.5"/><text x="340" y="87" text-anchor="middle" font-size="8">[]</text>
+        <line x1="130" y1="95" x2="100" y2="120" stroke="#5c5248"/><line x1="150" y1="95" x2="180" y2="120" stroke="#5c5248"/>
+        <circle cx="100" cy="132" r="14" fill="#fff9f0" stroke="#5c5248" stroke-width="1"/><text x="100" y="136" text-anchor="middle" font-size="8">[1,2]</text>
+        <circle cx="180" cy="132" r="14" fill="#fff9f0" stroke="#5c5248" stroke-width="1"/><text x="180" y="136" text-anchor="middle" font-size="8">[1]</text>
+        <text x="20" y="160" font-size="10" fill="#8a7a63">리프까지 내려가면 총 2² = 4개 부분집합: [1,2],[1],[2],[]</text>
+      </svg>
+      </div>
+
+      <div class="code-label">PowerSetRecursive.java — 포함/제외 재귀</div>
+<pre class="code-block">import java.util.*;
+
+public class PowerSetRecursive {
+    static int[] nums = {1, 2, 3};
+    static List&lt;Integer&gt; path = new ArrayList&lt;&gt;();
+
+    public static void main(String[] args) {
+        go(0);
+    }
+
+    static void go(int idx) {
+        if (idx == nums.length) {
+            System.out.println(path);       // 매 리프가 하나의 부분집합(빈 집합 포함)
+            return;
+        }
+        path.add(nums[idx]);                 // 포함하는 경우
+        go(idx + 1);
+        path.remove(path.size() - 1);         // 백트랙(취소)
+        go(idx + 1);                            // 포함하지 않는 경우
+    }
+}</pre>
+      <div class="output-label">실행결과 (2³ = 8개)</div>
+<pre class="output-block">[1, 2, 3]
+[1, 2]
+[1, 3]
+[1]
+[2, 3]
+[2]
+[3]
+[]</pre>
+
+      <div class="code-label">PowerSetBitmask.java — 비트마스크 방식</div>
+<pre class="code-block">public class PowerSetBitmask {
+    public static void main(String[] args) {
+        int[] nums = {1, 2, 3};
+        int n = nums.length;
+
+        for (int mask = 0; mask &lt; (1 &lt;&lt; n); mask++) {   // 0 ~ 2^n-1 모든 비트조합
+            StringBuilder sb = new StringBuilder("[");
+            for (int i = 0; i &lt; n; i++) {
+                if ((mask & (1 &lt;&lt; i)) != 0) sb.append(nums[i]).append(" ");   // i번째 비트가 1이면 포함
+            }
+            sb.append("]");
+            System.out.println(sb);
+        }
+    }
+}</pre>
+      <div class="output-label">실행결과 (mask=0~7 → 2³=8개, 비트 자체가 "포함여부"를 그대로 표현)</div>
+<pre class="output-block">[]
+[1 ]
+[2 ]
+[1 2 ]
+[3 ]
+[1 3 ]
+[2 3 ]
+[1 2 3 ]</pre>
+      <div class="tip">비트마스크 방식은 재귀 없이 반복문만으로 부분집합을 생성할 수 있어 <strong>n이 20 이하로 작을 때</strong> 코딩테스트에서 매우 자주 쓰입니다 — <code>mask</code>의 각 비트 하나하나가 원소 하나의 포함 여부와 정확히 대응합니다.</div>
+    </section>
+
+    <!-- CH15 -->
+    <section id="ch15">
+      <h2><span class="num">15</span>종합 체크리스트</h2>
+      <ul class="checklist">
+        <li>Collection(List/Set/Queue)과 Map이 서로 다른 계층(Map은 Collection 상속 X)이라는 것을 안다</li>
+        <li>ArrayList(배열, 인덱스O(1))와 LinkedList(노드+포인터, 양끝O(1))의 구조·시간복잡도 차이를 안다</li>
+        <li>HashSet(무순서)/LinkedHashSet(입력순)/TreeSet(정렬) 내부 구조(해시테이블/연결리스트/RB트리)와 차이를 안다</li>
+        <li>HashMap/LinkedHashMap/TreeMap의 구조 차이와 merge·computeIfAbsent 같은 실전 API를 쓸 수 있다</li>
+        <li>Queue(FIFO)와 PriorityQueue(힙, 우선순위)의 차이, offer/poll/peek 사용법을 안다</li>
+        <li>Stack(LIFO)의 push/pop 원리와 Deque(ArrayDeque)를 스택으로 쓰는 이유를 안다</li>
+        <li>Comparable(클래스 내부, 자연순서 1개)과 Comparator(외부, 여러 기준·체이닝) 차이를 설명할 수 있다</li>
+        <li>DFS(재귀/스택, 깊이 우선, 백트랙)와 BFS(큐, 레벨 순서, 최단거리)를 구분해 구현할 수 있다</li>
+        <li>Flood Fill이 DFS/BFS의 응용이며 배열 값 변경이 방문처리를 겸한다는 것을 안다</li>
+        <li>백트래킹 템플릿(선택→탐색→취소)과 가지치기(pruning)의 역할을 이해한다</li>
+        <li>순열(visited[], 매번 전체 후보)과 조합(start 인덱스, 지나간 것 제외)의 구현 차이를 안다</li>
+        <li>부분집합을 재귀(포함/제외)와 비트마스크(0~2ⁿ-1) 두 방식으로 모두 만들 수 있다</li>
+      </ul>
+    </section>
+
+    <footer>자바 컬렉션 · 알고리즘 완전학습서 · warm-paper study series</footer>
+  </main>
+</div>
+
+<script>
+  const links = document.querySelectorAll('#toc a');
+  const sections = Array.from(links).map(l => document.querySelector(l.getAttribute('href')));
+  function onScroll(){
+    let idx = 0;
+    const y = window.scrollY + 120;
+    sections.forEach((s,i)=>{ if(s && s.offsetTop <= y) idx = i; });
+    links.forEach(l=>l.classList.remove('active'));
+    if(links[idx]) links[idx].classList.add('active');
+  }
+  window.addEventListener('scroll', onScroll);
+  onScroll();
+</script>
+</body>
+</html>
